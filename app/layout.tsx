@@ -1,15 +1,18 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Lexend_Exa, Quando } from 'next/font/google';
 import './globals.css';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const lexendExa = Lexend_Exa({
   subsets: ['latin'],
+  variable: '--font-lexend-exa',
+  display: 'swap',
 });
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const quando = Quando({
+  weight: '400',
   subsets: ['latin'],
+  variable: '--font-quando',
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -19,16 +22,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
+    <html lang="it" className={`${lexendExa.variable} ${quando.variable}`}>
+      <body className={lexendExa.className}>{children}</body>
     </html>
   );
 }

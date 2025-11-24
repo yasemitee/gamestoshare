@@ -17,7 +17,7 @@ export const Table: React.FC<TableProps> = ({ data }) => {
       }}
     >
       <div
-        className="grid grid-cols-6 gap-4 px-6 py-3 text-xs uppercase tracking-wider border-b"
+        className="text-field-small grid grid-cols-6 gap-4 px-6 py-3 uppercase tracking-wider border-b"
         style={{
           color: colors.gray1,
           borderColor: colors.gray3,

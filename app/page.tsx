@@ -1,4 +1,5 @@
 import { Navbar } from '@/components/layout/Navbar';
+import { Container } from '@/components/layout/Container';
 import { HeroSection } from '@/components/home/HeroSection';
 import { Table } from '@/components/home/Table';
 import { colors } from '@/lib/colors';
@@ -48,12 +49,11 @@ export default function Home() {
       }}
     >
       <Navbar />
-
-      <main className="pt-32 px-8 pb-16">
-        <div className="max-w-7xl mx-auto">
+      <main className="pt-32 pb-16">
+        <Container>
           <HeroSection />
           <Table data={mockData} />
-        </div>
+        </Container>
       </main>
     </div>
   );

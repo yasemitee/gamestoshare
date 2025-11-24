@@ -1,5 +1,5 @@
 import React from 'react';
-import { colors } from '../../lib/colors';
+import { colors, gradients } from '@/lib/colors';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary';
@@ -12,10 +12,10 @@ export const Button: React.FC<ButtonProps> = ({
   className = '',
   ...props
 }) => {
-  const baseStyle = 'px-6 py-2 rounded font-medium transition-all duration-200';
+  const baseStyle = 'text-button px-6 py-2.5 transition-all duration-200';
   const variants = {
-    primary: 'bg-purple-200 text-gray-900 hover:bg-purple-300',
-    secondary: 'border border-gray-400 text-white hover:bg-gray-800',
+    primary: 'hover:opacity-90',
+    secondary: 'border border-gray-400 hover:bg-gray-800',
   };
 
   return (
@@ -23,8 +23,8 @@ export const Button: React.FC<ButtonProps> = ({
       className={`${baseStyle} ${variants[variant]} ${className}`}
       style={
         variant === 'primary'
-          ? { backgroundColor: colors.purple, color: colors.black }
-          : {}
+          ? { background: gradients.main, color: colors.black }
+          : { color: colors.white }
       }
       {...props}
     >
