@@ -15,11 +15,14 @@ export const SearchBar: React.FC = () => {
           <input
             type="text"
             placeholder="Search any game"
-            className="text-field w-full pl-12 pr-4 py-4 focus:outline-none transition-all"
-            style={{
-              backgroundColor: colors.blue1,
-              color: colors.gray1,
-            }}
+            className="text-field w-full pl-12 pr-4 py-4 focus:outline-none focus:ring-2 focus:ring-offset-0 transition-all"
+            style={
+              {
+                backgroundColor: colors.blue1,
+                color: colors.gray1,
+                '--tw-ring-color': colors.purple,
+              } as React.CSSProperties
+            }
           />
         </div>
 
