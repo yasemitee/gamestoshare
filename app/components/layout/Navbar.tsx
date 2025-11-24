@@ -24,14 +24,14 @@ export const Navbar: React.FC = () => {
             style={{ color: colors.white }}
           >
             Search
-            <img src="/Dropdown.svg" alt="" className="w-3 h-3" />
+            <img src="/Dropdown.svg" alt="" className="w-3 h-3 pt-1" />
           </button>
           <button
             className="text-navbar hover:opacity-80 transition-opacity flex items-center gap-2"
             style={{ color: colors.white }}
           >
             Platform
-            <img src="/Dropdown.svg" alt="" className="w-3 h-3" />
+            <img src="/Dropdown.svg" alt="" className="w-3 h-3 pt-1" />
           </button>
           <button
             className="text-navbar hover:opacity-80 transition-opacity"
