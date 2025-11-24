@@ -1,5 +1,21 @@
 @import "tailwindcss";
 
+@layer base {
+  :root {
+    --color-white: #FFFFFF;
+    --color-gray1: #898A8B;
+    --color-gray2: #636365;
+    --color-gray3: #2C3137;
+    --color-purple: #C3C2F5;
+    --color-red: #4D2222;
+    --color-black: #0B0B0C;
+    
+    --gradient-main: linear-gradient(180deg, #D9D9D9 0%, #C3C2F5 100%);
+    --gradient-stroke: linear-gradient(180deg, #FFFFFF 0%, #F6E0F5 100%);
+    --gradient-bg: linear-gradient(180deg, #0B0B0C 0%, #2C3137 100%);
+  }
+}
+
 body {
   font-family: var(--font-lexend-exa), sans-serif;
 }
@@ -49,4 +65,26 @@ h4 {
 .text-link {
   font-size: 10px;
   line-height: auto;
+}
+
+/* Scrollbar */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-purple) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--color-purple);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gray1);
 }

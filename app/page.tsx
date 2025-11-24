@@ -13,7 +13,7 @@ export default function Home() {
       platform: 'STEAM',
       games: ['#E8A642', '#3B82F6', '#EF4444'],
       offering: 5,
-      date: '18 days ago',
+      postingDate: '18 days ago',
     },
     {
       user: 'yasemite',
@@ -21,7 +21,7 @@ export default function Home() {
       platform: 'STEAM',
       games: ['#E8A642', '#3B82F6', '#EF4444'],
       offering: 5,
-      date: '18 days ago',
+      postingDate: '18 days ago',
     },
     {
       user: 'yasemite',
@@ -29,7 +29,7 @@ export default function Home() {
       platform: 'STEAM',
       games: ['#E8A642', '#3B82F6', '#EF4444'],
       offering: 5,
-      date: '18 days ago',
+      postingDate: '18 days ago',
     },
     {
       user: 'yasemite',
@@ -37,7 +37,39 @@ export default function Home() {
       platform: 'STEAM',
       games: ['#E8A642', '#3B82F6', '#EF4444'],
       offering: 5,
-      date: '18 days ago',
+      postingDate: '18 days ago',
+    },
+    {
+      user: 'yasemite',
+      location: 'IT',
+      platform: 'STEAM',
+      games: ['#E8A642', '#3B82F6', '#EF4444'],
+      offering: 5,
+      postingDate: '18 days ago',
+    },
+    {
+      user: 'yasemite',
+      location: 'IT',
+      platform: 'STEAM',
+      games: ['#E8A642', '#3B82F6', '#EF4444'],
+      offering: 5,
+      postingDate: '18 days ago',
+    },
+    {
+      user: 'yasemite',
+      location: 'IT',
+      platform: 'STEAM',
+      games: ['#E8A642', '#3B82F6', '#EF4444'],
+      offering: 5,
+      postingDate: '18 days ago',
+    },
+    {
+      user: 'yasemite',
+      location: 'IT',
+      platform: 'STEAM',
+      games: ['#E8A642', '#3B82F6', '#EF4444'],
+      offering: 5,
+      postingDate: '18 days ago',
     },
   ];
 

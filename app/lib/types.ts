@@ -4,5 +4,5 @@ export interface GameListingData {
   platform: string;
   games: string[];
   offering: number;
-  date: string;
+  postingDate: string;
 }

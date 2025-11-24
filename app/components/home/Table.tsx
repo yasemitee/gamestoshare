@@ -9,31 +9,27 @@ interface TableProps {
 
 export const Table: React.FC<TableProps> = ({ data }) => {
   return (
-    <div
-      className="rounded-lg overflow-hidden border"
-      style={{
-        backgroundColor: colors.black,
-        borderColor: colors.gray3,
-      }}
-    >
+    <div>
       <div
-        className="text-field-small grid grid-cols-6 gap-4 px-6 py-3 uppercase tracking-wider border-b"
+        className="text-small-title grid py-6 uppercase"
         style={{
-          color: colors.gray1,
-          borderColor: colors.gray3,
+          color: colors.white,
+          gridTemplateColumns: '1.5fr 1fr 1fr 1.5fr 1.5fr 1fr',
         }}
       >
         <div>User</div>
         <div>Location</div>
-        <div>Plaform</div>
+        <div>Platform</div>
         <div>Looking for</div>
         <div>Offering</div>
-        <div className="text-right">Date</div>
+        <div>Posted</div>
       </div>
 
-      {data.map((row, idx) => (
-        <TableRow key={idx} {...row} />
-      ))}
+      <div className="overflow-y-auto custom-scrollbar max-h-[40vh] md:max-h-[400px]">
+        {data.map((row, idx) => (
+          <TableRow key={idx} {...row} />
+        ))}
+      </div>
     </div>
   );
 };

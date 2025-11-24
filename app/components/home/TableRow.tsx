@@ -9,14 +9,14 @@ export const TableRow: React.FC<GameListingData> = ({
   platform,
   games,
   offering,
-  date,
+  postingDate,
 }) => {
   return (
     <div
-      className="h4 grid grid-cols-6 gap-4 items-center px-6 py-4 border-b hover:bg-opacity-50 transition-all"
+      className="text-field-small grid grid-cols-6 items-center py-6 border-b hover:bg-opacity-50 transition-all"
       style={{
-        borderColor: colors.gray3,
-        backgroundColor: 'transparent',
+        borderColor: colors.gray2,
+        gridTemplateColumns: '1.5fr 1fr 1fr 1.5fr 1.5fr 1fr',
       }}
     >
       <div style={{ color: colors.gray1 }}>{user}</div>
@@ -32,7 +32,7 @@ export const TableRow: React.FC<GameListingData> = ({
 
       <div>
         <span
-          className="text-field-small px-3 py-1 rounded font-medium"
+          className="px-3 py-1.5"
           style={{
             backgroundColor: colors.purple,
             color: colors.black,
@@ -42,7 +42,7 @@ export const TableRow: React.FC<GameListingData> = ({
         </span>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1">
         {games.map((game, idx) => (
           <GameIcon key={idx} color={game} />
         ))}
@@ -51,7 +51,7 @@ export const TableRow: React.FC<GameListingData> = ({
         </span>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1">
         {games.slice(0, 3).map((game, idx) => (
           <GameIcon key={idx} color={game} />
         ))}
@@ -60,9 +60,7 @@ export const TableRow: React.FC<GameListingData> = ({
         </span>
       </div>
 
-      <div className="text-right" style={{ color: colors.gray1 }}>
-        {date}
-      </div>
+      <div style={{ color: colors.gray1 }}>{postingDate}</div>
     </div>
   );
 };
