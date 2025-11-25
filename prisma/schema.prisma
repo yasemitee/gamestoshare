@@ -1,0 +1,106 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================
+// MODELS
+// ============================================
+
+model User {
+  id              String   @id @default(cuid())
+  username        String   @unique
+  steamId         String?  @unique
+  steamProfileUrl String?
+  location        String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relazioni
+  listings Listing[]
+
+  @@map("users")
+}
+
+model Listing {
+  id              String   @id @default(cuid())
+  userId          String
+  platform        Platform @default(STEAM)
+  steamProfileUrl String
+  description     String?  @db.Text
+  location        String
+  isActive        Boolean  @default(true)
+  views           Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relazioni
+  user  User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  games ListingGame[]
+
+  @@index([location])
+  @@index([platform])
+  @@index([isActive])
+  @@index([createdAt])
+  @@map("listings")
+}
+
+model Game {
+  id          String   @id @default(cuid())
+  steamAppId  Int      @unique
+  name        String
+  platform    Platform
+  iconUrl     String?
+  headerImage String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relazioni
+  listings ListingGame[]
+
+  @@unique([steamAppId, platform])
+  @@index([name])
+  @@map("games")
+}
+
+model ListingGame {
+  id        String      @id @default(cuid())
+  listingId String
+  gameId    String
+  type      ListingType // LOOKING_FOR o OFFERING
+  createdAt DateTime    @default(now())
+
+  // Relazioni
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  game    Game    @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  @@unique([listingId, gameId, type])
+  @@map("listing_games")
+}
+
+// ============================================
+// ENUMS
+// ============================================
+
+enum Platform {
+  STEAM
+  EPIC
+  GOG
+  XBOX
+  PLAYSTATION
+  NINTENDO
+}
+
+enum ListingType {
+  LOOKING_FOR
+  OFFERING
+}
