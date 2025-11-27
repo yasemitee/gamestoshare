@@ -1,11 +1,27 @@
-import React from 'react';
+'use client';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/Button';
 import { colors } from '@/lib/colors';
 import Image from 'next/image';
 
 export const Navbar: React.FC = () => {
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 0);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 py-8">
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled ? 'py-4 backdrop-blur-sm bg-black/30' : 'py-8'
+      }`}
+    >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex items-center">
           <Image
