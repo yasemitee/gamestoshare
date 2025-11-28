@@ -158,7 +158,7 @@ export default function CreateListingPage() {
               <div className="mt-6.5">
                 <GameIconsList
                   games={offering}
-                  onRemove={handleRemoveLookingFor}
+                  onRemove={handleRemoveOffering}
                   maxGames={10}
                 />
               </div>
