@@ -240,19 +240,21 @@ export async function getSteamWishlist(steamId: string): Promise<SteamWishlistGa
       appIds.slice(0, 100).map(async (appId: number) => {
         try {
           const details = await getGameDetails(appId);
+          const headerImage = details?.header_image || `https://cdn.cloudflare.steamstatic.com/steam/apps/${appId}/header.jpg`;
           
           return {
             appId,
             name: details?.name || `Game ${appId}`,
-            iconUrl: `https://media.steampowered.com/steamcommunity/public/images/apps/${appId}/${appId}.jpg`,
-            headerImage: details?.header_image || `https://cdn.cloudflare.steamstatic.com/steam/apps/${appId}/header.jpg`,
+            iconUrl: headerImage,
+            headerImage: headerImage,
           };
         } catch (error) {
+          const fallbackImage = `https://cdn.cloudflare.steamstatic.com/steam/apps/${appId}/header.jpg`;
           return {
             appId,
             name: `Game ${appId}`,
-            iconUrl: `https://media.steampowered.com/steamcommunity/public/images/apps/${appId}/${appId}.jpg`,
-            headerImage: `https://cdn.cloudflare.steamstatic.com/steam/apps/${appId}/header.jpg`,
+            iconUrl: fallbackImage,
+            headerImage: fallbackImage,
           };
         }
       })
@@ -282,6 +284,82 @@ export async function getGameDetails(appId: number) {
   } catch (error) {
     console.error('Error fetching game details:', error);
     return null;
+  }
+}
+
+export async function getOwnedGamesWithPrices(steamId: string, limit: number = 1000) {
+  try {
+    // Ottieni tutti i giochi posseduti
+    const games = await getSteamGames(steamId);
+    
+    if (games.length === 0) {
+      return [];
+    }
+
+    console.log(`Processing ${games.length} owned games for user ${steamId}`);
+
+    // Ottieni i dettagli per ogni gioco
+    // Processa in batch per evitare timeout
+    const batchSize = 50;
+    const allGamesWithPrices = [];
+    
+    for (let i = 0; i < Math.min(games.length, limit); i += batchSize) {
+      const batch = games.slice(i, i + batchSize);
+      const batchResults = await Promise.all(
+        batch.map(async (game) => {
+          try {
+            const details = await getGameDetails(game.appId);
+            
+            // Controlla se il gioco è free-to-play
+            const isFree = details?.is_free === true;
+            
+            // Il prezzo è in centesimi, quindi dividi per 100
+            const priceInCents = details?.price_overview?.final || 0;
+            const price = priceInCents / 100;
+            
+            // Se non ha price_overview ma non è marcato come free, potrebbe essere a pagamento
+            // In questo caso usa un prezzo di default basso
+            const finalPrice = !isFree && priceInCents === 0 ? 0.01 : price;
+            
+            return {
+              id: game.appId.toString(),
+              name: game.name,
+              appId: game.appId,
+              iconUrl: game.headerImage,
+              price: finalPrice,
+              isFree: isFree,
+            };
+          } catch (error) {
+            console.error(`Error fetching details for game ${game.appId}:`, error);
+            // Ritorna il gioco senza prezzo invece di null
+            return {
+              id: game.appId.toString(),
+              name: game.name,
+              appId: game.appId,
+              iconUrl: game.headerImage,
+              price: 0.01,
+              isFree: false,
+            };
+          }
+        })
+      );
+      allGamesWithPrices.push(...batchResults);
+    }
+
+    // Filtra giochi non free-to-play e ordina per prezzo decrescente
+    const paidGames = allGamesWithPrices
+      .filter((game): game is NonNullable<typeof game> => 
+        game !== null && !game.isFree
+      )
+      .sort((a, b) => b.price - a.price);
+
+    console.log(`Found ${paidGames.length} paid games, top 5 prices:`, 
+      paidGames.slice(0, 5).map(g => ({ name: g.name, price: g.price })));
+
+    return paidGames;
+  } catch (error) {
+    console.error('Error fetching owned games with prices:', error);
+    return [];
   }
 }
 

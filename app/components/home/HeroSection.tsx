@@ -27,7 +27,7 @@ export const HeroSection: React.FC = () => {
       </h4>
 
       <div className="flex justify-center mb-6">
-        <SearchBar />
+        <SearchBar showFilter={true} />
       </div>
 
       <p className="text-small-title upper" style={{ color: colors.gray1 }}>
