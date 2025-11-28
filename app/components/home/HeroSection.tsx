@@ -5,6 +5,7 @@ import { colors, gradients } from '@/lib/colors';
 export const HeroSection: React.FC = () => {
   return (
     <div className="text-center mt-32 mb-16">
+      {/* Title */}
       <h1
         className="mb-5"
         style={{
@@ -19,17 +20,17 @@ export const HeroSection: React.FC = () => {
         <br />
         and make new friends
       </h1>
-
+      {/* Subtitle */}
       <h4 className="mb-16" style={{ color: colors.gray1 }}>
         Choose a platform, search a game and send a friend request.
         <br />
         Owning a large library of games has never been easier.
       </h4>
-
+      {/* Search Bar */}
       <div className="flex justify-center mb-6">
         <SearchBar showFilter={true} />
       </div>
-
+      {/* Note */}
       <p className="text-small-title upper" style={{ color: colors.gray1 }}>
         No registering - No sensitive info shared
       </p>

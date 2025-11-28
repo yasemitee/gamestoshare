@@ -40,3 +40,25 @@ export function verifySecurityCode(bio: string | undefined, code: string): boole
   if (!bio) return false;
   return bio.includes(code);
 }
+
+export function normalizeSteamId(input: string): string {
+  const trimmed = input.trim();
+
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    return trimmed;
+  }
+  if (trimmed.includes('steamcommunity.com')) {
+    return `https://${trimmed}`;
+  }
+  if (/^\d{17}$/.test(trimmed)) {
+    return `https://steamcommunity.com/profiles/${trimmed}`;
+  }
+  if (!trimmed.includes('/')) {
+    return `https://steamcommunity.com/id/${trimmed}`;
+  }
+  if (trimmed.startsWith('id/') || trimmed.startsWith('profiles/')) {
+    return `https://steamcommunity.com/${trimmed}`;
+  }
+
+  return `https://steamcommunity.com/id/${trimmed}`;
+}

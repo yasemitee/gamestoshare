@@ -13,4 +13,5 @@ export const gradients = {
   main: 'linear-gradient(180deg, #D9D9D9 0%, #C3C2F5 100%)',
   stroke: 'linear-gradient(180deg, #FFFFFF 0%, #F6E0F5 100%)',
   bg: 'linear-gradient(180deg, #0F1012 0%, #1C1F23 100%)',
+  red: 'linear-gradient(180deg, #4D2222 0%, #4D2222 100%)',
 } as const;

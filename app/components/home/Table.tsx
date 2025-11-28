@@ -10,6 +10,7 @@ interface TableProps {
 export const Table: React.FC<TableProps> = ({ data }) => {
   return (
     <div>
+      {/* Table Header */}
       <div
         className="text-small-title grid py-6 uppercase"
         style={{
@@ -24,7 +25,7 @@ export const Table: React.FC<TableProps> = ({ data }) => {
         <div>Offering</div>
         <div>Posted</div>
       </div>
-
+      {/* Table Body */}
       <div className="overflow-y-auto custom-scrollbar max-h-[40vh] md:max-h-[400px]">
         {data.map((row, idx) => (
           <TableRow key={idx} {...row} />

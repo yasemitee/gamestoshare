@@ -289,18 +289,13 @@ export async function getGameDetails(appId: number) {
 
 export async function getOwnedGamesWithPrices(steamId: string, limit: number = 1000) {
   try {
-    // Ottieni tutti i giochi posseduti
     const games = await getSteamGames(steamId);
     
     if (games.length === 0) {
       return [];
     }
-
     console.log(`Processing ${games.length} owned games for user ${steamId}`);
-
-    // Ottieni i dettagli per ogni gioco
-    // Processa in batch per evitare timeout
-    const batchSize = 50;
+    const batchSize = 100;
     const allGamesWithPrices = [];
     
     for (let i = 0; i < Math.min(games.length, limit); i += batchSize) {
@@ -309,16 +304,14 @@ export async function getOwnedGamesWithPrices(steamId: string, limit: number = 1
         batch.map(async (game) => {
           try {
             const details = await getGameDetails(game.appId);
-            
-            // Controlla se il gioco è free-to-play
             const isFree = details?.is_free === true;
             
-            // Il prezzo è in centesimi, quindi dividi per 100
+            // The price is in cents, so divide by 100
             const priceInCents = details?.price_overview?.final || 0;
             const price = priceInCents / 100;
             
-            // Se non ha price_overview ma non è marcato come free, potrebbe essere a pagamento
-            // In questo caso usa un prezzo di default basso
+            // If it doesn't have price_overview but is not marked as free, it might be paid
+            // In this case, use a low default price
             const finalPrice = !isFree && priceInCents === 0 ? 0.01 : price;
             
             return {
@@ -331,7 +324,6 @@ export async function getOwnedGamesWithPrices(steamId: string, limit: number = 1
             };
           } catch (error) {
             console.error(`Error fetching details for game ${game.appId}:`, error);
-            // Ritorna il gioco senza prezzo invece di null
             return {
               id: game.appId.toString(),
               name: game.name,
@@ -346,7 +338,7 @@ export async function getOwnedGamesWithPrices(steamId: string, limit: number = 1
       allGamesWithPrices.push(...batchResults);
     }
 
-    // Filtra giochi non free-to-play e ordina per prezzo decrescente
+    // Filter only paid games and sort by price descending
     const paidGames = allGamesWithPrices
       .filter((game): game is NonNullable<typeof game> => 
         game !== null && !game.isFree
