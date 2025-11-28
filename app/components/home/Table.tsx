@@ -1,7 +1,7 @@
 import React from 'react';
 import { TableRow } from './TableRow';
 import { colors } from '@/lib/colors';
-import { GameListingData } from '@/lib/types';
+import { GameListingData } from '@/lib/db/types';
 
 interface TableProps {
   data: GameListingData[];

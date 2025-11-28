@@ -1,7 +1,7 @@
 import React from 'react';
 import { GameIcon } from './GameIcon';
 import { colors } from '@/lib/colors';
-import { GameListingData } from '@/lib/types';
+import { GameListingData } from '@/lib/db/types';
 
 export const TableRow: React.FC<GameListingData> = ({
   user,

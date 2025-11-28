@@ -3,7 +3,7 @@ import { Container } from '@/components/layout/Container';
 import { HeroSection } from '@/components/home/HeroSection';
 import { Table } from '@/components/home/Table';
 import { colors } from '@/lib/colors';
-import { GameListingData } from '@/lib/types';
+import { GameListingData } from '@/lib/db/types';
 
 export default function Home() {
   const mockData: GameListingData[] = [

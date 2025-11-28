@@ -13,11 +13,11 @@ export interface CreateListingInput {
   steamProfileUrl: string;
   description?: string;
   location: string;
-  lookingFor: number[]; // Array di steamAppId
-  offering: number[];   // Array di steamAppId
+  lookingFor: number[]; 
+  offering: number[];   
 }
 
-// Type per i filtri
+
 export interface ListingFilters {
   location?: string;
   platform?: Platform;
