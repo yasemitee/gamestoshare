@@ -3,6 +3,7 @@
 import {
   SteamGame,
   SteamGameFormatted,
+  SteamWishlistGame,
   SteamPlayerSummary,
   SteamBans,
   SteamProfileComplete,
@@ -211,17 +212,93 @@ export async function getSteamGames(steamId: string): Promise<SteamGameFormatted
   }
 }
 
+export async function getSteamWishlist(steamId: string): Promise<SteamWishlistGame[]> {
+  try {
+    const url = `https://api.steampowered.com/IWishlistService/GetWishlist/v1/?steamid=${steamId}`;
+    const response = await fetch(url, { next: { revalidate: 3600 } });
+    
+    if (!response.ok) {
+      console.error("Wishlist fetch failed:", response.status);
+      return [];
+    }
+    
+    const data = await response.json();
+    
+    if (!data?.response?.items || !Array.isArray(data.response.items)) {
+      return [];
+    }
+
+    const wishlistItems = data.response.items;
+
+    if (wishlistItems.length === 0) {
+      return [];
+    }
+
+    const appIds = wishlistItems.map((item: any) => item.appid);
+    
+    const gamesWithDetails = await Promise.all(
+      appIds.slice(0, 100).map(async (appId: number) => {
+        try {
+          const details = await getGameDetails(appId);
+          
+          return {
+            appId,
+            name: details?.name || `Game ${appId}`,
+            iconUrl: `https://media.steampowered.com/steamcommunity/public/images/apps/${appId}/${appId}.jpg`,
+            headerImage: details?.header_image || `https://cdn.cloudflare.steamstatic.com/steam/apps/${appId}/header.jpg`,
+          };
+        } catch (error) {
+          return {
+            appId,
+            name: `Game ${appId}`,
+            iconUrl: `https://media.steampowered.com/steamcommunity/public/images/apps/${appId}/${appId}.jpg`,
+            headerImage: `https://cdn.cloudflare.steamstatic.com/steam/apps/${appId}/header.jpg`,
+          };
+        }
+      })
+    );
+
+    return gamesWithDetails;
+  } catch (error) {
+    console.error("Error fetching Steam wishlist:", error);
+    return [];
+  }
+}
+
+export async function getGameDetails(appId: number) {
+  try {
+    const response = await fetch(
+      `https://store.steampowered.com/api/appdetails?appids=${appId}&l=english`,
+      { next: { revalidate: 86400 } }
+    );
+
+    const data = await response.json();
+
+    if (data[appId]?.success) {
+      return data[appId].data;
+    }
+
+    return null;
+  } catch (error) {
+    console.error('Error fetching game details:', error);
+    return null;
+  }
+}
+
 export async function getCompleteUserData(steamId: string): Promise<CompleteUserData> {
-  const [profile, games] = await Promise.all([
+  const [profile, games, wishlist] = await Promise.all([
     getCompleteProfile(steamId),
     getSteamGames(steamId).catch(() => []),
+    getSteamWishlist(steamId).catch(() => []),
   ]);
 
   return {
     profile,
     games,
+    wishlist,
     stats: {
       totalGames: games.length,
+      totalWishlist: wishlist.length,
       totalPlaytime: games.reduce((sum, game) => sum + game.playtimeMinutes, 0),
     },
   };

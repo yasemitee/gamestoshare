@@ -16,6 +16,13 @@ export interface SteamGameFormatted {
   headerImage: string;
 }
 
+export interface SteamWishlistGame {
+  appId: number;
+  name: string;
+  iconUrl: string;
+  headerImage: string;
+}
+
 export interface SteamPlayerSummary {
   steamid: string;
   personaname: string;
@@ -40,7 +47,6 @@ export interface SteamBans {
   NumberOfGameBans: number;
   EconomyBan: string;
 }
-
 
 export interface SteamProfileComplete {
   steamId: string;
@@ -69,8 +75,10 @@ export interface SteamProfileComplete {
 export interface CompleteUserData {
   profile: SteamProfileComplete;
   games: SteamGameFormatted[];
+  wishlist: SteamWishlistGame[];
   stats: {
     totalGames: number;
+    totalWishlist: number;
     totalPlaytime: number;
   };
 }
