@@ -1,8 +1,10 @@
 import React from 'react';
+import Link from 'next/link';
 import { colors } from '@/lib/colors';
 import { GameListingData } from '@/lib/db/types';
 
 export const TableRow: React.FC<GameListingData> = ({
+  id,
   user,
   showSteamId,
   location,
@@ -14,8 +16,9 @@ export const TableRow: React.FC<GameListingData> = ({
   const maxVisibleGames = 3;
 
   return (
-    <div
-      className="text-field-small grid grid-cols-6 items-center py-6 border-b hover:bg-opacity-50 transition-all"
+    <Link
+      href={`/listings/${id}`}
+      className="text-field-small grid grid-cols-6 items-center py-6 border-b hover:bg-opacity-50 transition-all cursor-pointer"
       style={{
         borderColor: colors.gray2,
         gridTemplateColumns: '1.5fr 1fr 1fr 1.5fr 1.5fr 1fr',
@@ -85,6 +88,6 @@ export const TableRow: React.FC<GameListingData> = ({
       </div>
 
       <div style={{ color: colors.gray1 }}>{postingDate}</div>
-    </div>
+    </Link>
   );
 };

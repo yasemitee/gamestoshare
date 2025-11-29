@@ -305,13 +305,58 @@ export async function getOwnedGamesWithPrices(steamId: string, limit: number = 1
           try {
             const details = await getGameDetails(game.appId);
             const isFree = details?.is_free === true;
+            const gameType = details?.type?.toLowerCase() || 'game';
             
-            const releaseDate = details?.release_date?.date;
-            let releaseYear = 0;
+            // Skip non-game logic
+            if (gameType !== 'game') {
+              return null;
+            }
+
+            const gameName = game.name.toLowerCase();
+            const softwareKeywords = [
+              'wallpaper engine',
+              'desktop',
+              'tool',
+              'benchmark',
+              'editor',
+              'sdk',
+            ];
+
+            if (softwareKeywords.some(keyword => gameName.includes(keyword))) {
+              return null;
+            }
+
+            if (
+              gameName.includes('test server') ||
+              gameName.includes('public test') ||
+              gameName.includes('playtest') ||
+              gameName.includes('beta test') ||
+              gameName.includes(' beta') ||
+              gameName.endsWith('beta') ||
+              gameName.includes('(beta)') ||
+              gameName.includes('- beta')
+            ) {
+              return null;
+            }
+
+            const releaseDate = details?.release_date;
             if (releaseDate) {
-              const yearMatch = releaseDate.match(/\d{4}/);
+              if (releaseDate.coming_soon === true) {
+                return null;
+              }
+            }
+            
+            if (details?.is_free === false && !details?.price_overview) {
+              return null;
+            }
+            
+            let releaseYear = 0;
+            if (releaseDate?.date) {
+              const yearMatch = releaseDate.date.match(/\d{4}/);
               releaseYear = yearMatch ? parseInt(yearMatch[0]) : 0;
             }
+            
+            const priceInCents = details?.price_overview?.final || 0;
             
             const headerImage = details?.header_image || game.headerImage;
             
@@ -322,6 +367,7 @@ export async function getOwnedGamesWithPrices(steamId: string, limit: number = 1
               iconUrl: headerImage,
               releaseYear,
               isFree: isFree,
+              priceInCents,
             };
           } catch (error) {
             console.error(`Error fetching details for game ${game.appId}:`, error);
@@ -332,21 +378,31 @@ export async function getOwnedGamesWithPrices(steamId: string, limit: number = 1
               iconUrl: game.headerImage,
               releaseYear: 0,
               isFree: false,
+              priceInCents: 0,
             };
           }
         })
       );
-      allGamesWithDetails.push(...batchResults);
+      allGamesWithDetails.push(...batchResults.filter(game => game !== null));
     }
 
-    const paidGames = allGamesWithDetails
+    const uniqueGames = Array.from(
+      new Map(allGamesWithDetails.map(game => [game!.appId, game])).values()
+    );
+
+    const paidGames = uniqueGames
       .filter((game): game is NonNullable<typeof game> => 
         game !== null && !game.isFree
       )
-      .sort((a, b) => b.releaseYear - a.releaseYear);
+      .sort((a, b) => {
+        if (b.releaseYear !== a.releaseYear) {
+          return b.releaseYear - a.releaseYear;
+        }
+        return b.priceInCents - a.priceInCents;
+      });
 
     console.log(`Found ${paidGames.length} paid games, top 5 recent:`, 
-      paidGames.slice(0, 5).map(g => ({ name: g.name, year: g.releaseYear })));
+      paidGames.slice(0, 5).map(g => ({ name: g.name, year: g.releaseYear, price: g.priceInCents })));
 
     return paidGames;
   } catch (error) {

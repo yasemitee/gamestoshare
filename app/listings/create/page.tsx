@@ -5,6 +5,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/Button';
 import { GoBackButton } from '@/components/ui/GoBackButton';
 import { SearchBar } from '@/components/ui/SearchBar';
+import { TermsCheckbox } from '@/components/ui/TermsCheckbox';
 import { GameIconsList } from '@/components/listings/GameIconsList';
 import { useState } from 'react';
 import { colors } from '@/lib/colors';
@@ -18,6 +19,9 @@ export default function CreateListingPage() {
   */
   const [steamId, setSteamId] = useState('');
   const [username, setUsername] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState('');
+  const [steamLevel, setSteamLevel] = useState<number | null>(null);
+  const [accountYears, setAccountYears] = useState<number | null>(null);
   const [location, setLocation] = useState('');
   const [platform, setPlatform] = useState('STEAM');
   const [lookingFor, setLookingFor] = useState<
@@ -29,7 +33,8 @@ export default function CreateListingPage() {
   const [showSteamId, setShowSteamId] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { isSteamIdValid, isVerifying, verifySteamId } = useSteamVerification();
+  const { isSteamIdValid, isSteamIdInvalid, isVerifying, verifySteamId } =
+    useSteamVerification();
 
   /*
     Handlers
@@ -37,6 +42,9 @@ export default function CreateListingPage() {
   const handleSteamIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSteamId(value);
+    if (!value.trim()) {
+      verifySteamId('');
+    }
   };
   const handleSteamIdBlur = async () => {
     if (steamId.trim()) {
@@ -44,22 +52,60 @@ export default function CreateListingPage() {
       if (result) {
         if (result.username) {
           setUsername(result.username);
+        } else {
+          setUsername('');
+        }
+        if (result.avatarUrl) {
+          setAvatarUrl(result.avatarUrl);
+        } else {
+          setAvatarUrl('');
         }
         if (result.location) {
           setLocation(result.location);
+        } else {
+          setLocation('');
         }
-        if (result.wishlist) {
-          setLookingFor(result.wishlist);
+        setSteamLevel(result.steamLevel || null);
+        setAccountYears(result.accountYears || null);
+
+        setLookingFor([]);
+        setOffering([]);
+
+        if (result.wishlist && result.wishlist.length > 0) {
+          const uniqueWishlist = Array.from(
+            new Map(
+              result.wishlist.map((game) => [
+                game.name.toLowerCase().trim(),
+                game,
+              ])
+            ).values()
+          );
+          setLookingFor(uniqueWishlist);
         }
-        if (result.ownedGames) {
-          setOffering(result.ownedGames);
+        if (result.ownedGames && result.ownedGames.length > 0) {
+          const uniqueOwned = Array.from(
+            new Map(
+              result.ownedGames.map((game) => [
+                game.name.toLowerCase().trim(),
+                game,
+              ])
+            ).values()
+          );
+          setOffering(uniqueOwned);
         }
       } else {
         setUsername('');
+        setAvatarUrl('');
         setLocation('');
         setLookingFor([]);
         setOffering([]);
       }
+    } else {
+      setUsername('');
+      setAvatarUrl('');
+      setLocation('');
+      setLookingFor([]);
+      setOffering([]);
     }
   };
   const handleRemoveLookingFor = (id: string) => {
@@ -97,19 +143,28 @@ export default function CreateListingPage() {
         body: JSON.stringify({
           steamId: cleanSteamId,
           username,
+          avatarUrl,
+          steamLevel,
+          accountYears,
           platform,
           steamProfileUrl: fullProfileUrl,
           location,
           showSteamId,
-          lookingFor: lookingFor.map((game) => ({
+          lookingFor: lookingFor.map((game: any) => ({
             appId: game.appId,
             name: game.name,
             iconUrl: game.iconUrl,
+            headerImage: `https://cdn.cloudflare.steamstatic.com/steam/apps/${game.appId}/header.jpg`,
+            releaseYear: game.releaseYear,
+            priceInCents: game.priceInCents,
           })),
-          offering: offering.map((game) => ({
+          offering: offering.map((game: any) => ({
             appId: game.appId,
             name: game.name,
             iconUrl: game.iconUrl,
+            headerImage: `https://cdn.cloudflare.steamstatic.com/steam/apps/${game.appId}/header.jpg`,
+            releaseYear: game.releaseYear,
+            priceInCents: game.priceInCents,
           })),
         }),
       });
@@ -169,6 +224,20 @@ export default function CreateListingPage() {
                     alt="Verified"
                     className="w-5 h-5"
                   />
+                ) : isSteamIdInvalid ? (
+                  <svg
+                    className="w-5 h-5"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M6 6L14 14M14 6L6 14"
+                      stroke={colors.red}
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    />
+                  </svg>
                 ) : null}
               </div>
             </div>
@@ -261,35 +330,7 @@ export default function CreateListingPage() {
             </div>
           </div>
           {/* Terms and conditions */}
-          <div
-            className="mb-8 mx-auto max-w-xl"
-            style={{ color: colors.gray1 }}
-          >
-            <label className="flex items-center justify-center gap-2">
-              <input
-                type="checkbox"
-                checked={termsAccepted}
-                onChange={(e) => setTermsAccepted(e.target.checked)}
-                className="w-5 h-5 border-2 appearance-none checked:bg-transparent cursor-pointer flex-shrink-0"
-                style={{
-                  backgroundColor: 'transparent',
-                  borderColor: colors.purple,
-                  backgroundImage: termsAccepted
-                    ? `url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='${encodeURIComponent(
-                        colors.purple
-                      )}' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e")`
-                    : 'none',
-                }}
-              />
-              <span className="text-field-small">
-                I have read and agree to the{' '}
-                <a href="#" className="underline">
-                  terms and conditions
-                </a>
-                .
-              </span>
-            </label>
-          </div>
+          <TermsCheckbox checked={termsAccepted} onChange={setTermsAccepted} />
           {/* Submit button */}
           <Button
             type="submit"

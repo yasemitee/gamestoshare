@@ -20,6 +20,9 @@ model Listing {
   id              String   @id @default(cuid())
   steamId         String   @unique
   username        String?
+  avatarUrl       String?
+  steamLevel      Int?
+  accountYears    Float?
   platform        Platform @default(STEAM)
   steamProfileUrl String
   description     String?  @db.Text
@@ -44,20 +47,23 @@ model Listing {
 }
 
 model Game {
-  id          String   @id @default(cuid())
-  steamAppId  Int      @unique
-  name        String
-  platform    Platform
-  iconUrl     String?
-  headerImage String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String   @id @default(cuid())
+  steamAppId   Int      @unique
+  name         String
+  platform     Platform
+  iconUrl      String?
+  headerImage  String?
+  releaseYear  Int?
+  priceInCents Int?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   // Relazioni
   listings ListingGame[]
 
   @@unique([steamAppId, platform])
   @@index([name])
+  @@index([releaseYear])
   @@map("games")
 }
 

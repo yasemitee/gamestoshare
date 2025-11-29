@@ -11,6 +11,9 @@ interface Game {
 interface SteamVerificationResult {
   isValid: boolean;
   username?: string;
+  avatarUrl?: string;
+  steamLevel?: number;
+  accountYears?: number;
   location?: string;
   wishlist?: Game[];
   ownedGames?: Game[];
@@ -18,6 +21,7 @@ interface SteamVerificationResult {
 
 export function useSteamVerification() {
   const [isSteamIdValid, setIsSteamIdValid] = useState(false);
+  const [isSteamIdInvalid, setIsSteamIdInvalid] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
 
   const verifySteamId = async (
@@ -25,10 +29,13 @@ export function useSteamVerification() {
   ): Promise<SteamVerificationResult | null> => {
     if (!id.trim()) {
       setIsSteamIdValid(false);
+      setIsSteamIdInvalid(false);
       return null;
     }
 
     setIsVerifying(true);
+    setIsSteamIdValid(false);
+    setIsSteamIdInvalid(false);
     try {
       const normalizedUrl = normalizeSteamId(id);
 
@@ -39,10 +46,14 @@ export function useSteamVerification() {
       if (response.ok) {
         const data = await response.json();
         setIsSteamIdValid(true);
+        setIsSteamIdInvalid(false);
 
         const result: SteamVerificationResult = {
           isValid: true,
           username: data.username,
+          avatarUrl: data.avatar,
+          steamLevel: data.level,
+          accountYears: data.accountAge?.years,
           location: data.country?.toUpperCase(),
         };
 
@@ -100,11 +111,13 @@ export function useSteamVerification() {
         return result;
       } else {
         setIsSteamIdValid(false);
+        setIsSteamIdInvalid(true);
         return null;
       }
     } catch (error) {
       console.error('Error verifying Steam ID:', error);
       setIsSteamIdValid(false);
+      setIsSteamIdInvalid(true);
       return null;
     } finally {
       setIsVerifying(false);
@@ -113,6 +126,7 @@ export function useSteamVerification() {
 
   return {
     isSteamIdValid,
+    isSteamIdInvalid,
     isVerifying,
     verifySteamId,
   };

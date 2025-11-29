@@ -48,6 +48,9 @@ export async function POST(request: NextRequest) {
     const {
       steamId,
       username,
+      avatarUrl,
+      steamLevel,
+      accountYears,
       platform,
       steamProfileUrl,
       description,
@@ -56,6 +59,8 @@ export async function POST(request: NextRequest) {
       lookingFor = [],
       offering = [],
     } = body;
+
+    console.log('Parsed data:', { steamId, username, avatarUrl, location, lookingForCount: lookingFor.length, offeringCount: offering.length });
 
     if (!steamId || !steamProfileUrl || !location) {
       return NextResponse.json(
@@ -79,26 +84,48 @@ export async function POST(request: NextRequest) {
     }
 
     const allGames = [...lookingFor, ...offering];
+    
+    // Validate all games have appId
+    const invalidGames = allGames.filter((g: any) => !g.appId);
+    if (invalidGames.length > 0) {
+      console.error('Games without appId:', invalidGames);
+      return NextResponse.json(
+        { error: 'Some games are missing appId', details: invalidGames },
+        { status: 400 }
+      );
+    }
+    
     const gameRecords = await Promise.all(
       allGames.map(async (gameData: any) => {
-        return await prisma.game.upsert({
-          where: {
-            steamAppId_platform: {
-              steamAppId: gameData.appId,
-              platform: platform || 'STEAM',
+        try {
+          return await prisma.game.upsert({
+            where: {
+              steamAppId_platform: {
+                steamAppId: gameData.appId,
+                platform: platform || 'STEAM',
+              },
             },
-          },
-          update: {
-            name: gameData.name,
-            iconUrl: gameData.iconUrl,
-          },
-          create: {
-            steamAppId: gameData.appId,
-            name: gameData.name,
-            platform: platform || 'STEAM',
-            iconUrl: gameData.iconUrl,
-          },
-        });
+            update: {
+              name: gameData.name,
+              iconUrl: gameData.iconUrl,
+              headerImage: gameData.headerImage || `https://cdn.cloudflare.steamstatic.com/steam/apps/${gameData.appId}/header.jpg`,
+              releaseYear: gameData.releaseYear,
+              priceInCents: gameData.priceInCents,
+            },
+            create: {
+              steamAppId: gameData.appId,
+              name: gameData.name,
+              platform: platform || 'STEAM',
+              iconUrl: gameData.iconUrl,
+              headerImage: gameData.headerImage || `https://cdn.cloudflare.steamstatic.com/steam/apps/${gameData.appId}/header.jpg`,
+              releaseYear: gameData.releaseYear,
+              priceInCents: gameData.priceInCents,
+            },
+          });
+        } catch (error) {
+          console.error('Error upserting game:', gameData, error);
+          throw error;
+        }
       })
     );
 
@@ -106,6 +133,9 @@ export async function POST(request: NextRequest) {
       where: { steamId },
       update: {
         username: username || null,
+        avatarUrl: avatarUrl || null,
+        steamLevel: steamLevel || null,
+        accountYears: accountYears || null,
         platform: platform || 'STEAM',
         steamProfileUrl,
         description: description || null,
@@ -117,6 +147,9 @@ export async function POST(request: NextRequest) {
       create: {
         steamId,
         username: username || null,
+        avatarUrl: avatarUrl || null,
+        steamLevel: steamLevel || null,
+        accountYears: accountYears || null,
         platform: platform || 'STEAM',
         steamProfileUrl,
         description: description || null,
@@ -126,10 +159,19 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Deduplica i giochi per nome (case-insensitive) prima di creare le relazioni
+    // Questo evita duplicati con stesso nome ma appId diversi (diverse edizioni/regioni)
+    const uniqueLookingFor = Array.from(
+      new Map(lookingFor.map((g: any) => [g.name.toLowerCase().trim(), g])).values()
+    );
+    const uniqueOffering = Array.from(
+      new Map(offering.map((g: any) => [g.name.toLowerCase().trim(), g])).values()
+    );
+
     // Crea le nuove relazioni con i giochi
     await prisma.listingGame.createMany({
       data: [
-        ...lookingFor.map((gameData: any) => {
+        ...uniqueLookingFor.map((gameData: any) => {
           const game = gameRecords.find(g => g.steamAppId === gameData.appId);
           return {
             listingId: listing.id,
@@ -137,7 +179,7 @@ export async function POST(request: NextRequest) {
             type: 'LOOKING_FOR' as const,
           };
         }),
-        ...offering.map((gameData: any) => {
+        ...uniqueOffering.map((gameData: any) => {
           const game = gameRecords.find(g => g.steamAppId === gameData.appId);
           return {
             listingId: listing.id,
@@ -163,8 +205,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(completeListing, { status: existingListing ? 200 : 201 });
   } catch (error) {
     console.error('Error creating/updating listing:', error);
+    console.error('Error details:', error instanceof Error ? error.message : 'Unknown error');
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
     return NextResponse.json(
-      { error: 'Failed to create/update listing' },
+      { error: 'Failed to create/update listing', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }

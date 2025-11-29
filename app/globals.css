@@ -78,6 +78,11 @@ h4 {
   line-height: auto;
 }
 
+.text-user{
+  font-size: 20px;
+  line-height: auto;
+}
+
 /* Scrollbar */
 .custom-scrollbar {
   scrollbar-width: thin;

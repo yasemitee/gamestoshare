@@ -24,6 +24,14 @@ export async function GET(request: NextRequest) {
 
     const profile = await getCompleteProfile(steamId);
 
+    // Check if profile is private
+    if (!profile.isPublic) {
+      return NextResponse.json(
+        { error: 'Steam profile is private. Please make your profile public to use this service.' },
+        { status: 403 }
+      );
+    }
+
     return NextResponse.json(profile);
   } catch (error: any) {
     console.error('Steam API error:', error);
