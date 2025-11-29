@@ -1,8 +1,26 @@
+'use client';
+
 import React from 'react';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { colors, gradients } from '@/lib/colors';
 
-export const HeroSection: React.FC = () => {
+interface Game {
+  appId: number;
+  name: string;
+  iconUrl: string;
+}
+
+interface HeroSectionProps {
+  onGameSelect?: (game: Game | null) => void;
+  onLocationChange?: (location: string) => void;
+  selectedLocation?: string;
+}
+
+export const HeroSection: React.FC<HeroSectionProps> = ({
+  onGameSelect,
+  onLocationChange,
+  selectedLocation = '',
+}) => {
   return (
     <div className="text-center mt-32 mb-16">
       {/* Title */}
@@ -28,7 +46,12 @@ export const HeroSection: React.FC = () => {
       </h4>
       {/* Search Bar */}
       <div className="flex justify-center mb-6">
-        <SearchBar showFilter={true} />
+        <SearchBar
+          showLocationFilter={true}
+          onGameSelect={onGameSelect}
+          onLocationChange={onLocationChange}
+          selectedLocation={selectedLocation}
+        />
       </div>
       {/* Note */}
       <p className="text-small-title upper" style={{ color: colors.gray1 }}>

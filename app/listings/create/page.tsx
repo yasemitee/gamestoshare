@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { GoBackButton } from '@/components/ui/GoBackButton';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { TermsCheckbox } from '@/components/ui/TermsCheckbox';
+import { LocationSelector } from '@/components/ui/LocationSelector';
 import { GameIconsList } from '@/components/listings/GameIconsList';
 import { useState } from 'react';
 import { colors } from '@/lib/colors';
@@ -39,6 +40,28 @@ export default function CreateListingPage() {
   /*
     Handlers
   */
+  const handleAddGameToLookingFor = (
+    game: { appId: number; name: string; iconUrl: string } | null
+  ) => {
+    if (!game) return;
+    const isDuplicate = lookingFor.some((g) => g.appId === game.appId);
+    if (!isDuplicate && lookingFor.length < 10) {
+      setLookingFor((prev) => [
+        ...prev,
+        { id: game.appId.toString(), ...game },
+      ]);
+    }
+  };
+
+  const handleAddGameToOffering = (
+    game: { appId: number; name: string; iconUrl: string } | null
+  ) => {
+    if (!game) return;
+    const isDuplicate = offering.some((g) => g.appId === game.appId);
+    if (!isDuplicate && offering.length < 10) {
+      setOffering((prev) => [...prev, { id: game.appId.toString(), ...game }]);
+    }
+  };
   const handleSteamIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSteamId(value);
@@ -267,27 +290,11 @@ export default function CreateListingPage() {
           </div>
           {/* Location & Platform */}
           <div className="flex gap-16 my-12">
-            <div className="relative">
-              <label className="block mb-6 text-field">Location</label>
-              <select
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                className="p-4 text-small-title appearance-none pr-10 cursor-pointer"
-                style={{ background: colors.blue1 }}
-              >
-                <option value="" disabled>
-                  --
-                </option>
-                {COUNTRIES.map((country) => (
-                  <option key={country.code} value={country.code}>
-                    {country.emoji} {country.code}
-                  </option>
-                ))}
-              </select>
-              <div className="absolute right-4 top-[60px] pointer-events-none">
-                <img src="/Dropdown.svg" alt="" width={10} height={6} />
-              </div>
-            </div>
+            <LocationSelector
+              value={location}
+              onChange={setLocation}
+              showLabel={true}
+            />
             <div className="relative">
               <label className="block mb-6 text-field">Platform</label>
               <select
@@ -308,7 +315,11 @@ export default function CreateListingPage() {
           <div className="flex gap-8 mb-12">
             <div className="w-1/2">
               <label className="block mb-6 text-field">Looking for</label>
-              <SearchBar placeholder="Search any game" />
+              <SearchBar
+                placeholder="Search any game"
+                onGameSelect={handleAddGameToLookingFor}
+                clearOnSelect={true}
+              />
               <div className="mt-6.5">
                 <GameIconsList
                   games={lookingFor}
@@ -319,7 +330,11 @@ export default function CreateListingPage() {
             </div>
             <div className="w-1/2">
               <label className="block mb-6 text-field">Offering</label>
-              <SearchBar placeholder="Search any game" />
+              <SearchBar
+                placeholder="Search any game"
+                onGameSelect={handleAddGameToOffering}
+                clearOnSelect={true}
+              />
               <div className="mt-6.5">
                 <GameIconsList
                   games={offering}

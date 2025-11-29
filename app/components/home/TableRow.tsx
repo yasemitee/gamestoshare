@@ -18,10 +18,10 @@ export const TableRow: React.FC<GameListingData> = ({
   return (
     <Link
       href={`/listings/${id}`}
-      className="text-field-small grid grid-cols-6 items-center py-6 border-b hover:bg-opacity-50 transition-all cursor-pointer"
+      className="text-field-small grid items-center py-6 border-b hover:bg-opacity-50 transition-all cursor-pointer"
       style={{
         borderColor: colors.gray2,
-        gridTemplateColumns: '1.5fr 1fr 1fr 1.5fr 1.5fr 1fr',
+        gridTemplateColumns: '1.5fr 1fr 1.5fr 1.5fr auto',
       }}
     >
       <div style={{ color: colors.gray1 }}>
@@ -35,18 +35,6 @@ export const TableRow: React.FC<GameListingData> = ({
           className="w-5 h-4"
         />
         <span style={{ color: colors.gray1 }}>{location}</span>
-      </div>
-
-      <div>
-        <span
-          className="px-3 py-1.5"
-          style={{
-            backgroundColor: colors.purple,
-            color: colors.black,
-          }}
-        >
-          {platform}
-        </span>
       </div>
 
       <div className="flex items-center gap-1">
