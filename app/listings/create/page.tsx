@@ -169,12 +169,12 @@ export default function CreateListingPage() {
             className="mb-8 mx-auto max-w-xl"
             style={{ color: colors.gray1 }}
           >
-            <label className="flex items-center gap-2">
+            <label className="flex items-center justify-center gap-2">
               <input
                 type="checkbox"
                 checked={termsAccepted}
                 onChange={(e) => setTermsAccepted(e.target.checked)}
-                className="w-5 h-5 border-2 appearance-none checked:bg-transparent cursor-pointer"
+                className="w-5 h-5 border-2 appearance-none checked:bg-transparent cursor-pointer flex-shrink-0"
                 style={{
                   backgroundColor: 'transparent',
                   borderColor: colors.purple,
@@ -194,6 +194,7 @@ export default function CreateListingPage() {
               </span>
             </label>
           </div>
+          {/* Submit button */}
           <Button
             type="submit"
             disabled={!termsAccepted}
