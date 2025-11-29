@@ -1,6 +1,5 @@
 import React from 'react';
 import { colors, gradients } from '@/lib/colors';
-import { FilterIcon } from './FilterIcon';
 
 interface SearchBarProps {
   placeholder?: string;
@@ -35,14 +34,14 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 
         {showFilter && (
           <button
-            className="hover:opacity-80 transition-opacity flex items-center justify-center"
+            className="hover:opacity-80 transition-opacity flex items-center justify-center cursor-pointer"
             style={{
               background: gradients.main,
               minWidth: '48px',
               height: '48px',
             }}
           >
-            <FilterIcon color={colors.black} />
+            <img src="/Filter.svg" alt="Filter" width={20} height={20} />
           </button>
         )}
       </div>
