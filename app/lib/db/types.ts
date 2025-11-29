@@ -1,7 +1,6 @@
-import { Listing, User, Game, ListingGame, Platform, ListingType } from '@prisma/client';
+import { Listing, Game, ListingGame, Platform, ListingType } from '@prisma/client';
 
 export type ListingWithRelations = Listing & {
-  user: User;
   games: (ListingGame & {
     game: Game;
   })[];
@@ -24,12 +23,14 @@ export interface ListingFilters {
   search?: string;
 }
 
-// TODO: is the old type, will be removed later
 export interface GameListingData {
-  user: string;
+  id: string;
+  user: string | null;
+  steamId: string;
+  showSteamId: boolean;
   location: string;
   platform: string;
-  games: string[];
-  offering: number;
+  lookingFor: Array<{ iconUrl: string; name: string }>;
+  offering: Array<{ iconUrl: string; name: string }>;
   postingDate: string;
 }

@@ -73,7 +73,10 @@ export const GameIconsList: React.FC<GameIconsListProps> = ({
 
           {/* Placeholder for no games */}
           {games.length === 0 && (
-            <div className="text-gray-500 text-sm w-full text-center py-8">
+            <div
+              className="text-sm w-full text-center py-8"
+              style={{ color: colors.gray2 }}
+            >
               No games selected
             </div>
           )}

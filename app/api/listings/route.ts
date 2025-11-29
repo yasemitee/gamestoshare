@@ -11,11 +11,13 @@ export async function GET(request: NextRequest) {
     const listings = await prisma.listing.findMany({
       where: {
         isActive: true,
+        expiresAt: {
+          gt: new Date(),
+        },
         ...(location && { location }),
         ...(platform && { platform: platform as any }),
       },
       include: {
-        user: true,
         games: {
           include: {
             game: true,
@@ -41,73 +43,115 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    console.log('Received listing data:', JSON.stringify(body, null, 2));
+    
     const {
-      userId,
+      steamId,
+      username,
       platform,
       steamProfileUrl,
       description,
       location,
+      showSteamId,
       lookingFor = [],
       offering = [],
     } = body;
 
-    if (!userId || !steamProfileUrl || !location) {
+    if (!steamId || !steamProfileUrl || !location) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: 'Missing required fields: steamId, steamProfileUrl, location' },
         { status: 400 }
       );
     }
 
-    const listing = await prisma.listing.create({
-      data: {
-        userId,
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 30);
+
+    const existingListing = await prisma.listing.findUnique({
+      where: { steamId },
+      include: { games: true },
+    });
+
+    if (existingListing) {
+      await prisma.listingGame.deleteMany({
+        where: { listingId: existingListing.id },
+      });
+    }
+
+    const allGames = [...lookingFor, ...offering];
+    const gameRecords = await Promise.all(
+      allGames.map(async (gameData: any) => {
+        return await prisma.game.upsert({
+          where: {
+            steamAppId_platform: {
+              steamAppId: gameData.appId,
+              platform: platform || 'STEAM',
+            },
+          },
+          update: {
+            name: gameData.name,
+            iconUrl: gameData.iconUrl,
+          },
+          create: {
+            steamAppId: gameData.appId,
+            name: gameData.name,
+            platform: platform || 'STEAM',
+            iconUrl: gameData.iconUrl,
+          },
+        });
+      })
+    );
+
+    const listing = await prisma.listing.upsert({
+      where: { steamId },
+      update: {
+        username: username || null,
         platform: platform || 'STEAM',
         steamProfileUrl,
-        description,
+        description: description || null,
         location,
-        games: {
-          create: [
-            ...lookingFor.map((steamAppId: number) => ({
-              type: 'LOOKING_FOR' as const,
-              game: {
-                connectOrCreate: {
-                  where: {
-                    steamAppId_platform: {
-                      steamAppId,
-                      platform: platform || 'STEAM',
-                    },
-                  },
-                  create: {
-                    steamAppId,
-                    name: `Game ${steamAppId}`, // TODO: Update with Steam API
-                    platform: platform || 'STEAM',
-                  },
-                },
-              },
-            })),
-            ...offering.map((steamAppId: number) => ({
-              type: 'OFFERING' as const,
-              game: {
-                connectOrCreate: {
-                  where: {
-                    steamAppId_platform: {
-                      steamAppId,
-                      platform: platform || 'STEAM',
-                    },
-                  },
-                  create: {
-                    steamAppId,
-                    name: `Game ${steamAppId}`, // TODO: Update with Steam API
-                    platform: platform || 'STEAM',
-                  },
-                },
-              },
-            })),
-          ],
-        },
+        showSteamId: showSteamId || false,
+        expiresAt,
+        updatedAt: new Date(),
       },
+      create: {
+        steamId,
+        username: username || null,
+        platform: platform || 'STEAM',
+        steamProfileUrl,
+        description: description || null,
+        location,
+        showSteamId: showSteamId || false,
+        expiresAt,
+      },
+    });
+
+    // Crea le nuove relazioni con i giochi
+    await prisma.listingGame.createMany({
+      data: [
+        ...lookingFor.map((gameData: any) => {
+          const game = gameRecords.find(g => g.steamAppId === gameData.appId);
+          return {
+            listingId: listing.id,
+            gameId: game!.id,
+            type: 'LOOKING_FOR' as const,
+          };
+        }),
+        ...offering.map((gameData: any) => {
+          const game = gameRecords.find(g => g.steamAppId === gameData.appId);
+          return {
+            listingId: listing.id,
+            gameId: game!.id,
+            type: 'OFFERING' as const,
+          };
+        }),
+      ],
+    });
+
+    // Recupera il listing completo con i giochi
+    const completeListing = await prisma.listing.findUnique({
+      where: { id: listing.id },
       include: {
-        user: true,
         games: {
           include: {
             game: true,
@@ -116,11 +160,11 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(listing, { status: 201 });
+    return NextResponse.json(completeListing, { status: existingListing ? 200 : 201 });
   } catch (error) {
-    console.error('Error creating listing:', error);
+    console.error('Error creating/updating listing:', error);
     return NextResponse.json(
-      { error: 'Failed to create listing' },
+      { error: 'Failed to create/update listing' },
       { status: 500 }
     );
   }

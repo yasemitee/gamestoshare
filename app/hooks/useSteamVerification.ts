@@ -10,6 +10,7 @@ interface Game {
 
 interface SteamVerificationResult {
   isValid: boolean;
+  username?: string;
   location?: string;
   wishlist?: Game[];
   ownedGames?: Game[];
@@ -41,6 +42,7 @@ export function useSteamVerification() {
 
         const result: SteamVerificationResult = {
           isValid: true,
+          username: data.username,
           location: data.country?.toUpperCase(),
         };
 

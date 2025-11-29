@@ -9,7 +9,6 @@ export async function GET(
     const listing = await prisma.listing.findUnique({
       where: { id: params.id },
       include: {
-        user: true,
         games: {
           include: {
             game: true,

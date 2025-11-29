@@ -296,7 +296,7 @@ export async function getOwnedGamesWithPrices(steamId: string, limit: number = 1
     }
     console.log(`Processing ${games.length} owned games for user ${steamId}`);
     const batchSize = 100;
-    const allGamesWithPrices = [];
+    const allGamesWithDetails = [];
     
     for (let i = 0; i < Math.min(games.length, limit); i += batchSize) {
       const batch = games.slice(i, i + batchSize);
@@ -306,20 +306,21 @@ export async function getOwnedGamesWithPrices(steamId: string, limit: number = 1
             const details = await getGameDetails(game.appId);
             const isFree = details?.is_free === true;
             
-            // The price is in cents, so divide by 100
-            const priceInCents = details?.price_overview?.final || 0;
-            const price = priceInCents / 100;
+            const releaseDate = details?.release_date?.date;
+            let releaseYear = 0;
+            if (releaseDate) {
+              const yearMatch = releaseDate.match(/\d{4}/);
+              releaseYear = yearMatch ? parseInt(yearMatch[0]) : 0;
+            }
             
-            // If it doesn't have price_overview but is not marked as free, it might be paid
-            // In this case, use a low default price
-            const finalPrice = !isFree && priceInCents === 0 ? 0.01 : price;
+            const headerImage = details?.header_image || game.headerImage;
             
             return {
               id: game.appId.toString(),
               name: game.name,
               appId: game.appId,
-              iconUrl: game.headerImage,
-              price: finalPrice,
+              iconUrl: headerImage,
+              releaseYear,
               isFree: isFree,
             };
           } catch (error) {
@@ -329,24 +330,23 @@ export async function getOwnedGamesWithPrices(steamId: string, limit: number = 1
               name: game.name,
               appId: game.appId,
               iconUrl: game.headerImage,
-              price: 0.01,
+              releaseYear: 0,
               isFree: false,
             };
           }
         })
       );
-      allGamesWithPrices.push(...batchResults);
+      allGamesWithDetails.push(...batchResults);
     }
 
-    // Filter only paid games and sort by price descending
-    const paidGames = allGamesWithPrices
+    const paidGames = allGamesWithDetails
       .filter((game): game is NonNullable<typeof game> => 
         game !== null && !game.isFree
       )
-      .sort((a, b) => b.price - a.price);
+      .sort((a, b) => b.releaseYear - a.releaseYear);
 
-    console.log(`Found ${paidGames.length} paid games, top 5 prices:`, 
-      paidGames.slice(0, 5).map(g => ({ name: g.name, price: g.price })));
+    console.log(`Found ${paidGames.length} paid games, top 5 recent:`, 
+      paidGames.slice(0, 5).map(g => ({ name: g.name, year: g.releaseYear })));
 
     return paidGames;
   } catch (error) {

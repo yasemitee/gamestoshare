@@ -62,3 +62,21 @@ export function normalizeSteamId(input: string): string {
 
   return `https://steamcommunity.com/id/${trimmed}`;
 }
+
+export function extractCleanSteamId(input: string): string {
+  const trimmed = input.trim();
+  
+  if (!trimmed.includes('/') && !trimmed.includes('steamcommunity.com') && !/^\d{17}$/.test(trimmed)) {
+    return trimmed;
+  }
+  
+  const extracted = extractSteamId(input);
+  if (extracted) {
+    if (/^\d{17}$/.test(extracted)) {
+      return extracted;
+    }
+    return extracted;
+  }
+  
+  return trimmed;
+}

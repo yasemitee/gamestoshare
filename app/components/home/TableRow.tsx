@@ -1,16 +1,18 @@
 import React from 'react';
-import { GameIcon } from './GameIcon';
 import { colors } from '@/lib/colors';
 import { GameListingData } from '@/lib/db/types';
 
 export const TableRow: React.FC<GameListingData> = ({
   user,
+  showSteamId,
   location,
   platform,
-  games,
+  lookingFor,
   offering,
   postingDate,
 }) => {
+  const maxVisibleGames = 3;
+
   return (
     <div
       className="text-field-small grid grid-cols-6 items-center py-6 border-b hover:bg-opacity-50 transition-all"
@@ -19,7 +21,9 @@ export const TableRow: React.FC<GameListingData> = ({
         gridTemplateColumns: '1.5fr 1fr 1fr 1.5fr 1.5fr 1fr',
       }}
     >
-      <div style={{ color: colors.gray1 }}>{user}</div>
+      <div style={{ color: colors.gray1 }}>
+        {showSteamId && user ? user : 'Anonymous'}
+      </div>
 
       <div className="flex items-center gap-2">
         <img
@@ -43,21 +47,41 @@ export const TableRow: React.FC<GameListingData> = ({
       </div>
 
       <div className="flex items-center gap-1">
-        {games.map((game, idx) => (
-          <GameIcon key={idx} color={game} />
+        {lookingFor.slice(0, maxVisibleGames).map((game, idx) => (
+          <div
+            key={idx}
+            className="w-8 h-8 bg-cover bg-center flex-shrink-0"
+            style={{
+              backgroundImage: game.iconUrl ? `url(${game.iconUrl})` : 'none',
+              backgroundColor: game.iconUrl ? 'transparent' : colors.gray2,
+            }}
+            title={game.name}
+          />
         ))}
-        <span className="ml-1" style={{ color: colors.gray1 }}>
-          +{offering}
-        </span>
+        {lookingFor.length > maxVisibleGames && (
+          <span className="ml-1" style={{ color: colors.gray1 }}>
+            +{lookingFor.length - maxVisibleGames}
+          </span>
+        )}
       </div>
 
       <div className="flex items-center gap-1">
-        {games.slice(0, 3).map((game, idx) => (
-          <GameIcon key={idx} color={game} />
+        {offering.slice(0, maxVisibleGames).map((game, idx) => (
+          <div
+            key={idx}
+            className="w-8 h-8 bg-cover bg-center flex-shrink-0"
+            style={{
+              backgroundImage: game.iconUrl ? `url(${game.iconUrl})` : 'none',
+              backgroundColor: game.iconUrl ? 'transparent' : colors.gray2,
+            }}
+            title={game.name}
+          />
         ))}
-        <span className="ml-1" style={{ color: colors.gray1 }}>
-          +{offering}
-        </span>
+        {offering.length > maxVisibleGames && (
+          <span className="ml-1" style={{ color: colors.gray1 }}>
+            +{offering.length - maxVisibleGames}
+          </span>
+        )}
       </div>
 
       <div style={{ color: colors.gray1 }}>{postingDate}</div>
