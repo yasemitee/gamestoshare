@@ -1,36 +1,126 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GamesToShare
 
-## Getting Started
+This project is a Next.js 16 (App Router, TypeScript) application integrating Steam data and a PostgreSQL database via Prisma. UI is built with Tailwind CSS.
 
-First, run the development server:
+## Overview
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Create and display Steam listings (looking for / offering)
+- Steam ID verification (URL, vanity, numeric) with normalized username
+- Auto-populate location, wishlist, and owned games
+- Upsert by `steamId` (new post replaces previous for same ID)
+- Listing expiration: 30 days (`expiresAt` + cleanup endpoint)
+- Privacy control: `showSteamId` toggles displaying username
+
+## Architecture
+
+- Frontend: Next.js 16 (App Router, server/client components)
+- Data Layer: Prisma ORM with PostgreSQL (Neon compatible)
+- Steam Integration: server-side API routes for profile/wishlist/owned games
+- Styling: Tailwind CSS with custom color system (`app/lib/colors.ts`) and variables (`app/global.css`)
+
+## Project Structure
+
+- `app/` pages, components, and API routes
+- `app/api/listings/route.ts` — GET/POST listings (with upsert)
+- `app/api/listings/cleanup/route.ts` — disable expired listings
+- `app/api/steam/*` — Steam proxy endpoints (profile, wishlist, owned games)
+- `app/listings/create/page.tsx` — listing creation UI
+- `app/lib/steam/*` — Steam utilities and API wrappers
+- `prisma/schema.prisma` — database schema and migrations
+- `app/lib/db/db.ts` — Prisma client initialization
+
+## Requirements
+
+- Node.js 20+
+- PostgreSQL database and `DATABASE_URL`
+- Optional: `STEAM_API_KEY` if calling Steam directly (routes currently proxy server-side)
+
+## Environment Variables
+
+Create `.env` with:
+
+```
+DATABASE_URL="postgresql://<user>:<password>@<host>/<db>?sslmode=require"
+CRON_SECRET="<your_secret_string>"
+STEAM_API_KEY="<optional>"
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Installation & Commands
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# install deps
+npm install
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# development
+npm run dev
 
-## Learn More
+# prisma client
+npx prisma generate
 
-To learn more about Next.js, take a look at the following resources:
+# migrations (development)
+npx prisma migrate dev --name <migration_name>
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# migrations (deploy)
+npx prisma migrate deploy
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# production build
+npm run build
+npm run start
+```
 
-## Deploy on Vercel
+## Database Models
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `Listing`:
+  - `steamId` (unique), `username?`, `platform`, `steamProfileUrl`, `description?`, `location`, `showSteamId`, `isActive`, `expiresAt`, timestamps
+  - Relation: `games` via `ListingGame`
+- `Game`:
+  - `steamAppId` (unique), `name`, `platform`, `iconUrl`, `headerImage?`
+- `ListingGame`:
+  - Links `Listing`↔`Game` with `type` in {`LOOKING_FOR`,`OFFERING`}
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Key API Routes
+
+- `GET /api/listings` — active, non-expired listings with related games
+- `POST /api/listings` — upsert listing by `steamId`; recreate game relations after upsert
+- `POST /api/listings/cleanup` — set `isActive=false` for expired listings; requires `Authorization: Bearer <CRON_SECRET>`
+- `GET /api/steam/profile` — Steam profile and normalized username
+- `GET /api/steam/wishlist` — wishlist
+- `GET /api/steam/owned-games` — owned games (filters free, sorts by release year)
+
+## Listing Creation Flow
+
+1. Input Steam ID (any format)
+2. Verify: fetch profile, username, and autoload location/games
+3. Select games for "Looking for" and "Offering"
+4. Set privacy `showSteamId`
+5. Submit: upsert listing, set `expiresAt` + 30 days
+
+## Development Notes
+
+- Colors/gradients: `app/lib/colors.ts`
+- Hook: `useSteamVerification` centralizes Steam verification and data fetch
+- Utilities: `extractCleanSteamId`, `normalizeSteamId`
+- Prisma client logs reduced to `error|warn` in dev to avoid query noise
+
+## Cleanup Job
+
+Trigger periodically:
+
+```bash
+curl -X POST \
+	-H "Authorization: Bearer $CRON_SECRET" \
+	https://<host>/api/listings/cleanup
+```
+
+## Troubleshooting
+
+- Upsert failing: ensure game relations are created after listing upsert (`app/api/listings/route.ts` handles this via `createMany`)
+- Dev port conflicts: terminate other Next.js instances
+  ```bash
+  pkill -f "next dev"
+  ```
+- Excessive Prisma logs: confirm `log: ['error','warn']` in `app/lib/db/db.ts`
+
+## License
+
+Private project.
