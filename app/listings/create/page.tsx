@@ -3,6 +3,7 @@ import { Container } from '@/components/layout/Container';
 import { MainContentContainer } from '@/components/layout/MainContentContainer';
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/Button';
+import { GoBackButton } from '@/components/ui/GoBackButton';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { GameIconsList } from '@/components/listings/GameIconsList';
 import { useState } from 'react';
@@ -139,15 +140,7 @@ export default function CreateListingPage() {
     <Container>
       <Navbar />
       <MainContentContainer>
-        {/* Back button */}
-        <button
-          type="button"
-          onClick={() => window.history.back()}
-          className="inline-flex items-center text-sm text-gray-300 hover:text-white"
-        >
-          <span className="mr-2">←</span>
-          Go back
-        </button>
+        <GoBackButton />
         <form onSubmit={handleSubmit} className="mt-14 text-white">
           {/* Steam ID */}
           <div className="mb-6">
@@ -205,12 +198,12 @@ export default function CreateListingPage() {
           </div>
           {/* Location & Platform */}
           <div className="flex gap-16 my-12">
-            <div>
+            <div className="relative">
               <label className="block mb-6 text-field">Location</label>
               <select
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                className="p-4 text-small-title"
+                className="p-4 text-small-title appearance-none pr-10 cursor-pointer"
                 style={{ background: colors.blue1 }}
               >
                 <option value="" disabled>
@@ -222,18 +215,24 @@ export default function CreateListingPage() {
                   </option>
                 ))}
               </select>
+              <div className="absolute right-4 top-[60px] pointer-events-none">
+                <img src="/Dropdown.svg" alt="" width={10} height={6} />
+              </div>
             </div>
-            <div>
+            <div className="relative">
               <label className="block mb-6 text-field">Platform</label>
               <select
                 value={platform}
                 onChange={(e) => setPlatform(e.target.value)}
-                className="p-4 text-small-title"
+                className="p-4 text-small-title appearance-none pr-10"
                 style={{ background: colors.blue1, color: colors.gray2 }}
                 disabled
               >
                 <option value="STEAM">STEAM</option>
               </select>
+              <div className="absolute right-4 top-[60px] pointer-events-none opacity-40">
+                <img src="/Dropdown.svg" alt="" width={10} height={6} />
+              </div>
             </div>
           </div>
           {/* Looking for & Offering */}

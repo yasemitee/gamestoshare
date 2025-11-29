@@ -23,7 +23,10 @@ export const Navbar: React.FC = () => {
       }`}
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <div className="flex items-center">
+        <div
+          className="flex items-center cursor-pointer"
+          onClick={() => (window.location.href = '/')}
+        >
           <Image
             src="/logo.svg"
             alt="GamesToShare"
@@ -40,7 +43,6 @@ export const Navbar: React.FC = () => {
             style={{ color: colors.white }}
           >
             Search
-            <img src="/Dropdown.svg" alt="" className="w-3 h-3 pt-1" />
           </button>
           <button
             className="text-navbar hover:opacity-80 transition-opacity flex items-center gap-2"

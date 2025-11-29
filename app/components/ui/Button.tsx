@@ -12,7 +12,8 @@ export const Button: React.FC<ButtonProps> = ({
   className = '',
   ...props
 }) => {
-  const baseStyle = 'text-button px-6 py-2.5 transition-all duration-200';
+  const baseStyle =
+    'text-button px-6 py-2.5 transition-all duration-200 cursor-pointer';
   const variants = {
     primary: 'hover:opacity-90',
     secondary: 'border border-gray-400 hover:bg-gray-800',
