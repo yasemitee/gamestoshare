@@ -1,15 +1,15 @@
 import { colors } from '@/lib/colors';
 import { ReactNode } from 'react';
 
-interface TermsParagraphProps {
+interface ContentParagraphProps {
   children: ReactNode;
   className?: string;
 }
 
-export function TermsParagraph({
+export function ContentParagraph({
   children,
   className = 'mb-4',
-}: TermsParagraphProps) {
+}: ContentParagraphProps) {
   return (
     <p
       className={`text-field leading-relaxed ${className}`}

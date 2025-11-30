@@ -2,7 +2,8 @@
 
 import React from 'react';
 import { SearchBar } from '@/components/ui/SearchBar';
-import { colors, gradients } from '@/lib/colors';
+import { GradientTitle } from '@/components/ui/GradientTitle';
+import { colors } from '@/lib/colors';
 
 interface Game {
   appId: number;
@@ -24,20 +25,11 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   return (
     <div className="text-center mt-32 mb-16">
       {/* Title */}
-      <h1
-        className="mb-5"
-        style={{
-          background: gradients.main,
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text',
-          lineHeight: '1.2',
-        }}
-      >
+      <GradientTitle className="mb-5" style={{ lineHeight: '1.2' }}>
         Share your games
         <br />
         and make new friends
-      </h1>
+      </GradientTitle>
       {/* Subtitle */}
       <h4 className="mb-16" style={{ color: colors.gray1 }}>
         Choose a platform, search a game and send a friend request.

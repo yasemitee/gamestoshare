@@ -2,12 +2,13 @@ import { colors } from '@/lib/colors';
 
 interface NumberedListProps {
   items: string[];
+  className?: string;
 }
 
-export function NumberedList({ items }: NumberedListProps) {
+export function NumberedList({ items, className = 'my-8' }: NumberedListProps) {
   return (
     <ol
-      className="list-decimal list-inside space-y-4 text-field my-8"
+      className={`list-decimal list-inside space-y-4 text-field ${className}`}
       style={{ color: colors.purple }}
     >
       {items.map((item, index) => (

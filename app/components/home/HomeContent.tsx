@@ -6,8 +6,9 @@ import { Table } from '@/components/home/Table';
 import { FAQItem } from '@/components/home/FAQItem';
 import { Button } from '@/components/ui/Button';
 import { Footer } from '@/components/layout/Footer';
+import { GradientTitle } from '@/components/ui/GradientTitle';
 import { GameListingData } from '@/lib/db/types';
-import { colors, gradients } from '@/lib/colors';
+import { colors } from '@/lib/colors';
 
 interface Game {
   appId: number;
@@ -49,17 +50,7 @@ export function HomeContent({ listings }: HomeContentProps) {
       />
       <Table data={filteredListings} />
       <div className="mt-32">
-        <h1
-          className="text-center mb-12"
-          style={{
-            background: gradients.main,
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-          }}
-        >
-          FAQ
-        </h1>
+        <GradientTitle className="text-center mb-12">FAQ</GradientTitle>
         <div className="mx-auto">
           <FAQItem
             question="HOW DO I ENABLE FAMILY SHARING?"

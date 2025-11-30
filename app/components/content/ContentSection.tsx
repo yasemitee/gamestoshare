@@ -1,14 +1,21 @@
 import { colors } from '@/lib/colors';
 import { ReactNode } from 'react';
 
-interface TermsSectionProps {
+interface ContentSectionProps {
+  id?: string;
   title: string;
   children: ReactNode;
+  className?: string;
 }
 
-export function TermsSection({ title, children }: TermsSectionProps) {
+export function ContentSection({
+  id,
+  title,
+  children,
+  className = '',
+}: ContentSectionProps) {
   return (
-    <section>
+    <section id={id} className={className}>
       <h2 className="mb-4" style={{ color: colors.white }}>
         {title}
       </h2>
