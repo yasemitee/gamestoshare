@@ -1,7 +1,7 @@
 import { Navbar } from '@/components/layout/Navbar';
 import { Container } from '@/components/layout/Container';
+import { MainContentContainer } from '@/components/layout/MainContentContainer';
 import { HomeContent } from '@/components/home/HomeContent';
-import { colors } from '@/lib/colors';
 import { GameListingData } from '@/lib/db/types';
 import { prisma } from '@/lib/db/db';
 
@@ -69,18 +69,11 @@ export default async function Home() {
   });
 
   return (
-    <div
-      className="min-h-screen"
-      style={{
-        background: `linear-gradient(180deg, ${colors.black} 0%, ${colors.gray3} 100%)`,
-      }}
-    >
+    <Container>
       <Navbar />
-      <main className="pt-32 pb-16">
-        <Container>
-          <HomeContent listings={tableData} />
-        </Container>
-      </main>
-    </div>
+      <MainContentContainer>
+        <HomeContent listings={tableData} />
+      </MainContentContainer>
+    </Container>
   );
 }
