@@ -50,7 +50,7 @@ export function HomeContent({ listings }: HomeContentProps) {
       <Table data={filteredListings} />
       <div className="mt-32">
         <h1
-          className="text-big-title text-center mb-12"
+          className="text-center mb-12"
           style={{
             background: gradients.main,
             WebkitBackgroundClip: 'text',

@@ -39,21 +39,22 @@ export const Navbar: React.FC = () => {
 
         <div className="hidden md:flex items-center gap-16">
           <button
-            className="text-navbar hover:opacity-80 transition-opacity flex items-center gap-2"
+            className="text-navbar hover:opacity-80 transition-opacity flex items-center gap-2 cursor-pointer"
             style={{ color: colors.white }}
           >
             Search
           </button>
           <button
-            className="text-navbar hover:opacity-80 transition-opacity flex items-center gap-2"
+            className="text-navbar hover:opacity-80 transition-opacity flex items-center gap-2 cursor-pointer"
             style={{ color: colors.white }}
           >
             Platform
             <img src="/Dropdown.svg" alt="" className="w-3 h-3 pt-1" />
           </button>
           <button
-            className="text-navbar hover:opacity-80 transition-opacity"
+            className="text-navbar hover:opacity-80 transition-opacity cursor-pointer"
             style={{ color: colors.white }}
+            onClick={() => (window.location.href = '/info')}
           >
             Info
           </button>
