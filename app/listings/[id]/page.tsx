@@ -4,11 +4,15 @@ import { colors } from '@/lib/colors';
 import { GoBackButton } from '@/components/ui/GoBackButton';
 import { Container } from '@/components/layout/Container';
 import { Footer } from '@/components/layout/Footer';
-import { ActionButtons } from '@/components/listings/ActionButtons';
 import { Navbar } from '@/components/layout/Navbar';
 import { MainContentContainer } from '@/components/layout/MainContentContainer';
 import { GamesList } from '@/components/listings/GamesList';
 import { FriendRequestSection } from '@/components/listings/FriendRequestSection';
+import { ListingUserHeader } from '@/components/listings/ListingUserHeader';
+import {
+  sortGamesByYearAndPrice,
+  getDaysSincePosting,
+} from '@/lib/utils/listing';
 
 interface ListingDetailPageProps {
   params: Promise<{
@@ -47,21 +51,6 @@ export default async function ListingDetailPage({
     notFound();
   }
 
-  const sortGamesByYearAndPrice = (games: any[]) => {
-    return games.sort((a, b) => {
-      const yearA = a.releaseYear ?? 0;
-      const yearB = b.releaseYear ?? 0;
-      const priceA = a.priceInCents ?? 0;
-      const priceB = b.priceInCents ?? 0;
-
-      if (yearB !== yearA) {
-        return yearB - yearA;
-      }
-
-      return priceB - priceA;
-    });
-  };
-
   const lookingForGames = sortGamesByYearAndPrice(
     listing.games.filter((lg) => lg.type === 'LOOKING_FOR').map((lg) => lg.game)
   );
@@ -70,18 +59,7 @@ export default async function ListingDetailPage({
     listing.games.filter((lg) => lg.type === 'OFFERING').map((lg) => lg.game)
   );
 
-  const daysSincePosting = Math.floor(
-    (Date.now() - new Date(listing.createdAt).getTime()) / (1000 * 60 * 60 * 24)
-  );
-
-  const postingDate = `${daysSincePosting} day${
-    daysSincePosting !== 1 ? 's' : ''
-  } ago`;
-
-  console.log('Listing data:', {
-    steamLevel: listing.steamLevel,
-    accountYears: listing.accountYears,
-  });
+  const postingDate = getDaysSincePosting(new Date(listing.createdAt));
 
   return (
     <>
@@ -96,92 +74,20 @@ export default async function ListingDetailPage({
             {/* Main Content */}
             <div className="flex flex-col">
               {/* Top Section - Avatar and User Info */}
-              <div className="flex gap-8">
-                {/* Avatar */}
-                <div className="flex-shrink-0">
-                  <div
-                    className="w-20 h-20 bg-cover bg-center"
-                    style={{
-                      backgroundImage: listing.avatarUrl
-                        ? `url(${listing.avatarUrl})`
-                        : 'none',
-                      backgroundColor: colors.gray2,
-                    }}
-                  />
-                </div>
-                {/* User Details */}
-                <div className="flex-1 flex flex-col justify-between">
-                  {/* User Name and Badges */}
-                  <div className="flex items-center gap-3 mb-4">
-                    <h1 className="text-user" style={{ color: colors.white }}>
-                      {listing.showSteamId && listing.username
-                        ? listing.username
-                        : 'Anonymous'}
-                    </h1>
-                    {/* Location Flag */}
-                    <img
-                      src={`https://flagcdn.com/w20/${listing.location.toLowerCase()}.png`}
-                      alt={listing.location}
-                      className="w-6 h-5"
-                    />
-                  </div>
-                  {/* Stats */}
-                  <div className="flex items-center justify-between text-small-title">
-                    <div className="flex items-center gap-6">
-                      {/* Level Badge */}
-                      <div
-                        className="flex items-center gap-2"
-                        style={{ color: colors.white }}
-                      >
-                        <span className="text-small-title">LEVEL</span>
-                        <div
-                          className="rounded-full flex items-center justify-center text-small-title p-1"
-                          style={{
-                            backgroundColor: colors.purple,
-                            color: colors.black,
-                          }}
-                        >
-                          {listing.steamLevel || 0}
-                        </div>
-                      </div>
-                      {/* Years Badge */}
-                      <div className="flex items-center">
-                        <span style={{ color: colors.purple }}>
-                          {listing.accountYears
-                            ? listing.accountYears.toFixed(1)
-                            : '0.0'}
-                        </span>
-                        <span>&nbsp;</span>
-                        <span style={{ color: colors.white }}>YEARS</span>
-                      </div>
-                      {/* Donor Badge */}
-                      <div className="flex items-center gap-2">
-                        <span className="" style={{ color: colors.purple }}>
-                          💎 Donor
-                        </span>
-                      </div>
-                      {/* Popular Badge */}
-                      <div className="flex items-center gap-2">
-                        <span className="" style={{ color: colors.purple }}>
-                          ⭐ Popular
-                        </span>
-                      </div>
-                      {/* Veteran Badge */}
-                      <div className="flex items-center gap-2">
-                        <span className="" style={{ color: colors.purple }}>
-                          🗿 Veteran
-                        </span>
-                      </div>
-                    </div>
-                    {/* Action Buttons */}
-                    <ActionButtons />
-                  </div>
-                </div>
-              </div>
+              <ListingUserHeader
+                username={listing.username}
+                showSteamId={listing.showSteamId}
+                avatarUrl={listing.avatarUrl}
+                location={listing.location}
+                steamLevel={listing.steamLevel}
+                accountYears={listing.accountYears}
+              />
               {/* Divider */}
               <div
-                className="mt-5 mb-12"
-                style={{ borderTop: `1px solid ${colors.gray2}` }}
+                style={{
+                  borderTop: `1px solid ${colors.gray2}`,
+                }}
+                className="mt-5 mb-13"
               />
               {/* Content Section: Description | Games */}
               <div className="grid grid-cols-2">

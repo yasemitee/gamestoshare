@@ -10,23 +10,34 @@ export const Button: React.FC<ButtonProps> = ({
   children,
   variant = 'primary',
   className = '',
+  disabled,
   ...props
 }) => {
-  const baseStyle =
-    'text-button px-6 py-2.5 transition-all duration-200 cursor-pointer';
+  const baseStyle = 'text-button px-6 py-2.5 transition-all duration-200';
+  const cursorStyle = disabled ? 'cursor-not-allowed' : 'cursor-pointer';
   const variants = {
-    primary: 'hover:opacity-90',
+    primary: disabled ? '' : 'hover:opacity-90',
     secondary: 'border border-gray-400 hover:bg-gray-800',
+  };
+
+  const getButtonStyle = () => {
+    if (disabled) {
+      return {
+        background: colors.gray2,
+        color: colors.gray1,
+        opacity: 0.5,
+      };
+    }
+    return variant === 'primary'
+      ? { background: gradients.main, color: colors.black }
+      : { color: colors.white };
   };
 
   return (
     <button
-      className={`${baseStyle} ${variants[variant]} ${className}`}
-      style={
-        variant === 'primary'
-          ? { background: gradients.main, color: colors.black }
-          : { color: colors.white }
-      }
+      className={`${baseStyle} ${cursorStyle} ${variants[variant]} ${className}`}
+      style={getButtonStyle()}
+      disabled={disabled}
       {...props}
     >
       {children}

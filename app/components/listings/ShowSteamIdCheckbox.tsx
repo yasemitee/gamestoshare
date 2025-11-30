@@ -1,17 +1,17 @@
-'use client';
-
-import Link from 'next/link';
 import { colors } from '@/lib/colors';
 
-interface TermsCheckboxProps {
+interface ShowSteamIdCheckboxProps {
   checked: boolean;
   onChange: (checked: boolean) => void;
 }
 
-export function TermsCheckbox({ checked, onChange }: TermsCheckboxProps) {
+export function ShowSteamIdCheckbox({
+  checked,
+  onChange,
+}: ShowSteamIdCheckboxProps) {
   return (
-    <div className="mb-8 mx-auto max-w-xl" style={{ color: colors.gray1 }}>
-      <label className="flex items-center justify-center gap-2">
+    <div className="mb-6" style={{ color: colors.gray1 }}>
+      <label className="flex items-center gap-2">
         <input
           type="checkbox"
           checked={checked}
@@ -27,13 +27,7 @@ export function TermsCheckbox({ checked, onChange }: TermsCheckboxProps) {
               : 'none',
           }}
         />
-        <span className="text-field-small">
-          I have read and agree to the{' '}
-          <Link href="/terms" className="underline">
-            terms and conditions
-          </Link>
-          .
-        </span>
+        <span className="text-field-small">Show my Steam ID on my post</span>
       </label>
     </div>
   );

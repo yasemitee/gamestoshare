@@ -65,7 +65,7 @@ export const Navbar: React.FC = () => {
           className="hidden md:block"
           onClick={() => (window.location.href = '/listings/create')}
         >
-          POST
+          CREATE A POST
         </Button>
 
         {/* TODO: burger (not working yet) */}

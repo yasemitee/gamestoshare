@@ -33,7 +33,7 @@ export function FriendRequestSection({
   };
 
   return (
-    <div className="mt-8">
+    <div className="">
       <TermsCheckbox checked={termsAccepted} onChange={setTermsAccepted} />
       <Button
         onClick={handleSendRequest}
