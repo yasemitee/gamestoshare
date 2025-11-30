@@ -366,10 +366,9 @@ export default function TermsPage() {
             {/* 13. Governing Law */}
             <ContentSection title="13. Governing Law">
               <ContentParagraph className="">
-                These Terms and Conditions are governed by the applicable laws
-                of [Insert Jurisdiction]. Any disputes arising from the use of
-                GTS will be handled in the courts of the same jurisdiction
-                unless otherwise required by law.
+                These Terms and Conditions are governed by the laws of Italy.
+                Any disputes arising from the use of GTS will be subject to the
+                exclusive jurisdiction of the courts of Milan, Italy.
               </ContentParagraph>
             </ContentSection>
 

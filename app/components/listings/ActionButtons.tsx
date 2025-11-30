@@ -38,7 +38,7 @@ export function ActionButtons({
       {showReport && (
         <button
           onClick={handleReport}
-          className="p-3.5 transition-all hover:bg-opacity-80"
+          className="p-3.5 transition-all hover:bg-opacity-80 hover:cursor-pointer"
           style={{ backgroundColor: colors.red }}
           title="Report"
         >
@@ -50,7 +50,7 @@ export function ActionButtons({
       {showShare && (
         <button
           onClick={handleShare}
-          className="p-3.5 transition-all hover:bg-opacity-80"
+          className="p-3.5 transition-all hover:bg-opacity-80 hover:cursor-pointer"
           style={{ backgroundColor: colors.blue1 }}
           title="Share"
         >

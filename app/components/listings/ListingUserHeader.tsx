@@ -60,7 +60,7 @@ export function ListingUserHeader({
             />
             <UserBadge
               label="YEARS"
-              value={accountYears ? accountYears.toFixed(1) : '0.0'}
+              value={accountYears ? accountYears : '0'}
             />
             {isDonor && <UserBadge icon="💎" label="Donor" />}
             {isPopular && <UserBadge icon="⭐" label="Popular" />}

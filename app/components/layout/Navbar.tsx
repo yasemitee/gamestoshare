@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/Button';
-import { colors } from '@/lib/colors';
+import { colors, gradients } from '@/lib/colors';
 import Image from 'next/image';
 
 export const Navbar: React.FC = () => {
@@ -19,8 +19,9 @@ export const Navbar: React.FC = () => {
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'py-4 backdrop-blur-sm bg-black/30' : 'py-8'
+        isScrolled ? 'py-4 backdrop-blur-sm bg-black/30' : 'py-4'
       }`}
+      style={{ background: gradients.navbar }}
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div
@@ -39,21 +40,27 @@ export const Navbar: React.FC = () => {
 
         <div className="hidden md:flex items-center gap-16">
           <button
-            className="text-navbar hover:opacity-80 transition-opacity flex items-center gap-2 cursor-pointer"
-            style={{ color: colors.white }}
+            className="text-navbar transition-colors flex items-center gap-2 cursor-pointer hover:!text-white focus:!text-white"
+            style={{ color: colors.gray1 }}
           >
             Search
           </button>
           <button
-            className="text-navbar hover:opacity-80 transition-opacity flex items-center gap-2 cursor-pointer"
-            style={{ color: colors.white }}
+            className="text-navbar flex items-center gap-2 cursor-pointer outline-none group"
+            style={{ color: colors.gray1 }}
           >
-            Platform
-            <img src="/Dropdown.svg" alt="" className="w-3 h-3 pt-1" />
+            <span className="transition-colors group-hover:!text-white group-focus:!text-white">
+              Platform
+            </span>
+            <img
+              src="/Dropdown.svg"
+              alt=""
+              className="w-3 h-3 pt-1 transition-[filter] brightness-[0.6] group-hover:!brightness-[10]"
+            />
           </button>
           <button
-            className="text-navbar hover:opacity-80 transition-opacity cursor-pointer"
-            style={{ color: colors.white }}
+            className="text-navbar transition-colors cursor-pointer hover:!text-white focus:!text-white"
+            style={{ color: colors.gray1 }}
             onClick={() => (window.location.href = '/info')}
           >
             Info
