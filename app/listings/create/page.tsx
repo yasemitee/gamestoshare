@@ -45,12 +45,15 @@ export default function CreateListingPage() {
   const [isVerified, setIsVerified] = useState(false);
   const { isSteamIdValid, isSteamIdInvalid, isVerifying, verifySteamId } =
     useSteamVerification();
+
+  const cleanSteamId = extractCleanSteamId(steamId);
+
   const {
     isVerificationOpen,
     openVerification,
     closeVerification,
     confirmVerification,
-  } = useVerification(steamId);
+  } = useVerification(cleanSteamId);
 
   /*
     Handlers
@@ -305,7 +308,7 @@ export default function CreateListingPage() {
         isOpen={isVerificationOpen}
         onClose={closeVerification}
         onConfirm={handleVerificationConfirm}
-        steamId={steamId}
+        steamId={cleanSteamId}
       />
     </div>
   );
