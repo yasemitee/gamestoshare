@@ -1,11 +1,13 @@
 'use client';
 import React, { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { colors, gradients } from '@/lib/colors';
 import Image from 'next/image';
 
 export const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -15,6 +17,8 @@ export const Navbar: React.FC = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const isActive = (path: string) => pathname === path;
 
   return (
     <nav
@@ -41,7 +45,8 @@ export const Navbar: React.FC = () => {
         <div className="hidden md:flex items-center gap-16">
           <button
             className="text-navbar transition-colors flex items-center gap-2 cursor-pointer hover:!text-white focus:!text-white"
-            style={{ color: colors.gray1 }}
+            style={{ color: isActive('/') ? colors.white : colors.gray1 }}
+            onClick={() => (window.location.href = '/')}
           >
             Search
           </button>
@@ -60,7 +65,7 @@ export const Navbar: React.FC = () => {
           </button>
           <button
             className="text-navbar transition-colors cursor-pointer hover:!text-white focus:!text-white"
-            style={{ color: colors.gray1 }}
+            style={{ color: isActive('/info') ? colors.white : colors.gray1 }}
             onClick={() => (window.location.href = '/info')}
           >
             Info
