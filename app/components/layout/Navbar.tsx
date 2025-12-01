@@ -32,13 +32,12 @@ export const Navbar: React.FC = () => {
           className="flex items-center cursor-pointer"
           onClick={() => (window.location.href = '/')}
         >
-          <Image
+          <img
             src="/Logo.svg"
             alt="GamesToShare"
             width={191}
             height={18}
             className="w-[191px] h-[18px] md:w-[191px] md:h-[18px] sm:w-[150px] sm:h-auto object-contain"
-            priority
           />
         </div>
 
