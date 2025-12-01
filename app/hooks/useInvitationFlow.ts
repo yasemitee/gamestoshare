@@ -49,7 +49,6 @@ export function useInvitationFlow(
   }, []);
 
   const goToSteamIdInput = useCallback(async () => {
-    // Verify GTS code in bio
     try {
       const response = await fetch('/api/steam/verify', {
         method: 'POST',
@@ -78,14 +77,12 @@ export function useInvitationFlow(
   const goToCongratulations = useCallback(
     async (steamId: string) => {
       setIsLoading(true);
-      // Reset previous state
       setHasNoMatch(false);
       setMatchedGame(null);
       
       try {
         const cleanSteamId = extractCleanSteamId(steamId);
         
-        // Step 1: Verify GTS code in bio
         const verifyResponse = await fetch('/api/steam/verify', {
           method: 'POST',
           headers: {
@@ -107,7 +104,6 @@ export function useInvitationFlow(
 
         setUserSteamId(cleanSteamId);
 
-        // Step 2: Check for matching games
         const gamesResponse = await fetch(`/api/listings/${listingId}/check-games`, {
           method: 'POST',
           headers: {
@@ -146,7 +142,6 @@ export function useInvitationFlow(
         return;
       }
 
-      // Get listing owner's Steam ID
       const listingResponse = await fetch(`/api/listings/${listingId}`);
       const listingData = await listingResponse.json();
       
@@ -155,12 +150,10 @@ export function useInvitationFlow(
         return;
       }
 
-      // Open Steam profile in new tab
       const steamProfileUrl = `https://steamcommunity.com/profiles/${listingData.steamId}`;
       window.open(steamProfileUrl, '_blank');
       
-      // Also try to open Steam client
-      window.location.href = `steam://url/SteamIDPage/${listingData.steamId}`;
+      window.location.href = `steam://openurl/${steamProfileUrl}`;
       
       closeFlow();
     } catch (error) {
