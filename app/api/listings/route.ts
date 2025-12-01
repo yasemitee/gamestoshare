@@ -142,6 +142,7 @@ export async function POST(request: NextRequest) {
         location,
         showSteamId: showSteamId || false,
         expiresAt,
+        createdAt: new Date(),
         updatedAt: new Date(),
       },
       create: {

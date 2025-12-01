@@ -15,7 +15,7 @@ export const Table: React.FC<TableProps> = ({ data }) => {
         className="text-small-title grid py-6 uppercase"
         style={{
           color: colors.white,
-          gridTemplateColumns: '1.5fr 1fr 1.5fr 1.5fr auto',
+          gridTemplateColumns: '1.5fr 1fr 1.5fr 1.5fr 120px',
         }}
       >
         <div>User</div>

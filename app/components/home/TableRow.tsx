@@ -21,7 +21,7 @@ export const TableRow: React.FC<GameListingData> = ({
       className="text-field-small grid items-center py-6 border-b hover:bg-opacity-50 transition-all cursor-pointer"
       style={{
         borderColor: colors.gray2,
-        gridTemplateColumns: '1.5fr 1fr 1.5fr 1.5fr auto',
+        gridTemplateColumns: '1.5fr 1fr 1.5fr 1.5fr 120px',
       }}
     >
       <div style={{ color: colors.gray1 }}>
