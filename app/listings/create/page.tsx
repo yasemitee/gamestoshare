@@ -13,10 +13,12 @@ import { SteamIdInput } from '@/components/listings/SteamIdInput';
 import { ShowSteamIdCheckbox } from '@/components/listings/ShowSteamIdCheckbox';
 import { PlatformSelector } from '@/components/listings/PlatformSelector';
 import { GameSection } from '@/components/listings/GameSection';
+import { VerificationModal } from '@/components/verification/VerificationModal';
 import { useState } from 'react';
 import { colors } from '@/lib/colors';
 import { COUNTRIES } from '@/lib/countries';
 import { useSteamVerification } from '@/hooks/useSteamVerification';
+import { useVerification } from '@/hooks/useVerification';
 import { extractCleanSteamId, normalizeSteamId } from '@/lib/steam/utils';
 import { removeDuplicateGames } from '@/lib/utils/games';
 
@@ -40,8 +42,15 @@ export default function CreateListingPage() {
   const [showSteamId, setShowSteamId] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
   const { isSteamIdValid, isSteamIdInvalid, isVerifying, verifySteamId } =
     useSteamVerification();
+  const {
+    isVerificationOpen,
+    openVerification,
+    closeVerification,
+    confirmVerification,
+  } = useVerification(steamId);
 
   /*
     Handlers
@@ -127,21 +136,19 @@ export default function CreateListingPage() {
   const handleRemoveOffering = (id: string) => {
     setOffering((prev) => prev.filter((game) => game.id !== id));
   };
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (
-      !isSteamIdValid ||
-      !location ||
-      lookingFor.length === 0 ||
-      offering.length === 0
-    ) {
+  const handleVerificationConfirm = async () => {
+    const verified = await confirmVerification();
+    if (verified) {
+      setIsVerified(true);
+      await createListing();
+    } else {
       alert(
-        'Please verify your Steam ID, select a location, and add games to both Looking for and Offering sections.'
+        'Verification failed. Please make sure "GTS" is in your Steam bio and try again.'
       );
-      return;
     }
+  };
 
+  const createListing = async () => {
     setIsSubmitting(true);
 
     try {
@@ -202,6 +209,24 @@ export default function CreateListingPage() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (
+      !isSteamIdValid ||
+      !location ||
+      lookingFor.length === 0 ||
+      offering.length === 0
+    ) {
+      alert(
+        'Please verify your Steam ID, select a location, and add games to both Looking for and Offering sections.'
+      );
+      return;
+    }
+
+    openVerification();
   };
 
   return (
@@ -274,6 +299,14 @@ export default function CreateListingPage() {
           <Footer />
         </Container>
       </div>
+
+      {/* Verification Modal */}
+      <VerificationModal
+        isOpen={isVerificationOpen}
+        onClose={closeVerification}
+        onConfirm={handleVerificationConfirm}
+        steamId={steamId}
+      />
     </div>
   );
 }

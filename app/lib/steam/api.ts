@@ -120,9 +120,17 @@ export async function getPlayerLevel(steamId: string): Promise<number> {
 
 export async function getProfileBio(steamId: string): Promise<string | undefined> {
   try {
+    const cacheBuster = Date.now();
     const response = await fetch(
-      `https://steamcommunity.com/profiles/${steamId}?xml=1`,
-      { next: { revalidate: 3600 } }
+      `https://steamcommunity.com/profiles/${steamId}?xml=1&_=${cacheBuster}`,
+      { 
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      }
     );
 
     if (!response.ok) {

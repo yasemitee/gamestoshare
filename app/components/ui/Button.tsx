@@ -17,7 +17,7 @@ export const Button: React.FC<ButtonProps> = ({
   const cursorStyle = disabled ? 'cursor-not-allowed' : 'cursor-pointer';
   const variants = {
     primary: disabled ? '' : 'hover:opacity-90',
-    secondary: 'border border-gray-400 hover:bg-gray-800',
+    secondary: 'hover:opacity-80',
   };
 
   const getButtonStyle = () => {
@@ -30,7 +30,7 @@ export const Button: React.FC<ButtonProps> = ({
     }
     return variant === 'primary'
       ? { background: gradients.main, color: colors.black }
-      : { color: colors.white };
+      : { background: colors.gray2, color: colors.white };
   };
 
   return (

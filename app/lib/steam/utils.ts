@@ -37,8 +37,29 @@ export function extractBioFromXML(xmlText: string): string | undefined {
 }
 
 export function verifySecurityCode(bio: string | undefined, code: string): boolean {
-  if (!bio) return false;
-  return bio.includes(code);
+  if (!bio || !code) {
+    return false;
+  }
+  
+  // Remove HTML tags from bio
+  const cleanBio = bio.replace(/<[^>]*>/g, ' ');
+  
+  const normalizedBio = cleanBio.toUpperCase().replace(/\s+/g, ' ').trim();
+  const normalizedCode = code.toUpperCase().trim();
+  
+  // Pattern matches:
+  // - Code at the start of string (with space, tab, or newline after)
+  // - Code at the end of string (with space, tab, or newline before)
+  // - Code surrounded by whitespace/tabs
+  // - Code as the only content
+  const pattern = new RegExp(
+    `(^|[\\s\\t\\n])${normalizedCode}($|[\\s\\t\\n])`,
+    'i'
+  );
+  
+  const result = pattern.test(normalizedBio);
+  
+  return result;
 }
 
 export function normalizeSteamId(input: string): string {
