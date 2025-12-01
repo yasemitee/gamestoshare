@@ -13,6 +13,7 @@ import { SteamIdInput } from '@/components/listings/SteamIdInput';
 import { ShowSteamIdCheckbox } from '@/components/listings/ShowSteamIdCheckbox';
 import { PlatformSelector } from '@/components/listings/PlatformSelector';
 import { GameSection } from '@/components/listings/GameSection';
+import { DescriptionTextarea } from '@/components/listings/DescriptionTextarea';
 import { VerificationModal } from '@/components/verification/VerificationModal';
 import { useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
@@ -41,6 +42,7 @@ export default function CreateListingPage() {
     Array<{ id: string; name: string; iconUrl?: string; appId?: number }>
   >([]);
   const [showSteamId, setShowSteamId] = useState(false);
+  const [description, setDescription] = useState('');
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
@@ -192,6 +194,7 @@ export default function CreateListingPage() {
           steamProfileUrl: fullProfileUrl,
           location,
           showSteamId,
+          description,
           lookingFor: lookingFor.map((game: any) => ({
             appId: game.appId,
             name: game.name,
@@ -301,35 +304,49 @@ export default function CreateListingPage() {
           <MainContentContainer>
             <GoBackButton />
             <form onSubmit={handleSubmit} className="mt-14 text-white">
-              {/* Steam ID */}
-              <SteamIdInput
-                value={steamId}
-                onChange={handleSteamIdChange}
-                onBlur={handleSteamIdBlur}
-                isVerifying={isVerifying}
-                isValid={isSteamIdValid}
-                isInvalid={isSteamIdInvalid}
-                hasError={hasError}
-              />
-              {/* Show steam ID */}
-              <ShowSteamIdCheckbox
-                checked={showSteamId}
-                onChange={setShowSteamId}
-              />
-              {/* Location & Platform */}
-              <div className="flex gap-16 my-12">
-                <LocationSelector
-                  value={location}
-                  onChange={setLocation}
-                  showLabel={true}
-                  width="100px"
-                  hasError={locationError}
-                />
-                <PlatformSelector
-                  value={platform}
-                  onChange={setPlatform}
-                  disabled
-                />
+              {/* Main Grid: Left side (Steam ID, Location, Platform) and Right side (Description) */}
+              <div className="flex gap-8 mb-12">
+                {/* Left Column */}
+                <div className="flex-1 flex flex-col">
+                  {/* Steam ID */}
+                  <SteamIdInput
+                    value={steamId}
+                    onChange={handleSteamIdChange}
+                    onBlur={handleSteamIdBlur}
+                    isVerifying={isVerifying}
+                    isValid={isSteamIdValid}
+                    isInvalid={isSteamIdInvalid}
+                    hasError={hasError}
+                  />
+                  {/* Show steam ID */}
+                  <ShowSteamIdCheckbox
+                    checked={showSteamId}
+                    onChange={setShowSteamId}
+                  />
+                  {/* Location & Platform */}
+                  <div className="flex gap-16 mt-12">
+                    <LocationSelector
+                      value={location}
+                      onChange={setLocation}
+                      showLabel={true}
+                      width="100px"
+                      hasError={locationError}
+                    />
+                    <PlatformSelector
+                      value={platform}
+                      onChange={setPlatform}
+                      disabled
+                    />
+                  </div>
+                </div>
+
+                {/* Right Column - Description */}
+                <div className="flex-1">
+                  <DescriptionTextarea
+                    value={description}
+                    onChange={setDescription}
+                  />
+                </div>
               </div>
               {/* Looking for & Offering */}
               <div className="flex gap-8 mb-12">

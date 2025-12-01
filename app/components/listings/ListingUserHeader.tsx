@@ -21,9 +21,9 @@ export function ListingUserHeader({
   location,
   steamLevel,
   accountYears,
-  isDonor = true,
-  isPopular = true,
-  isVeteran = true,
+  isDonor = false,
+  isPopular = false,
+  isVeteran = false,
 }: ListingUserHeaderProps) {
   return (
     <div className="flex gap-8">
@@ -66,7 +66,7 @@ export function ListingUserHeader({
             {isPopular && <UserBadge icon="⭐" label="Popular" />}
             {isVeteran && <UserBadge icon="🗿" label="Veteran" />}
           </div>
-          <ActionButtons />
+          <ActionButtons showReport={false} />
         </div>
       </div>
     </div>

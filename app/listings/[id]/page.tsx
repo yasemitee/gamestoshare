@@ -90,7 +90,7 @@ export default async function ListingDetailPage({
                 className="mt-5 mb-13"
               />
               {/* Content Section: Description | Games */}
-              <div className="grid grid-cols-2">
+              <div className="grid grid-cols-2 gap-22">
                 {/* Left: Description */}
                 <div>
                   <div className="flex items-center gap-4 mb-8">
