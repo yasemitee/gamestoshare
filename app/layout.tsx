@@ -16,8 +16,8 @@ const quando = Quando({
 });
 
 export const metadata: Metadata = {
-  title: 'gamestoshare',
-  description: 'gamestoshar platform',
+  title: 'GamesToShare',
+  description: 'GamesToShare platform',
 };
 
 export default function RootLayout({

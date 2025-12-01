@@ -41,9 +41,9 @@ export function ListingUserHeader({
       <div className="flex-1 flex flex-col justify-between">
         {/* User Name and Location */}
         <div className="flex items-center gap-3 mb-4">
-          <h1 className="text-user" style={{ color: colors.white }}>
+          <p className="text-user" style={{ color: colors.white }}>
             {showSteamId && username ? username : 'Anonymous'}
-          </h1>
+          </p>
           <img
             src={`https://flagcdn.com/w20/${location.toLowerCase()}.png`}
             alt={location}
