@@ -54,7 +54,7 @@ export const Navbar: React.FC = () => {
             className="text-navbar flex items-center gap-2 cursor-pointer outline-none group"
             style={{ color: colors.gray1 }}
           >
-            <span className="transition-colors group-hover:!text-white group-focus:!text-white">
+            <span className="transition-colors group-hover:!text-white">
               Platform
             </span>
             <img

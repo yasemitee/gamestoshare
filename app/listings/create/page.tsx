@@ -63,7 +63,7 @@ export default function CreateListingPage() {
   ) => {
     if (!game) return;
     const isDuplicate = lookingFor.some((g) => g.appId === game.appId);
-    if (!isDuplicate && lookingFor.length < 10) {
+    if (!isDuplicate) {
       setLookingFor((prev) => [
         ...prev,
         { id: game.appId.toString(), ...game },
@@ -76,7 +76,7 @@ export default function CreateListingPage() {
   ) => {
     if (!game) return;
     const isDuplicate = offering.some((g) => g.appId === game.appId);
-    if (!isDuplicate && offering.length < 10) {
+    if (!isDuplicate) {
       setOffering((prev) => [...prev, { id: game.appId.toString(), ...game }]);
     }
   };
