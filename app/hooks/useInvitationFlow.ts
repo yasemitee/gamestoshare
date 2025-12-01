@@ -150,9 +150,12 @@ export function useInvitationFlow(
         return;
       }
 
-      const steamProfileUrl = `https://steamcommunity.com/profiles/${listingData.steamId}`;
-      window.open(steamProfileUrl, '_blank');
+      const isNumericId = /^\d{17}$/.test(listingData.steamId);
+      const steamProfileUrl = isNumericId 
+        ? `https://steamcommunity.com/profiles/${listingData.steamId}`
+        : `https://steamcommunity.com/id/${listingData.steamId}`;
       
+      window.open(steamProfileUrl, '_blank');
       window.location.href = `steam://openurl/${steamProfileUrl}`;
       
       closeFlow();
