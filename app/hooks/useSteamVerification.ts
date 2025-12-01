@@ -79,7 +79,7 @@ export function useSteamVerification() {
               Array.isArray(wishlistData) &&
               wishlistData.length > 0
             ) {
-              result.wishlist = wishlistData.slice(0, 10).map((game: any) => ({
+              result.wishlist = wishlistData.map((game: any) => ({
                 id: game.appId.toString(),
                 name: game.name,
                 iconUrl: game.iconUrl || game.headerImage,
