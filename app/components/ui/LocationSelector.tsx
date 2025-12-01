@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { colors, gradients } from '@/lib/colors';
 import { COUNTRIES } from '@/lib/countries';
 
@@ -11,6 +11,7 @@ interface LocationSelectorProps {
   showLabel?: boolean;
   gradient?: boolean;
   compact?: boolean;
+  width?: string;
 }
 
 export const LocationSelector: React.FC<LocationSelectorProps> = ({
@@ -20,37 +21,81 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
   showLabel = false,
   gradient = false,
   compact = false,
+  width,
 }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const selectedCountry = COUNTRIES.find((c) => c.code === value);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleSelect = (code: string) => {
+    onChange(code);
+    setIsOpen(false);
+  };
+
   return (
-    <div className="relative">
+    <div className="relative" ref={dropdownRef}>
       {showLabel && <label className="block mb-6 text-field">Location</label>}
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
         className={`${
           compact ? 'text-field' : 'text-small-title'
-        } appearance-none cursor-pointer p-4 pr-10`}
+        } appearance-none cursor-pointer p-4 pr-10 text-left flex items-center gap-2`}
         style={{
           background: gradient ? gradients.main : colors.blue1,
           color: gradient ? colors.black : colors.white,
-          minWidth: compact ? '100px' : showLabel ? 'auto' : '120px',
+          width: width || (compact ? '100px' : '120px'),
         }}
       >
-        {showAllOption && <option value="">🌍 ALL</option>}
-        {!showAllOption && !value && (
-          <option value="" disabled>
-            --
-          </option>
+        {value && selectedCountry ? (
+          <>
+            <img
+              src={`https://flagcdn.com/${value.toLowerCase()}.svg`}
+              alt={value}
+              className="w-5 h-4"
+            />
+            <span>{value}</span>
+          </>
+        ) : showAllOption ? (
+          <>
+            <svg
+              className="w-5 h-4 flex-shrink-0"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+            </svg>
+            <span>ALL</span>
+          </>
+        ) : (
+          <span>--</span>
         )}
-        {COUNTRIES.map((country) => (
-          <option key={country.code} value={country.code}>
-            {country.emoji} {country.code}
-          </option>
-        ))}
-      </select>
+      </button>
       <div
         className={`absolute pointer-events-none ${
-          compact ? 'right-2 top-1/2 -translate-y-1/2' : 'right-3 top-[60px]'
+          compact
+            ? 'right-2 top-1/2 -translate-y-1/2'
+            : showLabel
+            ? 'right-3 top-[60px]'
+            : 'right-3 top-1/2 -translate-y-1/2'
         }`}
       >
         <img
@@ -61,6 +106,63 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
           style={gradient ? { filter: 'brightness(0)' } : undefined}
         />
       </div>
+
+      {isOpen && (
+        <div
+          className="absolute z-50 mt-1 w-full max-h-60 overflow-y-auto custom-scrollbar"
+          style={{
+            background: gradient ? gradients.main : colors.blue1,
+            color: gradient ? colors.black : colors.white,
+          }}
+        >
+          {showAllOption && (
+            <button
+              type="button"
+              onClick={() => handleSelect('')}
+              className="w-full text-left p-3 hover:opacity-80 transition-opacity flex items-center gap-2"
+              style={{
+                borderBottom: `1px solid ${
+                  gradient ? 'rgba(0,0,0,0.1)' : colors.gray2
+                }`,
+              }}
+            >
+              <svg
+                className="w-5 h-4 flex-shrink-0"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+              </svg>
+              <span>ALL</span>
+            </button>
+          )}
+          {COUNTRIES.map((country) => (
+            <button
+              key={country.code}
+              type="button"
+              onClick={() => handleSelect(country.code)}
+              className={`w-full text-left p-3 hover:opacity-80 transition-opacity flex items-center gap-2 ${
+                compact ? 'text-field' : 'text-small-title'
+              }`}
+              style={{
+                borderBottom: `1px solid ${
+                  gradient ? 'rgba(0,0,0,0.1)' : colors.gray2
+                }`,
+              }}
+            >
+              <img
+                src={`https://flagcdn.com/${country.code.toLowerCase()}.svg`}
+                alt={country.code}
+                className="w-5 h-4"
+              />
+              <span>{country.code}</span>
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

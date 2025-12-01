@@ -30,7 +30,7 @@ export const TableRow: React.FC<GameListingData> = ({
 
       <div className="flex items-center gap-2">
         <img
-          src={`https://flagcdn.com/w20/${location.toLowerCase()}.png`}
+          src={`https://flagcdn.com/${location.toLowerCase()}.svg`}
           alt={location}
           className="w-5 h-4"
         />

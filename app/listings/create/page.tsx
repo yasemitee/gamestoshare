@@ -260,6 +260,7 @@ export default function CreateListingPage() {
                   value={location}
                   onChange={setLocation}
                   showLabel={true}
+                  width="100px"
                 />
                 <PlatformSelector
                   value={platform}
