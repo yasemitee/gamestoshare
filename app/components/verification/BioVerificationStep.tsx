@@ -102,25 +102,30 @@ export function BioVerificationStep({
             <button
               className="absolute top-0 right-0 text-field-small px-3 py-1 z-10 border"
               style={{
-                backgroundColor: colors.gray2,
+                backgroundColor: colors.gray3,
                 color: colors.gray1,
               }}
             >
               Reference
             </button>
             <div
-              className="w-full flex items-center justify-center"
+              className="w-full"
               style={{
                 backgroundColor: colors.black,
                 height: '130px',
+                overflow: 'hidden',
               }}
             >
-              <span
-                className="text-field-small"
-                style={{ color: colors.gray1 }}
-              >
-                Bio preview placeholder
-              </span>
+              <img
+                src="../SteamBioPreview.png"
+                alt="Steam Bio Preview"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  objectPosition: '50% 97%',
+                }}
+              />
             </div>
           </div>
         )}
