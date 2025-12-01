@@ -66,11 +66,15 @@ export function useInvitationFlow(
       if (data.verified) {
         setCurrentStep('steam-id-input');
       } else {
-        alert('Verification failed. Please make sure "GTS" is in your Steam bio.');
+        if (typeof window !== 'undefined' && (window as any).showVerificationError) {
+          (window as any).showVerificationError();
+        }
       }
     } catch (error) {
       console.error('Verification error:', error);
-      alert('Verification failed. Please try again.');
+      if (typeof window !== 'undefined' && (window as any).showVerificationErrorGeneric) {
+        (window as any).showVerificationErrorGeneric();
+      }
     }
   }, [userSteamId]);
 
@@ -98,7 +102,9 @@ export function useInvitationFlow(
 
         if (!verifyData.verified) {
           setIsLoading(false);
-          alert('Verification failed. Please make sure "GTS" is in your Steam bio.');
+          if (typeof window !== 'undefined' && (window as any).showVerificationError) {
+            (window as any).showVerificationError();
+          }
           return;
         }
 
@@ -127,7 +133,9 @@ export function useInvitationFlow(
         }
       } catch (error) {
         console.error('Error checking games:', error);
-        alert('Failed to verify. Please try again.');
+        if (typeof window !== 'undefined' && (window as any).showVerificationErrorGeneric) {
+          (window as any).showVerificationErrorGeneric();
+        }
       } finally {
         setIsLoading(false);
       }
@@ -138,7 +146,9 @@ export function useInvitationFlow(
   const sendInvitation = useCallback(async () => {
     try {
       if (!userSteamId) {
-        alert('Steam ID not found');
+        if (typeof window !== 'undefined' && (window as any).showSteamIdNotFound) {
+          (window as any).showSteamIdNotFound();
+        }
         return;
       }
 
@@ -146,7 +156,9 @@ export function useInvitationFlow(
       const listingData = await listingResponse.json();
       
       if (!listingData?.steamId) {
-        alert('Could not find listing owner Steam ID');
+        if (typeof window !== 'undefined' && (window as any).showListingOwnerNotFound) {
+          (window as any).showListingOwnerNotFound();
+        }
         return;
       }
 
@@ -161,7 +173,9 @@ export function useInvitationFlow(
       closeFlow();
     } catch (error) {
       console.error('Error sending invitation:', error);
-      alert('Failed to open Steam profile. Please try again.');
+      if (typeof window !== 'undefined' && (window as any).showProfileOpenError) {
+        (window as any).showProfileOpenError();
+      }
     }
   }, [listingId, userSteamId, closeFlow]);
 

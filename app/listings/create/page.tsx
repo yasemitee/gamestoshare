@@ -15,6 +15,7 @@ import { PlatformSelector } from '@/components/listings/PlatformSelector';
 import { GameSection } from '@/components/listings/GameSection';
 import { VerificationModal } from '@/components/verification/VerificationModal';
 import { useState } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
 import { colors } from '@/lib/colors';
 import { COUNTRIES } from '@/lib/countries';
 import { useSteamVerification } from '@/hooks/useSteamVerification';
@@ -148,8 +149,23 @@ export default function CreateListingPage() {
       setIsVerified(true);
       await createListing();
     } else {
-      alert(
-        'Verification failed. Please make sure "GTS" is in your Steam bio and try again.'
+      toast.error(
+        <div>
+          <div style={{ color: colors.white }}>Verification failed</div>
+          <div style={{ color: colors.gray1 }}>
+            Please make sure "GTS" is in your steam bio and try again.
+          </div>
+        </div>,
+        {
+          duration: 4000,
+          style: {
+            background: colors.blue1,
+            borderRadius: '0',
+            fontSize: '12px',
+            textAlign: 'left',
+            textTransform: 'none',
+          },
+        }
       );
     }
   };
@@ -203,14 +219,38 @@ export default function CreateListingPage() {
 
       const listing = await response.json();
 
-      alert('Listing created successfully!');
-      window.location.href = '/';
+      toast.success('Listing created successfully!', {
+        duration: 4000,
+        style: {
+          background: colors.blue1,
+          color: colors.white,
+          borderRadius: '0',
+          fontSize: '12px',
+          textTransform: 'none',
+        },
+      });
+
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 1000);
     } catch (error) {
       console.error('Error creating listing:', error);
-      alert(
-        `Failed to create listing: ${
-          error instanceof Error ? error.message : 'Unknown error'
-        }`
+      toast.error(
+        <div>
+          <div style={{ color: colors.white }}>Failed to create listing</div>
+          <div style={{ color: colors.gray1 }}>
+            {error instanceof Error ? error.message : 'Unknown error'}
+          </div>
+        </div>,
+        {
+          duration: 4000,
+          style: {
+            background: colors.blue1,
+            borderRadius: '0',
+            fontSize: '12px',
+            textTransform: 'none',
+          },
+        }
       );
     } finally {
       setIsSubmitting(false);
@@ -254,6 +294,7 @@ export default function CreateListingPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <Toaster position="top-center" />
       <div className="flex-1">
         <Container>
           <Navbar />
