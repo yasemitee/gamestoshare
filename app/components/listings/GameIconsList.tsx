@@ -54,17 +54,11 @@ export const GameIconsList: React.FC<GameIconsListProps> = ({
                       background: gradients.red,
                     }}
                   >
-                    <svg
-                      className="w-8 h-8 text-white relative z-10"
-                      fill="none"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="3"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
+                    <img
+                      src="/XIcon.svg"
+                      alt="Remove"
+                      className="w-8 h-8 relative z-10"
+                    />
                   </div>
                 )}
               </div>

@@ -7,6 +7,7 @@ export const colors = {
   red: '#4D2222',
   black: '#0B0B0C',
   blue1: '#2C3137',
+  error: '#DD4F4F',
 } as const;
 
 export const gradients = {

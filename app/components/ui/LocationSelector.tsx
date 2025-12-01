@@ -12,6 +12,7 @@ interface LocationSelectorProps {
   gradient?: boolean;
   compact?: boolean;
   width?: string;
+  hasError?: boolean;
 }
 
 export const LocationSelector: React.FC<LocationSelectorProps> = ({
@@ -22,6 +23,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
   gradient = false,
   compact = false,
   width,
+  hasError = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -60,6 +62,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
           background: gradient ? gradients.main : colors.blue1,
           color: gradient ? colors.black : colors.white,
           width: width || (compact ? '100px' : '120px'),
+          boxShadow: hasError ? `inset 0 0 0 1px ${colors.error}` : 'none',
         }}
       >
         {value && selectedCountry ? (

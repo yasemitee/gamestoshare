@@ -43,6 +43,9 @@ export default function CreateListingPage() {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
+  const [hasError, setHasError] = useState(false);
+  const [locationError, setLocationError] = useState(false);
+  const [termsError, setTermsError] = useState(false);
   const { isSteamIdValid, isSteamIdInvalid, isVerifying, verifySteamId } =
     useSteamVerification();
 
@@ -217,15 +220,32 @@ export default function CreateListingPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (
-      !isSteamIdValid ||
-      !location ||
-      lookingFor.length === 0 ||
-      offering.length === 0
-    ) {
-      alert(
-        'Please verify your Steam ID, select a location, and add games to both Looking for and Offering sections.'
-      );
+    setHasError(false);
+    setLocationError(false);
+    setTermsError(false);
+
+    let hasValidationError = false;
+
+    if (!isSteamIdValid) {
+      setHasError(true);
+      hasValidationError = true;
+    }
+
+    if (!location) {
+      setLocationError(true);
+      hasValidationError = true;
+    }
+
+    if (!termsAccepted) {
+      setTermsError(true);
+      hasValidationError = true;
+    }
+
+    if (lookingFor.length === 0 || offering.length === 0) {
+      hasValidationError = true;
+    }
+
+    if (hasValidationError) {
       return;
     }
 
@@ -248,6 +268,7 @@ export default function CreateListingPage() {
                 isVerifying={isVerifying}
                 isValid={isSteamIdValid}
                 isInvalid={isSteamIdInvalid}
+                hasError={hasError}
               />
               {/* Show steam ID */}
               <ShowSteamIdCheckbox
@@ -261,6 +282,7 @@ export default function CreateListingPage() {
                   onChange={setLocation}
                   showLabel={true}
                   width="100px"
+                  hasError={locationError}
                 />
                 <PlatformSelector
                   value={platform}
@@ -289,6 +311,7 @@ export default function CreateListingPage() {
               <TermsCheckbox
                 checked={termsAccepted}
                 onChange={setTermsAccepted}
+                hasError={termsError}
               />
               {/* Submit button */}
               <Button

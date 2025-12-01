@@ -7,6 +7,7 @@ interface SteamIdInputProps {
   isVerifying: boolean;
   isValid: boolean;
   isInvalid: boolean;
+  hasError?: boolean;
 }
 
 export function SteamIdInput({
@@ -16,6 +17,7 @@ export function SteamIdInput({
   isVerifying,
   isValid,
   isInvalid,
+  hasError = false,
 }: SteamIdInputProps) {
   return (
     <div className="mb-6">
@@ -27,9 +29,10 @@ export function SteamIdInput({
           onChange={onChange}
           onBlur={onBlur}
           placeholder="Your Steam ID"
-          className="flex-1 py-2 focus:outline-none border-b border-white text-field bg-transparent"
+          className="flex-1 py-2 focus:outline-none border-b text-field bg-transparent"
           style={{
             caretColor: colors.gray2,
+            borderColor: hasError ? colors.error : colors.white,
           }}
         />
         <div className="flex-shrink-0 w-5 h-5 flex items-center justify-center">
@@ -47,15 +50,14 @@ export function SteamIdInput({
           ) : isInvalid ? (
             <svg
               className="w-5 h-5"
-              viewBox="0 0 20 20"
+              viewBox="0 0 12 12"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
-                d="M6 6L14 14M14 6L6 14"
-                stroke={colors.red}
-                strokeWidth="2"
-                strokeLinecap="round"
+                d="M1 1L11 11M11 1L1 11"
+                stroke={colors.error}
+                strokeWidth="1.5"
               />
             </svg>
           ) : null}

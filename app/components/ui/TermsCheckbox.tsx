@@ -6,9 +6,14 @@ import { colors } from '@/lib/colors';
 interface TermsCheckboxProps {
   checked: boolean;
   onChange: (checked: boolean) => void;
+  hasError?: boolean;
 }
 
-export function TermsCheckbox({ checked, onChange }: TermsCheckboxProps) {
+export function TermsCheckbox({
+  checked,
+  onChange,
+  hasError = false,
+}: TermsCheckboxProps) {
   return (
     <div className="mb-8 mx-auto max-w-xl" style={{ color: colors.gray1 }}>
       <label className="flex items-center justify-center gap-2">
@@ -19,7 +24,7 @@ export function TermsCheckbox({ checked, onChange }: TermsCheckboxProps) {
           className="w-5 h-5 border-2 appearance-none checked:bg-transparent cursor-pointer flex-shrink-0"
           style={{
             backgroundColor: 'transparent',
-            borderColor: colors.purple,
+            borderColor: hasError ? colors.error : colors.purple,
             backgroundImage: checked
               ? `url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='${encodeURIComponent(
                   colors.purple
