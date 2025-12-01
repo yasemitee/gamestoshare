@@ -33,7 +33,7 @@ export const Navbar: React.FC = () => {
           onClick={() => (window.location.href = '/')}
         >
           <Image
-            src="/logo.svg"
+            src="/Logo.svg"
             alt="GamesToShare"
             width={191}
             height={18}
