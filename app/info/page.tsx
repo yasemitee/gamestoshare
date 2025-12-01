@@ -261,6 +261,7 @@ export default function InfoPage() {
                 buttonIcon="/Heart.svg"
                 buttonIconAlt="Heart"
                 buttonGradient={gradients.pink}
+                buttonHref="https://donate.stripe.com/test_8x28wQ2qtb5dcZTe6r18c00"
               />
             </section>
           </div>
