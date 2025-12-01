@@ -378,7 +378,10 @@ export default function TermsPage() {
                 For questions, concerns, or requests regarding these Terms, you
                 may contact us at:
               </ContentParagraph>
-              <a href="todo" style={{ color: colors.purple }}>
+              <a
+                href="https://discord.gg/mavhKaDRCv"
+                style={{ color: colors.purple }}
+              >
                 Discord Server
               </a>
             </ContentSection>

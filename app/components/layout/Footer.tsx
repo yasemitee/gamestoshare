@@ -19,7 +19,7 @@ export function Footer() {
             T&C
           </a>
           <a
-            href="https://discord.gg/todo"
+            href="https://discord.gg/mavhKaDRCv"
             target="_blank"
             rel="noopener noreferrer"
             className="text-navbar flex items-center gap-2 text-navbar hover:opacity-80 transition-opacity"

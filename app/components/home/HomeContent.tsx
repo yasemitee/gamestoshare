@@ -84,7 +84,7 @@ export function HomeContent({ listings }: HomeContentProps) {
           JOIN OUR COMMUNITY ON DISCORD AND GET TO KNOW US
         </p>
         <a
-          href="https://discord.gg/todo"
+          href="https://discord.gg/mavhKaDRCv"
           target="_blank"
           rel="noopener noreferrer"
         >

@@ -248,6 +248,7 @@ export default function InfoPage() {
                 buttonIcon="/Discord.svg"
                 buttonIconAlt="Discord"
                 buttonGradient={gradients.main}
+                buttonHref="https://discord.gg/mavhKaDRCv"
               />
 
               <SupportCard

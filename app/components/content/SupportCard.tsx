@@ -34,13 +34,25 @@ export function SupportCard({
           {text}
         </ContentParagraph>
       ))}
-      <Button
-        className="inline-flex items-center gap-1.5 text-button"
-        style={buttonGradient ? { background: buttonGradient } : undefined}
-      >
-        <img src={buttonIcon} alt={buttonIconAlt} width={16} height={16} />
-        <span className="text-button">{buttonText}</span>
-      </Button>
+      {buttonHref ? (
+        <a href={buttonHref} target="_blank" rel="noopener noreferrer">
+          <Button
+            className="inline-flex items-center gap-1.5 text-button"
+            style={buttonGradient ? { background: buttonGradient } : undefined}
+          >
+            <img src={buttonIcon} alt={buttonIconAlt} width={16} height={16} />
+            <span className="text-button">{buttonText}</span>
+          </Button>
+        </a>
+      ) : (
+        <Button
+          className="inline-flex items-center gap-1.5 text-button"
+          style={buttonGradient ? { background: buttonGradient } : undefined}
+        >
+          <img src={buttonIcon} alt={buttonIconAlt} width={16} height={16} />
+          <span className="text-button">{buttonText}</span>
+        </Button>
+      )}
     </div>
   );
 }
