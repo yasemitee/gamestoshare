@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSteamIdFromUrl, getOwnedGamesWithPrices } from '@/lib/steam/api';
 
+// Cache owned games for 10 minutes - library doesn't change frequently
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
@@ -25,7 +26,11 @@ export async function GET(request: NextRequest) {
 
     const data = await getOwnedGamesWithPrices(steamId, limit);
 
-    return NextResponse.json(data);
+    return NextResponse.json(data, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=1200',
+      },
+    });
   } catch (error: any) {
     console.error('Steam API error:', error);
     return NextResponse.json(

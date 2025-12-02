@@ -2,6 +2,9 @@ import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/db/db';
 import { colors } from '@/lib/colors';
 import { GoBackButton } from '@/components/ui/GoBackButton';
+
+// Cache listing pages for 60 seconds to reduce database queries
+export const revalidate = 60;
 import { Container } from '@/components/layout/Container';
 import { Footer } from '@/components/layout/Footer';
 import { Navbar } from '@/components/layout/Navbar';

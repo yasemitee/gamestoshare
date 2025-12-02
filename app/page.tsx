@@ -4,8 +4,12 @@ import { MainContentContainer } from '@/components/layout/MainContentContainer';
 import { HomeContent } from '@/components/home/HomeContent';
 import { GameListingData } from '@/lib/db/types';
 import { prisma } from '@/lib/db/db';
+import { headers } from 'next/headers';
 
-export const revalidate = 0; // Disable caching
+// Revalidate every 60 seconds on server - reduces function invocations
+// Browser will check for fresh content on manual refresh
+export const revalidate = 60;
+export const fetchCache = 'default-cache';
 
 function formatTimeAgo(date: Date): string {
   const now = new Date();
@@ -39,7 +43,7 @@ export default async function Home() {
     orderBy: {
       createdAt: 'desc',
     },
-    take: 50,
+    take: 30,
   });
 
   const tableData: GameListingData[] = listings.map((listing) => {

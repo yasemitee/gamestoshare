@@ -12,6 +12,9 @@ import { PageHeaderMeta } from '@/components/ui/PageHeaderMeta';
 import { colors } from '@/lib/colors';
 import { getTimeAgo } from '@/lib/utils/time';
 
+// Static page - no need for function invocations
+export const dynamic = 'force-static';
+
 // Update this date when Terms & Conditions are modified
 const LAST_UPDATED = new Date('2025-11-30');
 

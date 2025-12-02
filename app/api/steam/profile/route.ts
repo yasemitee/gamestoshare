@@ -32,7 +32,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    return NextResponse.json(profile);
+    // Cache profile data for 5 minutes - profile info doesn't change often
+    return NextResponse.json(profile, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+      },
+    });
   } catch (error: any) {
     console.error('Steam API error:', error);
     return NextResponse.json(

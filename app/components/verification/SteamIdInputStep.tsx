@@ -105,10 +105,12 @@ export function SteamIdInputStep({
         {/* Loading Spinner */}
         {isLoading && (
           <div className="flex justify-center">
-            <img
-              src="/Spinner.svg"
-              alt="Loading"
-              className="w-12 h-12 animate-spin"
+            <div
+              className="w-12 h-12 rounded-full border-4 animate-spin"
+              style={{
+                borderColor: colors.gray1,
+                borderTopColor: colors.purple,
+              }}
             />
           </div>
         )}

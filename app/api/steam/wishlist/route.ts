@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSteamIdFromUrl, getSteamWishlist } from '@/lib/steam/api';
 
+// Cache wishlist for 10 minutes - wishlist doesn't change frequently
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
@@ -24,7 +25,11 @@ export async function GET(request: NextRequest) {
 
     const data = await getSteamWishlist(steamId);
 
-    return NextResponse.json(data);
+    return NextResponse.json(data, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=1200',
+      },
+    });
   } catch (error: any) {
     console.error('Steam API error:', error);
     return NextResponse.json(

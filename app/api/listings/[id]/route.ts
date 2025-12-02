@@ -25,13 +25,13 @@ export async function GET(
       );
     }
 
-    // Incrementa views
-    await prisma.listing.update({
-      where: { id },
-      data: { views: { increment: 1 } },
+    // Return listing with cache headers
+    // Views tracking removed to enable caching and reduce function calls
+    return NextResponse.json(listing, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
+      },
     });
-
-    return NextResponse.json(listing);
   } catch (error) {
     console.error('Error fetching listing:', error);
     return NextResponse.json(

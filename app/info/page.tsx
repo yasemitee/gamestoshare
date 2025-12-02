@@ -19,6 +19,9 @@ import { QuickNavigation } from '@/components/ui/QuickNavigation';
 import { CodeBlock } from '@/components/ui/CodeBlock';
 import { SupportCard } from '@/components/content/SupportCard';
 
+// Static page - no need for function invocations
+export const dynamic = 'force-static';
+
 export default function InfoPage() {
   return (
     <Container>

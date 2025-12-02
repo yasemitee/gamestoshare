@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/db/db';
 
 export async function GET(request: NextRequest) {
@@ -27,10 +28,15 @@ export async function GET(request: NextRequest) {
       orderBy: {
         createdAt: 'desc',
       },
-      take: 50,
+      take: 30,
     });
 
-    return NextResponse.json(listings);
+    // Add cache headers to reduce API calls
+    return NextResponse.json(listings, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
+      },
+    });
   } catch (error) {
     console.error('Error fetching listings:', error);
     return NextResponse.json(
@@ -202,6 +208,10 @@ export async function POST(request: NextRequest) {
         },
       },
     });
+
+    // Revalidate homepage cache immediately after creating/updating a listing
+    // This ensures users see their new listing right away while keeping cache for other visitors
+    revalidatePath('/');
 
     return NextResponse.json(completeListing, { status: existingListing ? 200 : 201 });
   } catch (error) {
