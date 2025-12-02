@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Lexend_Exa, Quando } from 'next/font/google';
 import './globals.css';
+import { colors, gradients } from './lib/colors';
 
 const lexendExa = Lexend_Exa({
   subsets: ['latin'],
@@ -35,8 +36,14 @@ export default function RootLayout({
           name="apple-mobile-web-app-status-bar-style"
           content="black-translucent"
         />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </head>
-      <body className={lexendExa.className}>{children}</body>
+      <body
+        className={lexendExa.className}
+        style={{ backgroundColor: '#2C3137' }}
+      >
+        {children}
+      </body>
     </html>
   );
 }
