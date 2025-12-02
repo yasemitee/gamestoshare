@@ -35,17 +35,8 @@ export default function RootLayout({
           name="apple-mobile-web-app-status-bar-style"
           content="black-translucent"
         />
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
-        />
       </head>
-      <body
-        className={lexendExa.className}
-        style={{ backgroundColor: '#0B0B0C' }}
-      >
-        {children}
-      </body>
+      <body className={lexendExa.className}>{children}</body>
     </html>
   );
 }
