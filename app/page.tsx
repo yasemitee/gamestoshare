@@ -5,6 +5,8 @@ import { HomeContent } from '@/components/home/HomeContent';
 import { GameListingData } from '@/lib/db/types';
 import { prisma } from '@/lib/db/db';
 
+export const revalidate = 0; // Disable caching
+
 function formatTimeAgo(date: Date): string {
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
@@ -41,18 +43,20 @@ export default async function Home() {
   });
 
   const tableData: GameListingData[] = listings.map((listing) => {
-    const lookingForGames = listing.games
+    const allGames = listing.games || [];
+
+    const lookingForGames = allGames
       .filter((lg) => lg.type === 'LOOKING_FOR')
       .map((lg) => ({
-        iconUrl: lg.game.iconUrl || '',
-        name: lg.game.name,
+        iconUrl: lg.game?.iconUrl || '',
+        name: lg.game?.name || '',
       }));
 
-    const offeringGames = listing.games
+    const offeringGames = allGames
       .filter((lg) => lg.type === 'OFFERING')
       .map((lg) => ({
-        iconUrl: lg.game.iconUrl || '',
-        name: lg.game.name,
+        iconUrl: lg.game?.iconUrl || '',
+        name: lg.game?.name || '',
       }));
 
     return {
