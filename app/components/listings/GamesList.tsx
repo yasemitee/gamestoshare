@@ -27,11 +27,11 @@ export function GamesList({ title, games }: GamesListProps) {
           <span style={{ color: colors.gray1 }}>{games.length} GAMES</span>
         </p>
       </div>
-      <div className="flex flex-col gap-2 max-h-[400px] overflow-y-auto custom-scrollbar">
+      <div className="flex md:flex-col gap-2 overflow-x-auto md:overflow-x-visible overflow-y-visible md:overflow-y-auto max-h-none md:max-h-[400px] custom-scrollbar">
         {games.map((game) => (
           <div
             key={game.id}
-            className="flex-shrink-0 relative overflow-hidden"
+            className="flex-shrink-0 relative overflow-hidden w-[200px] md:w-auto"
             style={{
               backgroundColor: colors.gray2,
               aspectRatio: '21/9',

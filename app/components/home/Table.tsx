@@ -12,17 +12,24 @@ export const Table: React.FC<TableProps> = ({ data }) => {
     <div>
       {/* Table Header */}
       <div
-        className="text-small-title grid py-6 uppercase"
+        className="text-small-title py-6 uppercase grid"
         style={{
           color: colors.white,
-          gridTemplateColumns: '1.5fr 1fr 1.5fr 1.5fr 120px',
+          gridTemplateColumns: '1fr 0.8fr 1.2fr 1.2fr',
         }}
       >
+        <style>{`
+          @media (min-width: 768px) {
+            .text-small-title {
+              grid-template-columns: 1.5fr 1fr 1.5fr 1.5fr 120px !important;
+            }
+          }
+        `}</style>
         <div>User</div>
         <div>Location</div>
         <div>Looking for</div>
         <div>Offering</div>
-        <div>Posted</div>
+        <div className="hidden md:block">Posted</div>
       </div>
       {/* Table Body */}
       {data.length === 0 ? (

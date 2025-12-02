@@ -46,11 +46,15 @@ export function BioVerificationStep({
         {/* Verification Code */}
         <div className="flex items-center justify-center mb-6">
           <div
-            className="flex items-center px-6 py-2 gap-8"
+            className="flex items-center px-4 md:px-6 py-2 gap-4 md:gap-8"
             style={{ backgroundColor: 'rgba(0, 0, 0, 0.25)' }}
           >
             {verificationCode.split('').map((char, index) => (
-              <h2 key={index} style={{ color: colors.white }}>
+              <h2
+                key={index}
+                className="text-2xl md:text-4xl"
+                style={{ color: colors.white }}
+              >
                 {char}
               </h2>
             ))}

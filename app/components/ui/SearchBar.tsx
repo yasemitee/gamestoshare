@@ -17,6 +17,7 @@ interface SearchBarProps {
   onLocationChange?: (location: string) => void;
   selectedLocation?: string;
   clearOnSelect?: boolean;
+  className?: string;
 }
 
 export const SearchBar: React.FC<SearchBarProps> = ({
@@ -26,6 +27,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   onLocationChange,
   selectedLocation = '',
   clearOnSelect = false,
+  className = '',
 }) => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Game[]>([]);
@@ -91,7 +93,10 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   };
 
   return (
-    <div className="relative w-full max-w-2xl" ref={searchRef}>
+    <div
+      className={`relative w-full ${className ? '' : 'max-w-2xl'}`}
+      ref={searchRef}
+    >
       <div className="relative flex items-center gap-2">
         <div className="relative flex-1 flex items-center">
           <img

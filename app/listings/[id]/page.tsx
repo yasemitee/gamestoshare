@@ -93,7 +93,7 @@ export default async function ListingDetailPage({
                 className="mt-5 mb-13"
               />
               {/* Content Section: Description | Games */}
-              <div className="grid grid-cols-2 gap-22">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-22">
                 {/* Left: Description */}
                 <div>
                   <div className="flex items-center gap-4 mb-8">
@@ -118,7 +118,7 @@ export default async function ListingDetailPage({
                   </p>
                 </div>
                 {/* Right: Games Section */}
-                <div className="grid grid-cols-2 gap-8 mb-30">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-8">
                   <GamesList title="LOOKING FOR" games={lookingForGames} />
                   <GamesList title="OFFERING" games={offeringGames} />
                 </div>
@@ -126,10 +126,12 @@ export default async function ListingDetailPage({
             </div>
           </div>
           {/* Friend Request Section */}
-          <FriendRequestSection
-            listingId={listing.id}
-            username={listing.username}
-          />
+          <div className="mt-32">
+            <FriendRequestSection
+              listingId={listing.id}
+              username={listing.username}
+            />
+          </div>
         </MainContentContainer>
       </Container>
       <Footer />

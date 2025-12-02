@@ -26,11 +26,11 @@ export function ListingUserHeader({
   isVeteran = false,
 }: ListingUserHeaderProps) {
   return (
-    <div className="flex gap-8">
+    <div className="relative flex gap-4 md:gap-8">
       {/* Avatar */}
       <div className="flex-shrink-0">
         <div
-          className="w-20 h-20 bg-cover bg-center"
+          className="w-16 h-16 md:w-20 md:h-20 bg-cover bg-center"
           style={{
             backgroundImage: avatarUrl ? `url(${avatarUrl})` : 'none',
             backgroundColor: colors.gray2,
@@ -40,7 +40,7 @@ export function ListingUserHeader({
       {/* User Details */}
       <div className="flex-1 flex flex-col justify-between">
         {/* User Name and Location */}
-        <div className="flex items-center gap-3 mb-4">
+        <div className="flex items-center gap-2 md:gap-3 mb-2 md:mb-4">
           <p className="text-user" style={{ color: colors.white }}>
             {showSteamId && username ? username : 'Anonymous'}
           </p>
@@ -51,8 +51,8 @@ export function ListingUserHeader({
           />
         </div>
         {/* Stats and Badges */}
-        <div className="flex items-center justify-between text-small-title">
-          <div className="flex items-center gap-6">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between text-small-title gap-2 md:gap-0">
+          <div className="flex items-center gap-3 md:gap-6">
             <UserBadge
               label="LEVEL"
               value={steamLevel || 0}
@@ -66,8 +66,14 @@ export function ListingUserHeader({
             {isPopular && <UserBadge icon="⭐" label="Popular" />}
             {isVeteran && <UserBadge icon="🗿" label="Veteran" />}
           </div>
-          <ActionButtons showReport={false} />
+          <div className="hidden md:block">
+            <ActionButtons showReport={false} />
+          </div>
         </div>
+      </div>
+      {/* Action Buttons */}
+      <div className="absolute bottom-0 right-0 md:hidden">
+        <ActionButtons showReport={false} />
       </div>
     </div>
   );

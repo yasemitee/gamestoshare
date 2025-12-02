@@ -25,12 +25,12 @@ export function BaseVerificationModal({
       />
 
       <div
-        className="relative w-full max-w-[762px] px-48 py-8"
+        className="relative w-full max-w-[762px] px-6 md:px-48 py-8 mx-4 md:mx-0"
         style={{ backgroundColor: colors.blue1 }}
       >
         <button
           onClick={onClose}
-          className="absolute top-9 right-8 hover:opacity-70 transition-opacity"
+          className="absolute top-6 md:top-9 right-4 md:right-8 hover:opacity-70 transition-opacity"
         >
           <img src="/XIcon.svg" alt="Close" width="14" height="14" />
         </button>

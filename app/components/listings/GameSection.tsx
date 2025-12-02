@@ -26,13 +26,16 @@ export function GameSection({
   maxGames = 10,
 }: GameSectionProps) {
   return (
-    <div className="w-1/2">
+    <div className="w-full md:w-1/2">
       <label className="block mb-6 text-field">{label}</label>
-      <SearchBar
-        placeholder="Search any game"
-        onGameSelect={onGameSelect}
-        clearOnSelect={true}
-      />
+      <div className="max-w-[calc(72px*5+12px*4)] md:max-w-none">
+        <SearchBar
+          placeholder="Search any game"
+          onGameSelect={onGameSelect}
+          clearOnSelect={true}
+          className="w-full"
+        />
+      </div>
       <div className="mt-6.5">
         <GameIconsList games={games} onRemove={onRemove} maxGames={maxGames} />
       </div>

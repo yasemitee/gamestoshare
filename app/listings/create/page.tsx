@@ -304,8 +304,8 @@ export default function CreateListingPage() {
           <MainContentContainer>
             <GoBackButton />
             <form onSubmit={handleSubmit} className="mt-14 text-white">
-              {/* Main Grid: Left side (Steam ID, Location, Platform) and Right side (Description) */}
-              <div className="flex gap-8 mb-12">
+              {/* Main Grid */}
+              <div className="flex flex-col md:flex-row gap-8 mb-12">
                 {/* Left Column */}
                 <div className="flex-1 flex flex-col">
                   {/* Steam ID */}
@@ -324,7 +324,7 @@ export default function CreateListingPage() {
                     onChange={setShowSteamId}
                   />
                   {/* Location & Platform */}
-                  <div className="flex gap-16 mt-12">
+                  <div className="flex gap-8 md:gap-16 mt-12">
                     <LocationSelector
                       value={location}
                       onChange={setLocation}
@@ -349,7 +349,7 @@ export default function CreateListingPage() {
                 </div>
               </div>
               {/* Looking for & Offering */}
-              <div className="flex gap-8 mb-12">
+              <div className="flex flex-col md:flex-row gap-8 mb-12">
                 <GameSection
                   label="Looking for"
                   games={lookingFor}
@@ -366,19 +366,21 @@ export default function CreateListingPage() {
                 />
               </div>
               {/* Terms and conditions */}
-              <TermsCheckbox
-                checked={termsAccepted}
-                onChange={setTermsAccepted}
-                hasError={termsError}
-              />
-              {/* Submit button */}
-              <Button
-                type="submit"
-                disabled={!termsAccepted || isSubmitting}
-                className="mx-auto block px-6 py-2.5 text-button"
-              >
-                {isSubmitting ? 'POSTING...' : 'POST'}
-              </Button>
+              <div className="mt-32">
+                <TermsCheckbox
+                  checked={termsAccepted}
+                  onChange={setTermsAccepted}
+                  hasError={termsError}
+                />
+                {/* Submit button */}
+                <Button
+                  type="submit"
+                  disabled={!termsAccepted || isSubmitting}
+                  className="mx-auto block px-6 py-2.5 text-button"
+                >
+                  {isSubmitting ? 'POSTING...' : 'POST'}
+                </Button>
+              </div>
             </form>
           </MainContentContainer>
           <Footer />
