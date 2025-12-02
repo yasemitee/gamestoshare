@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/db/db';
+import { getSteamIdFromUrl } from '@/lib/steam/api';
 
 export async function GET(request: NextRequest) {
   try {
@@ -75,11 +76,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Convert any vanity URL or case-sensitive ID to numeric Steam64 ID
+    const normalizedSteamId = await getSteamIdFromUrl(steamProfileUrl);
+    
+    if (!normalizedSteamId) {
+      return NextResponse.json(
+        { error: 'Invalid Steam ID or unable to resolve Steam profile' },
+        { status: 400 }
+      );
+    }
+
+    console.log('Normalized Steam ID:', normalizedSteamId);
+
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 30);
 
     const existingListing = await prisma.listing.findUnique({
-      where: { steamId },
+      where: { steamId: normalizedSteamId },
       include: { games: true },
     });
 
@@ -136,7 +149,7 @@ export async function POST(request: NextRequest) {
     );
 
     const listing = await prisma.listing.upsert({
-      where: { steamId },
+      where: { steamId: normalizedSteamId },
       update: {
         username: username || null,
         avatarUrl: avatarUrl || null,
@@ -152,7 +165,7 @@ export async function POST(request: NextRequest) {
         updatedAt: new Date(),
       },
       create: {
-        steamId,
+        steamId: normalizedSteamId,
         username: username || null,
         avatarUrl: avatarUrl || null,
         steamLevel: steamLevel || null,
