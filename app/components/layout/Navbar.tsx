@@ -25,25 +25,16 @@ export const Navbar: React.FC = () => {
     if (isMobileMenuOpen) {
       scrollPosition.current = window.scrollY;
       document.body.style.overflow = 'hidden';
-      document.documentElement.style.overflow = 'hidden';
       document.body.style.position = 'fixed';
       document.body.style.top = `-${scrollPosition.current}px`;
       document.body.style.width = '100%';
     } else {
       document.body.style.overflow = '';
-      document.documentElement.style.overflow = '';
       document.body.style.position = '';
       document.body.style.top = '';
       document.body.style.width = '';
       window.scrollTo(0, scrollPosition.current);
     }
-    return () => {
-      document.body.style.overflow = '';
-      document.documentElement.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.width = '';
-    };
   }, [isMobileMenuOpen]);
 
   const isActive = (path: string) => pathname === path;
@@ -109,7 +100,7 @@ export const Navbar: React.FC = () => {
 
         {/* Mobile menu button */}
         <button
-          className="md:hidden p-2 relative w-10 h-10 flex items-center justify-center"
+          className="md:hidden p-2 relative w-10 h-10 flex items-center justify-center z-[70]"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           aria-label="Menu"
         >
@@ -148,91 +139,75 @@ export const Navbar: React.FC = () => {
       </div>
 
       {/* Mobile menu */}
-      <div
-        className={`fixed top-[80px] left-0 right-0 bottom-0 md:hidden z-50 transition-all duration-500 ${
-          isMobileMenuOpen
-            ? 'opacity-100 backdrop-blur-md pointer-events-auto'
-            : 'opacity-0 backdrop-blur-none pointer-events-none'
-        }`}
-        style={{
-          backgroundColor: isMobileMenuOpen ? '#0f10129f' : 'transparent',
-        }}
-        onClick={() => setIsMobileMenuOpen(false)}
-      >
-        {/* Menu content - centered */}
+      {isMobileMenuOpen && (
         <div
-          className="flex flex-col items-center justify-center h-full space-y-8"
-          onClick={(e) => e.stopPropagation()}
+          className="fixed top-0 left-0 w-full md:hidden z-40"
+          style={{
+            backgroundColor: 'rgba(11, 11, 12, 0.95)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            height: '100dvh',
+            minHeight: '100vh',
+          }}
+          onClick={() => setIsMobileMenuOpen(false)}
         >
-          {/* Search */}
-          <button
-            className={`text-title transition-all duration-500 ${
-              isMobileMenuOpen
-                ? 'opacity-100 translate-y-0 delay-100'
-                : 'opacity-0 translate-y-4'
-            }`}
-            style={{ color: isActive('/') ? colors.white : colors.gray1 }}
-            onClick={() => {
-              window.location.href = '/';
-              setIsMobileMenuOpen(false);
-            }}
-          >
-            Search
-          </button>
-
-          {/* Platform */}
-          <button
-            className={`text-title flex items-center gap-2 transition-all duration-500 ${
-              isMobileMenuOpen
-                ? 'opacity-100 translate-y-0 delay-200'
-                : 'opacity-0 translate-y-4'
-            }`}
-            style={{ color: colors.gray1 }}
-          >
-            <span>Platform</span>
-            <img
-              src="/Dropdown.svg"
-              alt=""
-              className="w-3 h-3 brightness-[0.6]"
-            />
-          </button>
-
-          {/* Info */}
-          <button
-            className={`text-title transition-all duration-500 ${
-              isMobileMenuOpen
-                ? 'opacity-100 translate-y-0 delay-300'
-                : 'opacity-0 translate-y-4'
-            }`}
-            style={{ color: isActive('/info') ? colors.white : colors.gray1 }}
-            onClick={() => {
-              window.location.href = '/info';
-              setIsMobileMenuOpen(false);
-            }}
-          >
-            Info
-          </button>
-
-          {/* Create post button */}
+          {/* Menu content - centered */}
           <div
-            className={`transition-all duration-500 delay-[400ms] ${
-              isMobileMenuOpen
-                ? 'opacity-100 translate-y-0'
-                : 'opacity-0 translate-y-4'
-            }`}
+            className="flex flex-col items-center justify-center h-full space-y-10"
+            onClick={(e) => e.stopPropagation()}
           >
-            <Button
-              variant="primary"
+            {/* Search */}
+            <button
+              className="text-title"
+              style={{ color: isActive('/') ? colors.white : colors.gray1 }}
               onClick={() => {
-                window.location.href = '/listings/create';
+                window.location.href = '/';
                 setIsMobileMenuOpen(false);
               }}
             >
-              CREATE A POST
-            </Button>
+              Search
+            </button>
+
+            {/* Platform */}
+            <button
+              className="text-title flex items-center gap-2"
+              style={{ color: colors.gray1 }}
+            >
+              <span>Platform</span>
+              <img
+                src="/Dropdown.svg"
+                alt=""
+                className="w-3 h-3 brightness-[0.6]"
+              />
+            </button>
+
+            {/* Info */}
+            <button
+              className="text-title"
+              style={{ color: isActive('/info') ? colors.white : colors.gray1 }}
+              onClick={() => {
+                window.location.href = '/info';
+                setIsMobileMenuOpen(false);
+              }}
+            >
+              Info
+            </button>
+
+            {/* Create post button */}
+            <div>
+              <Button
+                variant="primary"
+                onClick={() => {
+                  window.location.href = '/listings/create';
+                  setIsMobileMenuOpen(false);
+                }}
+              >
+                CREATE A POST
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </nav>
   );
 };

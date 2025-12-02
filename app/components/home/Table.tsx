@@ -15,7 +15,7 @@ export const Table: React.FC<TableProps> = ({ data }) => {
         className="text-small-title py-6 uppercase grid"
         style={{
           color: colors.white,
-          gridTemplateColumns: '1fr 0.8fr 1.2fr 1.2fr',
+          gridTemplateColumns: '1.4fr 1.2fr 1.2fr',
         }}
       >
         <style>{`
@@ -26,7 +26,7 @@ export const Table: React.FC<TableProps> = ({ data }) => {
           }
         `}</style>
         <div>User</div>
-        <div>Location</div>
+        <div className="hidden md:block">Location</div>
         <div>Looking for</div>
         <div>Offering</div>
         <div className="hidden md:block">Posted</div>

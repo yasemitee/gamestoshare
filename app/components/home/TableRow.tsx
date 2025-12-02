@@ -19,7 +19,7 @@ export const TableRow: React.FC<GameListingData> = ({
       className="text-field-small grid items-center py-6 border-b hover:bg-opacity-50 transition-all cursor-pointer table-row-grid"
       style={{
         borderColor: colors.gray2,
-        gridTemplateColumns: '1fr 0.7fr 1fr 1fr',
+        gridTemplateColumns: '1.4fr 1fr 1fr',
       }}
     >
       <style>{`
@@ -29,20 +29,24 @@ export const TableRow: React.FC<GameListingData> = ({
           }
         }
       `}</style>
-      <div className="truncate pr-3" style={{ color: colors.gray1 }}>
-        {showSteamId && user ? user : 'Anonymous'}
+      <div className="flex items-center gap-2 truncate pr-10">
+        <span className="truncate" style={{ color: colors.gray1 }}>
+          {showSteamId && user ? user : 'Anonymous'}
+        </span>
+        <img
+          src={`https://flagcdn.com/${location.toLowerCase()}.svg`}
+          alt={location}
+          className="w-5 h-4 flex-shrink-0 md:hidden"
+        />
       </div>
 
-      <div className="flex items-center gap-2 min-w-0 md:pl-1">
+      <div className="hidden md:flex items-center gap-2 min-w-0 md:pl-1">
         <img
           src={`https://flagcdn.com/${location.toLowerCase()}.svg`}
           alt={location}
           className="w-5 h-4 flex-shrink-0"
         />
-        <span
-          className="truncate hidden md:inline"
-          style={{ color: colors.gray1 }}
-        >
+        <span className="truncate" style={{ color: colors.gray1 }}>
           {location}
         </span>
       </div>

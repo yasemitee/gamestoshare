@@ -33,7 +33,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
       {/* Subtitle */}
       <h4 className="mb-16" style={{ color: colors.gray1 }}>
         Choose a platform, search a game and send a friend request.
-        <br />
+        <br className="hidden md:block" />
         Owning a large library of games has never been easier.
       </h4>
       {/* Search Bar */}
