@@ -9,5 +9,5 @@ export const MainContentContainer: React.FC<MainContentContainerProps> = ({
   children,
   className = '',
 }) => {
-  return <div className={`mt-26 md:mt-48 w-full ${className}`}>{children}</div>;
+  return <div className={`mt-26 md:mt-24 w-full ${className}`}>{children}</div>;
 };

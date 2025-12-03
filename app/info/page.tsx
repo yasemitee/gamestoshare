@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/Button';
 import { ContentSection } from '@/components/content/ContentSection';
 import { ContentParagraph } from '@/components/content/ContentParagraph';
 import { ContentSubtitle } from '@/components/content/ContentSubtitle';
-import { ImagePlaceholder } from '@/components/content/ImagePlaceholder';
+import { Image } from '@/components/content/Image';
 import { FAQItem } from '@/components/content/FAQItem';
 import { NumberedList } from '@/components/content/NumberedList';
 import { GradientTitle } from '@/components/ui/GradientTitle';
@@ -91,7 +91,9 @@ export default function InfoPage() {
                   Additionally you can use the location filter to find friends
                   close to you.
                 </ContentParagraph>
-                <ImagePlaceholder />
+                <Image
+                  img={{ src: '/BrowsingOffer.png', alt: 'Location Filter' }}
+                />
               </ContentSection>
               {/* Sending a Request */}
               <ContentSection id="sending-request" title="Sending a Request">
@@ -108,7 +110,26 @@ export default function InfoPage() {
                   match, you'll be able to send a friend request or open the
                   user's Steam profile directly.
                 </ContentParagraph>
-                <ImagePlaceholder />
+                <div className="flex gap-6">
+                  <Image
+                    img={{
+                      src: '/SendingRequest1.png',
+                      alt: 'Sending Request',
+                    }}
+                  />
+                  <Image
+                    img={{
+                      src: '/SendingRequest2.png',
+                      alt: 'Sending Request',
+                    }}
+                  />
+                  <Image
+                    img={{
+                      src: '/SendingRequest3.png',
+                      alt: 'Sending Request',
+                    }}
+                  />
+                </div>
               </ContentSection>
             </section>
             <section id="how-to-use">
@@ -187,7 +208,10 @@ export default function InfoPage() {
                   works, refer to the related section.
                 </ContentParagraph>
 
-                <ImagePlaceholder className="mb-12 mb-16" />
+                <Image
+                  className="mb-12 mb-16"
+                  img={{ src: '/Offering.png', alt: 'Offering Games' }}
+                />
 
                 {/* Verification Step */}
                 <ContentSubtitle>Verification Step</ContentSubtitle>
@@ -199,7 +223,12 @@ export default function InfoPage() {
                   published.
                 </ContentParagraph>
 
-                <ImagePlaceholder />
+                <Image
+                  img={{
+                    src: '/VerificationStep.png',
+                    alt: 'Verification Step',
+                  }}
+                />
               </ContentSection>
             </section>
 
