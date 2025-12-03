@@ -25,6 +25,7 @@ export function ListingUserHeader({
   isPopular = false,
   isVeteran = false,
 }: ListingUserHeaderProps) {
+  const veteran = accountYears && accountYears >= 8;
   return (
     <div className="relative flex gap-4 md:gap-8">
       {/* Avatar */}
@@ -64,7 +65,7 @@ export function ListingUserHeader({
             />
             {isDonor && <UserBadge icon="💎" label="Donor" />}
             {isPopular && <UserBadge icon="⭐" label="Popular" />}
-            {isVeteran && <UserBadge icon="🗿" label="Veteran" />}
+            {(isVeteran || veteran) && <UserBadge icon="⚔️" label="Veteran" />}
           </div>
           <div className="hidden md:block">
             <ActionButtons showReport={false} />
