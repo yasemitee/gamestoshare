@@ -80,7 +80,10 @@ export function HomeContent({ listings }: HomeContentProps) {
         <h2 className="mb-4" style={{ color: colors.white }}>
           Still unsure?
         </h2>
-        <p className="text-small-title mb-8" style={{ color: colors.gray1 }}>
+        <p
+          className="text-small-title mb-8"
+          style={{ color: colors.gray1, lineHeight: '24px' }}
+        >
           JOIN OUR COMMUNITY ON DISCORD AND GET TO KNOW US
         </p>
         <AnimatedButton

@@ -14,7 +14,6 @@ export async function GET(request: NextRequest) {
     }
 
     const steamId = await getSteamIdFromUrl(profileUrl);
-
     if (!steamId) {
       return NextResponse.json(
         { error: 'Invalid Steam profile URL' },

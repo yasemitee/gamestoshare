@@ -19,13 +19,9 @@ export const gradients = {
   pink: 'linear-gradient(180deg, #F0C5FF 0%, #CB71FF 100%)',
 } as const;
 
-/**
- * Shadowbox effects for hover animations
- * Use these to maintain consistent glow effects across the application
- */
+
 export const shadowbox = {
-  // Standard purple glow effect
   standard: '0 0 20px rgba(195, 194, 245, 0.6), 0 0 40px rgba(195, 194, 245, 0.3)',
-  // Reduced intensity for subtle effects
+  medium: '0 0 16px rgba(195, 194, 245, 0.4), 0 0 36px rgba(195, 194, 245, 0.2)',
   subtle: '0 0 12px rgba(195, 194, 245, 0.3), 0 0 24px rgba(195, 194, 245, 0.15)',
 } as const;

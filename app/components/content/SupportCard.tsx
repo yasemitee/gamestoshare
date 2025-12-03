@@ -1,6 +1,6 @@
 'use client';
 
-import { colors, gradients } from '@/lib/colors';
+import { colors, gradients, shadowbox } from '@/lib/colors';
 import { Button } from '@/components/ui/Button';
 import { ContentParagraph } from '@/components/content/ContentParagraph';
 import { motion } from 'motion/react';
@@ -41,8 +41,7 @@ export function SupportCard({
         <a href={buttonHref} target="_blank" rel="noopener noreferrer">
           <motion.div
             whileHover={{
-              boxShadow:
-                '0 0 20px rgba(195, 194, 245, 0.6), 0 0 40px rgba(195, 194, 245, 0.3)',
+              boxShadow: shadowbox.medium,
             }}
             whileTap={{ scale: 0.98 }}
             transition={{ duration: 0.2 }}
@@ -67,8 +66,7 @@ export function SupportCard({
       ) : (
         <motion.div
           whileHover={{
-            boxShadow:
-              '0 0 20px rgba(195, 194, 245, 0.6), 0 0 40px rgba(195, 194, 245, 0.3)',
+            boxShadow: shadowbox.medium,
           }}
           whileTap={{ scale: 0.98 }}
           transition={{ duration: 0.2 }}

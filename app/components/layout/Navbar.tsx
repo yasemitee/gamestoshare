@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
-import { colors, gradients } from '@/lib/colors';
+import { colors, shadowbox } from '@/lib/colors';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -113,8 +113,7 @@ export const Navbar: React.FC = () => {
 
         <motion.div
           whileHover={{
-            boxShadow:
-              '0 0 20px rgba(195, 194, 245, 0.6), 0 0 40px rgba(195, 194, 245, 0.3)',
+            boxShadow: shadowbox.medium,
             filter: 'brightness(1.1)',
           }}
           whileTap={{ scale: 0.98 }}

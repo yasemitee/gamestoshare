@@ -9,7 +9,7 @@ interface CodeBlockProps {
 export function CodeBlock({ children, className = 'my-6' }: CodeBlockProps) {
   return (
     <p
-      className={`text-field leading-relaxed inline-block ${className}`}
+      className={`text-field leading-relaxed ${className}`}
       style={{
         color: colors.gray1,
         backgroundColor: `${colors.black}40`,

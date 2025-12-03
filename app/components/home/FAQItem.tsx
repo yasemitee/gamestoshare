@@ -22,20 +22,33 @@ export function FAQItem({ question, answer }: FAQItemProps) {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-full py-6 flex items-center gap-2 text-small-title text-left border-b cursor-pointer"
-        style={{ color: colors.white, borderColor: colors.gray2 }}
+        style={{
+          color: colors.white,
+          borderColor: colors.gray2,
+          lineHeight: '24px',
+        }}
       >
-        <motion.img
-          src="/Dropdown.svg"
-          alt=""
-          width={10}
-          height={6}
-          animate={{
-            rotate: isOpen ? 180 : 0,
-          }}
-          transition={{ duration: 0.3, ease: 'easeInOut' }}
-        />
-        <span>{question}</span>
+        <style>{`
+          @media (max-width: 767px) {
+            .faq-btn-responsive { line-height: 20px !important; }
+          }
+        `}</style>
+        {/* aggiungi una classe per la media query */}
+        <span className="faq-btn-responsive w-full flex items-center gap-2">
+          <motion.img
+            src="/Dropdown.svg"
+            alt=""
+            width={10}
+            height={6}
+            animate={{
+              rotate: isOpen ? 180 : 0,
+            }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+          />
+          <span>{question}</span>
+        </span>
       </button>
+      {/* ...resto invariato... */}
       <motion.div
         initial={false}
         animate={{

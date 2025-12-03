@@ -70,7 +70,7 @@ export default function InfoPage() {
                   GTS is designed for people who want access to try new games
                   without buying them right away.
                 </ContentParagraph>
-                <ContentParagraph className="">
+                <ContentParagraph>
                   By trading, two users create a Steam Family and share access
                   to each other's libraries, creating a balanced exchange.
                 </ContentParagraph>
@@ -114,7 +114,7 @@ export default function InfoPage() {
                     match, you'll be able to send a friend request or open the
                     user's Steam profile directly.
                   </ContentParagraph>
-                  <div className="flex gap-6">
+                  <div className="md:flex gap-6">
                     <Image
                       img={{
                         src: '/SendingRequest1.png',
@@ -156,7 +156,16 @@ export default function InfoPage() {
                     for example:
                   </ContentParagraph>
                   <CodeBlock>
-                    https://steamcommunity.com/profiles/76561199382517992
+                    <span
+                      className="break-all"
+                      style={{
+                        wordBreak: 'break-all',
+                        overflowWrap: 'anywhere',
+                        whiteSpace: 'normal',
+                      }}
+                    >
+                      https://steamcommunity.com/profiles/76561199382517992
+                    </span>
                   </CodeBlock>
                   <ContentParagraph className="mb-8">
                     You can choose whether to show your Steam username in the
@@ -298,7 +307,7 @@ export default function InfoPage() {
                   buttonIcon="/Heart.svg"
                   buttonIconAlt="Heart"
                   buttonGradient={gradients.pink}
-                  buttonHref="https://donate.stripe.com/test_8x28wQ2qtb5dcZTe6r18c00"
+                  buttonHref="https://buymeacoffee.com/gamestoshare"
                 />
               </section>
             </div>
