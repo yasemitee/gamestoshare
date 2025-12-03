@@ -1,126 +1,64 @@
-# GamesToShare
+<div align="center">
 
-This project is a Next.js 16 (App Router, TypeScript) application integrating Steam data and a PostgreSQL database via Prisma. UI is built with Tailwind CSS.
+# 🎮 GamesToShare
 
-## Overview
+**Gaming matchmaking platform for Steam users**
 
-- Create and display Steam listings (looking for / offering)
-- Steam ID verification (URL, vanity, numeric) with normalized username
-- Auto-populate location, wishlist, and owned games
-- Upsert by `steamId` (new post replaces previous for same ID)
-- Listing expiration: 30 days (`expiresAt` + cleanup endpoint)
-- Privacy control: `showSteamId` toggles displaying username
+[![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat&logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat&logo=typescript)](https://www.typescriptlang.org/)
+[![Prisma](https://img.shields.io/badge/Prisma-7-2D3748?style=flat&logo=prisma)](https://www.prisma.io/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-336791?style=flat&logo=postgresql)](https://www.postgresql.org/)
 
-## Architecture
+_Share your Steam library, find players with common interests, send friend requests. No registration needed._
 
-- Frontend: Next.js 16 (App Router, server/client components)
-- Data Layer: Prisma ORM with PostgreSQL (Neon compatible)
-- Steam Integration: server-side API routes for profile/wishlist/owned games
-- Styling: Tailwind CSS with custom color system (`app/lib/colors.ts`) and variables (`app/global.css`)
+[Report Bug](https://github.com/yasemitee/gamestoshare/issues) · [Request Feature](https://github.com/yasemitee/gamestoshare/issues)
 
-## Project Structure
+</div>
 
-- `app/` pages, components, and API routes
-- `app/api/listings/route.ts` — GET/POST listings (with upsert)
-- `app/api/listings/cleanup/route.ts` — disable expired listings
-- `app/api/steam/*` — Steam proxy endpoints (profile, wishlist, owned games)
-- `app/listings/create/page.tsx` — listing creation UI
-- `app/lib/steam/*` — Steam utilities and API wrappers
-- `prisma/schema.prisma` — database schema and migrations
-- `app/lib/db/db.ts` — Prisma client initialization
+---
 
-## Requirements
+## About The Project
 
-- Node.js 20+
-- PostgreSQL database and `DATABASE_URL`
-- Optional: `STEAM_API_KEY` if calling Steam directly (routes currently proxy server-side)
+GamesToShare is a **full-stack web application** that solves a common problem in the gaming community: finding players who own or want the same games as you.
 
-## Environment Variables
+### Why was this platform made
 
-Create `.env` with:
+Gamers often struggle to find friends to play specific games with. Traditional methods involve:
 
-```
-DATABASE_URL="postgresql://<user>:<password>@<host>/<db>?sslmode=require"
-CRON_SECRET="<your_secret_string>"
-STEAM_API_KEY="<optional>"
-```
+- Posting in Discord servers with hundreds of messages
+- Scrolling through Steam community forums
+- Manually checking friends' libraries one by one
 
-## Installation & Commands
+So GTS can be used as a centralized platform where users can:
 
-```bash
-# install deps
-npm install
+1. **Create listings** with games they're looking for and games they can offer
+2. **Browse other players** filtered by location and platform
+3. **Send friend requests** directly through Steam
+4. **No registration required** - just Steam ID verification
 
-# development
-npm run dev
+---
 
-# prisma client
-npx prisma generate
+## Key Features
 
-# migrations (development)
-npx prisma migrate dev --name <migration_name>
+### **Anonymous Authentication System**
 
-# migrations (deploy)
-npx prisma migrate deploy
+- **No traditional registration** - uses Steam ID as unique identifier
+- **Bio verification** system with security codes (prevents impersonation)
+- **Privacy controls** - users choose whether to display their username publicly
+- **Smart upsert logic** - one active listing per user (prevents spam)
 
-# production build
-npm run build
-npm run start
-```
+### **Intelligent Matching System**
 
-## Database Models
+- **Game crossmatch algorithm** - finds common games between users
+- **Real-time search** with debouncing and caching
+- **Filters by location, platform, and game titles**
 
-- `Listing`:
-  - `steamId` (unique), `username?`, `platform`, `steamProfileUrl`, `description?`, `location`, `showSteamId`, `isActive`, `expiresAt`, timestamps
-  - Relation: `games` via `ListingGame`
-- `Game`:
-  - `steamAppId` (unique), `name`, `platform`, `iconUrl`, `headerImage?`
-- `ListingGame`:
-  - Links `Listing`↔`Game` with `type` in {`LOOKING_FOR`,`OFFERING`}
+---
 
-## Key API Routes
+<div align="center">
 
-- `GET /api/listings` — active, non-expired listings with related games
-- `POST /api/listings` — upsert listing by `steamId`; recreate game relations after upsert
-- `POST /api/listings/cleanup` — set `isActive=false` for expired listings; requires `Authorization: Bearer <CRON_SECRET>`
-- `GET /api/steam/profile` — Steam profile and normalized username
-- `GET /api/steam/wishlist` — wishlist
-- `GET /api/steam/owned-games` — owned games (filters free, sorts by release year)
+**Built with ❤️ using Next.js, TypeScript, and modern web technologies**
 
-## Listing Creation Flow
+If you found this project interesting, consider giving it a ⭐!
 
-1. Input Steam ID (any format)
-2. Verify: fetch profile, username, and autoload location/games
-3. Select games for "Looking for" and "Offering"
-4. Set privacy `showSteamId`
-5. Submit: upsert listing, set `expiresAt` + 30 days
-
-## Development Notes
-
-- Colors/gradients: `app/lib/colors.ts`
-- Hook: `useSteamVerification` centralizes Steam verification and data fetch
-- Utilities: `extractCleanSteamId`, `normalizeSteamId`
-- Prisma client logs reduced to `error|warn` in dev to avoid query noise
-
-## Cleanup Job
-
-Trigger periodically:
-
-```bash
-curl -X POST \
-	-H "Authorization: Bearer $CRON_SECRET" \
-	https://<host>/api/listings/cleanup
-```
-
-## Troubleshooting
-
-- Upsert failing: ensure game relations are created after listing upsert (`app/api/listings/route.ts` handles this via `createMany`)
-- Dev port conflicts: terminate other Next.js instances
-  ```bash
-  pkill -f "next dev"
-  ```
-- Excessive Prisma logs: confirm `log: ['error','warn']` in `app/lib/db/db.ts`
-
-## License
-
-Private project.
+</div>
