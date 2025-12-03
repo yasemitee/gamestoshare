@@ -32,8 +32,22 @@ export async function GET(request: NextRequest) {
       take: 30,
     });
 
+    // Filter sensitive data for anonymous users
+    const sanitizedListings = listings.map(listing => {
+      if (!listing.showSteamId) {
+        // Remove sensitive data for anonymous listings (but keep avatarUrl)
+        return {
+          ...listing,
+          steamId: null,
+          steamProfileUrl: null,
+          username: null,
+        };
+      }
+      return listing;
+    });
+
     // Add cache headers to reduce API calls
-    return NextResponse.json(listings, {
+    return NextResponse.json(sanitizedListings, {
       headers: {
         'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
       },

@@ -41,6 +41,16 @@ async function getListing(id: string) {
     return null;
   }
 
+  // Sanitize sensitive data for anonymous users (but keep avatarUrl)
+  if (!listing.showSteamId) {
+    return {
+      ...listing,
+      steamId: '',
+      steamProfileUrl: null,
+      username: null,
+    };
+  }
+
   return listing;
 }
 
@@ -90,13 +100,13 @@ export default async function ListingDetailPage({
                 style={{
                   borderTop: `1px solid ${colors.gray2}`,
                 }}
-                className="mt-5 mb-13"
+                className="mt-5 mb-6 md:mb-13"
               />
               {/* Content Section: Description | Games */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-22">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-22">
                 {/* Left: Description */}
                 <div>
-                  <div className="flex items-center gap-4 mb-8">
+                  <div className="flex items-center gap-4 pb-4 md:mb-8">
                     <p
                       className="text-small-title"
                       style={{ color: colors.white }}
@@ -118,7 +128,7 @@ export default async function ListingDetailPage({
                   </p>
                 </div>
                 {/* Right: Games Section */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <GamesList title="LOOKING FOR" games={lookingForGames} />
                   <GamesList title="OFFERING" games={offeringGames} />
                 </div>
@@ -126,7 +136,7 @@ export default async function ListingDetailPage({
             </div>
           </div>
           {/* Friend Request Section */}
-          <div className="mt-32">
+          <div className="mt-14 md:mt-32">
             <FriendRequestSection
               listingId={listing.id}
               username={listing.username}

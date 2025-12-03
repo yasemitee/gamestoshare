@@ -22,6 +22,20 @@ export function Footer() {
             T&C
           </a>
           <a
+            href="https://x.com/gamestoshare"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:opacity-80 transition-opacity"
+          >
+            <img
+              src="/XSocialLogo.svg"
+              alt="X (Twitter)"
+              width={16}
+              height={16}
+              style={{ filter: 'brightness(0) invert(1)' }}
+            />
+          </a>
+          <a
             href="https://discord.gg/mavhKaDRCv"
             target="_blank"
             rel="noopener noreferrer"

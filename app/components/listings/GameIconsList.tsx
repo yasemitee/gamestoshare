@@ -24,11 +24,11 @@ export const GameIconsList: React.FC<GameIconsListProps> = ({
       <div className="text-small-title mb-2" style={{ color: colors.gray1 }}>
         {games.length} GAMES
       </div>
-      <div className="mt-7 min-h-[140px] max-h-[280px] bg-transparent overflow-y-auto overflow-x-hidden">
+      <div className="mt-7 md:min-h-[140px] max-h-[280px] bg-transparent overflow-y-auto overflow-x-hidden">
         {games.length === 0 ? (
           <div
-            className="text-sm w-full h-full flex items-center justify-center"
-            style={{ color: colors.gray2 }}
+            className="text-field w-full h-full flex items-center justify-center"
+            style={{ color: colors.gray1 }}
           >
             No games selected
           </div>

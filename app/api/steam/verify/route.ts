@@ -10,15 +10,21 @@ export async function POST(request: NextRequest) {
     const code = verificationCode || securityCode;
     let id = steamId;
 
+    console.log('[Verify] Initial steamId:', steamId, 'profileUrl:', profileUrl);
+
     if (!id && profileUrl) {
       id = await getSteamIdFromUrl(profileUrl);
+      console.log('[Verify] Resolved from profileUrl:', id);
     }
 
     if (id && !/^\d{17}$/.test(id)) {
+      console.log('[Verify] Resolving vanity URL:', id);
       const resolvedId = await resolveVanityUrl(id);
       if (resolvedId) {
         id = resolvedId;
+        console.log('[Verify] Resolved to Steam64 ID:', id);
       } else {
+        console.log('[Verify] Failed to resolve vanity URL');
         return NextResponse.json(
           { 
             verified: false, 
@@ -36,6 +42,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    console.log('[Verify] Fetching bio for Steam64 ID:', id);
     const bio = await getProfileBio(id);
     
     if (!bio) {

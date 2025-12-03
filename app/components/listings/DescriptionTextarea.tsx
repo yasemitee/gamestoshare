@@ -17,7 +17,10 @@ export function DescriptionTextarea({
 }: DescriptionTextareaProps) {
   return (
     <div className="flex flex-col">
-      <label className="text-field mb-11" style={{ color: colors.white }}>
+      <label
+        className="text-field mb-4 md:mb-11"
+        style={{ color: colors.white }}
+      >
         Description
       </label>
       <textarea
@@ -25,11 +28,10 @@ export function DescriptionTextarea({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         maxLength={maxLength}
-        className="w-full text-field-small resize-none border-b"
+        className="w-full text-field-small resize-none border-b md:min-h-[220px]"
         style={{
-          color: colors.gray2,
+          color: colors.gray1,
           outline: 'none',
-          minHeight: '220px',
         }}
       />
       <div

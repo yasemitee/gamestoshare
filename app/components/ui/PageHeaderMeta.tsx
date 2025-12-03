@@ -15,7 +15,7 @@ export function PageHeaderMeta({
 }: PageHeaderMetaProps) {
   return (
     <div
-      className={`flex items-center gap-9 border-b pb-4 ${className}`}
+      className={`flex items-center md:gap-9 gap-4 border-b pb-4 ${className}`}
       style={{ borderColor: colors.gray2 }}
     >
       {lastUpdated && (

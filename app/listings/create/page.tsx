@@ -324,7 +324,7 @@ export default function CreateListingPage() {
                     onChange={setShowSteamId}
                   />
                   {/* Location & Platform */}
-                  <div className="flex gap-8 md:gap-16 mt-12">
+                  <div className="flex gap-8 md:gap-16 mt-6">
                     <LocationSelector
                       value={location}
                       onChange={setLocation}
@@ -341,7 +341,7 @@ export default function CreateListingPage() {
                 </div>
 
                 {/* Right Column - Description */}
-                <div className="flex-1">
+                <div className="flex-1 md:mt-0 mt-6">
                   <DescriptionTextarea
                     value={description}
                     onChange={setDescription}

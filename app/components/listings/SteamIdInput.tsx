@@ -21,7 +21,7 @@ export function SteamIdInput({
 }: SteamIdInputProps) {
   return (
     <div className="mb-6">
-      <label className="pb-8 block text-field">Steam ID</label>
+      <label className="mb-4 md:mb-8 block text-field">Steam ID</label>
       <div className="flex items-center gap-3">
         <input
           type="text"
