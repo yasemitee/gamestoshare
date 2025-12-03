@@ -1,5 +1,7 @@
 import { useState, useCallback } from 'react';
 import { extractCleanSteamId } from '@/lib/steam/utils';
+import { STEAM_VERIFICATION_CODE } from '@/lib/constants';
+import { showVerificationError, showGenericError, showSteamIdNotFoundError } from '@/lib/utils/errors';
 
 type InvitationStep = 'bio-verification' | 'steam-id-input' | 'congratulations' | 'closed';
 
@@ -57,7 +59,7 @@ export function useInvitationFlow(
         },
         body: JSON.stringify({
           steamId: userSteamId,
-          verificationCode: 'GTS',
+          verificationCode: STEAM_VERIFICATION_CODE,
         }),
       });
 
@@ -66,15 +68,11 @@ export function useInvitationFlow(
       if (data.verified) {
         setCurrentStep('steam-id-input');
       } else {
-        if (typeof window !== 'undefined' && (window as any).showVerificationError) {
-          (window as any).showVerificationError();
-        }
+        showVerificationError();
       }
     } catch (error) {
       console.error('Verification error:', error);
-      if (typeof window !== 'undefined' && (window as any).showVerificationErrorGeneric) {
-        (window as any).showVerificationErrorGeneric();
-      }
+      showGenericError();
     }
   }, [userSteamId]);
 
@@ -94,7 +92,7 @@ export function useInvitationFlow(
           },
           body: JSON.stringify({
             steamId: cleanSteamId,
-            verificationCode: 'GTS',
+            verificationCode: STEAM_VERIFICATION_CODE,
           }),
         });
 
@@ -102,9 +100,7 @@ export function useInvitationFlow(
 
         if (!verifyData.verified) {
           setIsLoading(false);
-          if (typeof window !== 'undefined' && (window as any).showVerificationError) {
-            (window as any).showVerificationError();
-          }
+          showVerificationError();
           return;
         }
 
@@ -146,9 +142,7 @@ export function useInvitationFlow(
   const sendInvitation = useCallback(async () => {
     try {
       if (!userSteamId) {
-        if (typeof window !== 'undefined' && (window as any).showSteamIdNotFound) {
-          (window as any).showSteamIdNotFound();
-        }
+        showSteamIdNotFoundError();
         return;
       }
 
@@ -156,9 +150,7 @@ export function useInvitationFlow(
       const listingData = await listingResponse.json();
       
       if (!listingData?.steamId) {
-        if (typeof window !== 'undefined' && (window as any).showListingOwnerNotFound) {
-          (window as any).showListingOwnerNotFound();
-        }
+        showGenericError();
         return;
       }
 
@@ -173,9 +165,7 @@ export function useInvitationFlow(
       closeFlow();
     } catch (error) {
       console.error('Error sending invitation:', error);
-      if (typeof window !== 'undefined' && (window as any).showProfileOpenError) {
-        (window as any).showProfileOpenError();
-      }
+      showGenericError();
     }
   }, [listingId, userSteamId, closeFlow]);
 

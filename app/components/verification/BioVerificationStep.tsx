@@ -2,6 +2,7 @@
 
 import { colors } from '@/lib/colors';
 import { Button } from '@/components/ui/Button';
+import { motion } from 'motion/react';
 
 interface BioVerificationStepProps {
   steamId?: string;
@@ -27,7 +28,14 @@ export function BioVerificationStep({
   };
 
   return (
-    <div className="flex flex-col h-full" style={{ minHeight: '455px' }}>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={{ duration: 0.3 }}
+      className="flex flex-col h-full"
+      style={{ minHeight: '455px' }}
+    >
       {/* Content Area */}
       <div>
         {/* Title */}
@@ -74,7 +82,7 @@ export function BioVerificationStep({
               href={
                 steamId
                   ? `steam://openurl/https://steamcommunity.com/profiles/${steamId}/edit/info`
-                  : '#'
+                  : 'steam://openurl/https://steamcommunity.com/my/edit/info'
               }
               className="underline"
               style={{ color: colors.purple }}
@@ -87,8 +95,8 @@ export function BioVerificationStep({
             <a
               href={
                 steamId
-                  ? `https://steamcommunity.com/id/${steamId}/edit/info`
-                  : '#'
+                  ? `https://steamcommunity.com/profiles/${steamId}/edit/info`
+                  : 'https://steamcommunity.com/my/edit/info'
               }
               target="_blank"
               rel="noopener noreferrer"
@@ -167,6 +175,6 @@ export function BioVerificationStep({
           </Button>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }

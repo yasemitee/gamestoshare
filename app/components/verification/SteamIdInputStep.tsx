@@ -3,6 +3,7 @@
 import { colors } from '@/lib/colors';
 import { Button } from '@/components/ui/Button';
 import { useState } from 'react';
+import { motion } from 'motion/react';
 
 interface SteamIdInputStepProps {
   onBack: () => void;
@@ -58,7 +59,13 @@ export function SteamIdInputStep({
   );
 
   return (
-    <div style={{ minHeight: '455px' }}>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={{ duration: 0.3 }}
+      style={{ minHeight: '455px' }}
+    >
       {renderTitle()}
       {renderDescription()}
 
@@ -220,6 +227,6 @@ export function SteamIdInputStep({
           </div>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }

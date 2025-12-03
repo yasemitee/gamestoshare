@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { STEAM_VERIFICATION_CODE } from '@/lib/constants';
 
 interface UseVerificationReturn {
   isVerificationOpen: boolean;
@@ -9,7 +10,7 @@ interface UseVerificationReturn {
 
 export function useVerification(steamId?: string): UseVerificationReturn {
   const [isVerificationOpen, setIsVerificationOpen] = useState(false);
-  const verificationCode = 'GTS';
+  const verificationCode = STEAM_VERIFICATION_CODE;
 
   const openVerification = useCallback(() => {
     setIsVerificationOpen(true);

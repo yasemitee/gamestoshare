@@ -4,6 +4,12 @@ import React from 'react';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { GradientTitle } from '@/components/ui/GradientTitle';
 import { colors } from '@/lib/colors';
+import {
+  ANIMATION_DURATION,
+  ANIMATION_DELAY,
+  ANIMATION_EASING,
+} from '@/lib/constants';
+import { motion } from 'motion/react';
 
 interface Game {
   appId: number;
@@ -25,30 +31,63 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   return (
     <div className="text-center mt-32 mb-16">
       {/* Title */}
-      <GradientTitle className="mb-5" style={{ lineHeight: '1.2' }}>
-        Share your games
-        <br />
-        and make new friends
-      </GradientTitle>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{
+          duration: ANIMATION_DURATION.SLOW,
+          ease: ANIMATION_EASING,
+        }}
+      >
+        <GradientTitle className="mb-5" style={{ lineHeight: '1.2' }}>
+          Share your games
+          <br />
+          and make new friends
+        </GradientTitle>
+      </motion.div>
+
       {/* Subtitle */}
-      <h4 className="mb-16" style={{ color: colors.gray1 }}>
+      <motion.h4
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{
+          duration: ANIMATION_DURATION.SLOW,
+          delay: ANIMATION_DELAY.MEDIUM,
+          ease: ANIMATION_EASING,
+        }}
+        className="mb-16"
+        style={{ color: colors.gray1 }}
+      >
         Choose a platform, search a game and send a friend request.
         <br className="hidden md:block" />
         Owning a large library of games has never been easier.
-      </h4>
+      </motion.h4>
+
       {/* Search Bar */}
-      <div className="flex justify-center mb-6">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2, ease: 'easeOut' }}
+        className="flex justify-center mb-6"
+      >
         <SearchBar
           showLocationFilter={true}
           onGameSelect={onGameSelect}
           onLocationChange={onLocationChange}
           selectedLocation={selectedLocation}
         />
-      </div>
+      </motion.div>
+
       {/* Note */}
-      <p className="text-small-title upper" style={{ color: colors.gray1 }}>
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6, delay: 0.6, ease: 'easeOut' }}
+        className="text-small-title upper"
+        style={{ color: colors.gray1 }}
+      >
         No registering - No sensitive info shared
-      </p>
+      </motion.p>
     </div>
   );
 };

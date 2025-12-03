@@ -4,6 +4,7 @@ interface SteamIdInputProps {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onBlur: () => void;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   isVerifying: boolean;
   isValid: boolean;
   isInvalid: boolean;
@@ -14,6 +15,7 @@ export function SteamIdInput({
   value,
   onChange,
   onBlur,
+  onKeyDown,
   isVerifying,
   isValid,
   isInvalid,
@@ -28,6 +30,7 @@ export function SteamIdInput({
           value={value}
           onChange={onChange}
           onBlur={onBlur}
+          onKeyDown={onKeyDown}
           placeholder="Your Steam ID"
           className="flex-1 py-2 focus:outline-none border-b text-field bg-transparent"
           style={{

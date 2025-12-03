@@ -1,4 +1,5 @@
 import { colors } from '@/lib/colors';
+import { motion } from 'motion/react';
 
 interface ShowSteamIdCheckboxProps {
   checked: boolean;
@@ -11,11 +12,16 @@ export function ShowSteamIdCheckbox({
 }: ShowSteamIdCheckboxProps) {
   return (
     <div className="mb-6" style={{ color: colors.gray1 }}>
-      <label className="flex items-center gap-2">
-        <input
+      <label className="flex items-center gap-2 cursor-pointer">
+        <motion.input
           type="checkbox"
           checked={checked}
           onChange={(e) => onChange(e.target.checked)}
+          whileHover={{
+            boxShadow:
+              '0 0 15px rgba(195, 194, 245, 0.4), 0 0 30px rgba(195, 194, 245, 0.2)',
+          }}
+          transition={{ duration: 0.2 }}
           className="w-5 h-5 border-2 appearance-none checked:bg-transparent cursor-pointer flex-shrink-0"
           style={{
             backgroundColor: 'transparent',

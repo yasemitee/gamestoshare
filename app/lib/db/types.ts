@@ -1,5 +1,15 @@
 import { Listing, Game, ListingGame, Platform, ListingType } from '@prisma/client';
 
+/**
+ * Generic game representation used across components
+ */
+export interface GameData {
+  id: string;
+  name: string;
+  iconUrl?: string;
+  appId?: number;
+}
+
 export type ListingWithRelations = Listing & {
   games: (ListingGame & {
     game: Game;

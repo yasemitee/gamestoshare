@@ -1,21 +1,18 @@
 import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/db/db';
 import { colors } from '@/lib/colors';
-import { GoBackButton } from '@/components/ui/GoBackButton';
-
-// Cache listing pages for 60 seconds to reduce database queries
-export const revalidate = 60;
 import { Container } from '@/components/layout/Container';
 import { Footer } from '@/components/layout/Footer';
 import { Navbar } from '@/components/layout/Navbar';
 import { MainContentContainer } from '@/components/layout/MainContentContainer';
-import { GamesList } from '@/components/listings/GamesList';
-import { FriendRequestSection } from '@/components/listings/FriendRequestSection';
-import { ListingUserHeader } from '@/components/listings/ListingUserHeader';
+import { ListingDetailContent } from '@/components/listings/ListingDetailContent';
 import {
   sortGamesByYearAndPrice,
   getDaysSincePosting,
 } from '@/lib/utils/listing';
+
+// Cache listing pages for 60 seconds to reduce database queries
+export const revalidate = 60;
 
 interface ListingDetailPageProps {
   params: Promise<{
@@ -79,69 +76,21 @@ export default async function ListingDetailPage({
       <Container>
         <Navbar />
         <MainContentContainer>
-          <div className="">
-            {/* Go Back Button */}
-            <div className="mb-14">
-              <GoBackButton />
-            </div>
-            {/* Main Content */}
-            <div className="flex flex-col">
-              {/* Top Section - Avatar and User Info */}
-              <ListingUserHeader
-                username={listing.username}
-                showSteamId={listing.showSteamId}
-                avatarUrl={listing.avatarUrl}
-                location={listing.location}
-                steamLevel={listing.steamLevel}
-                accountYears={listing.accountYears}
-              />
-              {/* Divider */}
-              <div
-                style={{
-                  borderTop: `1px solid ${colors.gray2}`,
-                }}
-                className="mt-5 mb-6 md:mb-13"
-              />
-              {/* Content Section: Description | Games */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-22">
-                {/* Left: Description */}
-                <div>
-                  <div className="flex items-center gap-4 pb-4 md:mb-8">
-                    <p
-                      className="text-small-title"
-                      style={{ color: colors.white }}
-                    >
-                      DESCRIPTION
-                    </p>
-                    <span
-                      className="text-field-small"
-                      style={{ color: colors.gray1 }}
-                    >
-                      {postingDate}
-                    </span>
-                  </div>
-                  <p
-                    className="text-field-small"
-                    style={{ color: colors.gray1 }}
-                  >
-                    {listing.description || 'No description provided.'}
-                  </p>
-                </div>
-                {/* Right: Games Section */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <GamesList title="LOOKING FOR" games={lookingForGames} />
-                  <GamesList title="OFFERING" games={offeringGames} />
-                </div>
-              </div>
-            </div>
-          </div>
-          {/* Friend Request Section */}
-          <div className="mt-14 md:mt-32">
-            <FriendRequestSection
-              listingId={listing.id}
-              username={listing.username}
-            />
-          </div>
+          <ListingDetailContent
+            listing={{
+              id: listing.id,
+              username: listing.username,
+              showSteamId: listing.showSteamId,
+              avatarUrl: listing.avatarUrl,
+              location: listing.location,
+              steamLevel: listing.steamLevel,
+              accountYears: listing.accountYears,
+              description: listing.description,
+            }}
+            lookingForGames={lookingForGames}
+            offeringGames={offeringGames}
+            postingDate={postingDate}
+          />
         </MainContentContainer>
       </Container>
       <Footer />

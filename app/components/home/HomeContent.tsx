@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { HeroSection } from '@/components/home/HeroSection';
 import { Table } from '@/components/home/Table';
 import { FAQItem } from '@/components/home/FAQItem';
-import { Button } from '@/components/ui/Button';
+import { AnimatedButton } from '@/components/ui/AnimatedButton';
 import { Footer } from '@/components/layout/Footer';
 import { GradientTitle } from '@/components/ui/GradientTitle';
 import { GameListingData } from '@/lib/db/types';
@@ -83,16 +83,13 @@ export function HomeContent({ listings }: HomeContentProps) {
         <p className="text-small-title mb-8" style={{ color: colors.gray1 }}>
           JOIN OUR COMMUNITY ON DISCORD AND GET TO KNOW US
         </p>
-        <a
+        <AnimatedButton
           href="https://discord.gg/mavhKaDRCv"
-          target="_blank"
-          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 text-button"
         >
-          <Button className="inline-flex items-center gap-1.5 text-button">
-            <img src="/Discord.svg" alt="Discord" width={16} height={16} />
-            <span className="text-button">JOIN OUR SERVER</span>
-          </Button>
-        </a>
+          <img src="/Discord.svg" alt="Discord" width={16} height={16} />
+          <span className="text-button">JOIN OUR SERVER</span>
+        </AnimatedButton>
       </div>
       <Footer />
     </>

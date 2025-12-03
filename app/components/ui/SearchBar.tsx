@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { colors, gradients } from '@/lib/colors';
 import { LocationSelector } from './LocationSelector';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface Game {
   appId: number;
@@ -33,6 +34,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   const [results, setResults] = useState<Game[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -98,7 +100,19 @@ export const SearchBar: React.FC<SearchBarProps> = ({
       ref={searchRef}
     >
       <div className="relative flex items-center gap-2">
-        <div className="relative flex-1 flex items-center">
+        <motion.div
+          animate={{
+            boxShadow: isFocused
+              ? '0 0 20px rgba(195, 194, 245, 0.4), 0 0 40px rgba(195, 194, 245, 0.2)'
+              : '0 0 0px rgba(195, 194, 245, 0)',
+          }}
+          whileHover={{
+            boxShadow:
+              '0 0 15px rgba(195, 194, 245, 0.3), 0 0 30px rgba(195, 194, 245, 0.15)',
+          }}
+          transition={{ duration: 0.3 }}
+          className="relative flex-1 flex items-center"
+        >
           <img
             src="/Lens.svg"
             alt=""
@@ -109,6 +123,8 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             placeholder={placeholder}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
             className="text-field w-full pl-12 pr-4 py-4 focus:outline-none focus:ring-2 focus:ring-offset-0 transition-all"
             style={
               {
@@ -118,7 +134,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
               } as React.CSSProperties
             }
           />
-        </div>
+        </motion.div>
 
         {showLocationFilter && onLocationChange && (
           <LocationSelector
@@ -132,43 +148,48 @@ export const SearchBar: React.FC<SearchBarProps> = ({
       </div>
 
       {/* Search Results Dropdown */}
-      {showResults && results.length > 0 && (
-        <div
-          className="absolute top-full left-0 right-0 mt-2 max-h-80 overflow-y-auto"
-          style={{
-            backgroundColor: colors.blue1,
-            border: `1px solid ${colors.gray2}`,
-            zIndex: 50,
-          }}
-        >
-          {results.map((game) => (
-            <button
-              key={game.appId}
-              onClick={() => handleGameClick(game)}
-              className="w-full flex items-center gap-2.5 p-2.5 hover:bg-opacity-80 transition-all text-left"
-              style={{
-                backgroundColor: 'transparent',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = colors.gray2;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
-              }}
-            >
-              <img
-                src={game.iconUrl}
-                alt={game.name}
-                className="w-7 h-7 object-cover flex-shrink-0"
-                style={{ backgroundColor: colors.gray2 }}
-              />
-              <span className="text-field" style={{ color: colors.white }}>
-                {game.name}
-              </span>
-            </button>
-          ))}
-        </div>
-      )}
+      <AnimatePresence>
+        {showResults && results.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3, ease: [0.4, 0.0, 0.2, 1] }}
+            className="absolute top-full left-0 right-0 mt-2 max-h-80 overflow-y-auto"
+            style={{
+              backgroundColor: colors.blue1,
+              border: `1px solid ${colors.gray2}`,
+              zIndex: 50,
+            }}
+          >
+            {results.map((game, index) => (
+              <motion.button
+                key={game.appId}
+                whileHover={{
+                  boxShadow:
+                    '0 0 12px rgba(195, 194, 245, 0.3), 0 0 24px rgba(195, 194, 245, 0.15)',
+                }}
+                transition={{ duration: 0.2 }}
+                onClick={() => handleGameClick(game)}
+                className="w-full flex items-center gap-2.5 p-2.5 text-left"
+                style={{
+                  backgroundColor: 'transparent',
+                }}
+              >
+                <img
+                  src={game.iconUrl}
+                  alt={game.name}
+                  className="w-7 h-7 object-cover flex-shrink-0"
+                  style={{ backgroundColor: colors.gray2 }}
+                />
+                <span className="text-field" style={{ color: colors.white }}>
+                  {game.name}
+                </span>
+              </motion.button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

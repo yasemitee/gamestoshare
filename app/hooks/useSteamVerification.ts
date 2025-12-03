@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { normalizeSteamId } from '@/lib/steam/utils';
+import { showPrivateProfileError } from '@/lib/utils/errors';
 
 interface Game {
   id: string;
@@ -40,7 +41,13 @@ export function useSteamVerification() {
       const normalizedUrl = normalizeSteamId(id);
 
       const response = await fetch(
-        `/api/steam/profile?profileUrl=${encodeURIComponent(normalizedUrl)}`
+        `/api/steam/profile?profileUrl=${encodeURIComponent(normalizedUrl)}`,
+        {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache',
+          },
+        }
       );
 
       if (response.ok) {
@@ -110,6 +117,23 @@ export function useSteamVerification() {
 
         return result;
       } else {
+        // Handle error response
+        let errorData: any = {};
+        try {
+          errorData = await response.json();
+        } catch (e) {
+          // Failed to parse JSON
+        }
+        
+        // Check if it's a private profile error (403 status or error message contains 'private')
+        const isPrivateProfile = 
+          response.status === 403 || 
+          (errorData.error && typeof errorData.error === 'string' && errorData.error.toLowerCase().includes('private'));
+        
+        if (isPrivateProfile) {
+          showPrivateProfileError();
+        }
+        
         setIsSteamIdValid(false);
         setIsSteamIdInvalid(true);
         return null;

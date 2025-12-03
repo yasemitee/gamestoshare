@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { colors, gradients } from '@/lib/colors';
 import Image from 'next/image';
+import { motion, AnimatePresence } from 'motion/react';
 
 export const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -40,11 +41,20 @@ export const Navbar: React.FC = () => {
   const isActive = (path: string) => pathname === path;
 
   return (
-    <nav
-      className={`fixed top-0 left-0 right-0 z-[60] transition-all duration-300 ${
-        isScrolled ? 'py-4 backdrop-blur-sm bg-black/30' : 'py-4'
+    <motion.nav
+      initial={false}
+      animate={{
+        background: isScrolled
+          ? 'linear-gradient(180deg, #1C1F23 0%, #0F1012 100%)'
+          : 'linear-gradient(180deg, rgba(28, 31, 35, 0) 0%, rgba(15, 16, 18, 0) 100%)',
+      }}
+      transition={{
+        duration: 0.5,
+        ease: [0.4, 0.0, 0.2, 1],
+      }}
+      className={`fixed top-0 left-0 right-0 z-[60] py-4 ${
+        isScrolled ? 'backdrop-blur-sm' : ''
       }`}
-      style={{ background: gradients.navbar }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 flex items-center justify-between">
         <div
@@ -61,18 +71,26 @@ export const Navbar: React.FC = () => {
         </div>
 
         <div className="hidden md:flex items-center gap-16 md:gap-8 lg:gap-16">
-          <button
-            className="text-navbar transition-colors flex items-center gap-2 cursor-pointer hover:!text-white focus:!text-white"
+          <motion.button
+            whileHover={{ y: -2 }}
+            whileTap={{ y: 0 }}
+            transition={{ duration: 0.2 }}
+            className="text-navbar flex items-center gap-2 cursor-pointer transition-colors hover:!text-white"
             style={{ color: isActive('/') ? colors.white : colors.gray1 }}
             onClick={() => (window.location.href = '/')}
           >
             Search
-          </button>
-          <button
+          </motion.button>
+          <motion.button
+            whileHover={{ y: -2 }}
+            whileTap={{ y: 0 }}
+            transition={{ duration: 0.2 }}
             className="text-navbar flex items-center gap-2 cursor-pointer outline-none group"
-            style={{ color: colors.gray1 }}
           >
-            <span className="transition-colors group-hover:!text-white">
+            <span
+              className="transition-colors group-hover:!text-white"
+              style={{ color: colors.gray1 }}
+            >
               Platform
             </span>
             <img
@@ -80,23 +98,36 @@ export const Navbar: React.FC = () => {
               alt=""
               className="w-3 h-3 pt-1 transition-[filter] brightness-[0.6] group-hover:!brightness-[10]"
             />
-          </button>
-          <button
-            className="text-navbar transition-colors cursor-pointer hover:!text-white focus:!text-white"
+          </motion.button>
+          <motion.button
+            whileHover={{ y: -2 }}
+            whileTap={{ y: 0 }}
+            transition={{ duration: 0.2 }}
+            className="text-navbar cursor-pointer transition-colors hover:!text-white"
             style={{ color: isActive('/info') ? colors.white : colors.gray1 }}
             onClick={() => (window.location.href = '/info')}
           >
             Info
-          </button>
+          </motion.button>
         </div>
 
-        <Button
-          variant="primary"
+        <motion.div
+          whileHover={{
+            boxShadow:
+              '0 0 20px rgba(195, 194, 245, 0.6), 0 0 40px rgba(195, 194, 245, 0.3)',
+            filter: 'brightness(1.1)',
+          }}
+          whileTap={{ scale: 0.98 }}
+          transition={{ duration: 0.2 }}
           className="hidden md:block"
-          onClick={() => (window.location.href = '/listings/create')}
         >
-          CREATE A POST
-        </Button>
+          <Button
+            variant="primary"
+            onClick={() => (window.location.href = '/listings/create')}
+          >
+            CREATE A POST
+          </Button>
+        </motion.div>
 
         {/* Mobile menu button */}
         <button
@@ -139,75 +170,87 @@ export const Navbar: React.FC = () => {
       </div>
 
       {/* Mobile menu */}
-      {isMobileMenuOpen && (
-        <div
-          className="fixed top-0 left-0 w-full md:hidden z-40"
-          style={{
-            backgroundColor: 'rgba(11, 11, 12, 0.95)',
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
-            height: '100dvh',
-            minHeight: '100vh',
-          }}
-          onClick={() => setIsMobileMenuOpen(false)}
-        >
-          {/* Menu content - centered */}
-          <div
-            className="flex flex-col items-center justify-center h-full space-y-10"
-            onClick={(e) => e.stopPropagation()}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed top-0 left-0 w-full md:hidden z-40"
+            style={{
+              backgroundColor: 'rgba(11, 11, 12, 0.95)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+              height: '100dvh',
+              minHeight: '100vh',
+            }}
+            onClick={() => setIsMobileMenuOpen(false)}
           >
-            {/* Search */}
-            <button
-              className="text-title"
-              style={{ color: isActive('/') ? colors.white : colors.gray1 }}
-              onClick={() => {
-                window.location.href = '/';
-                setIsMobileMenuOpen(false);
-              }}
+            {/* Menu content - centered */}
+            <motion.div
+              initial={{ y: -20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -20, opacity: 0 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
+              className="flex flex-col items-center justify-center h-full space-y-10"
+              onClick={(e) => e.stopPropagation()}
             >
-              Search
-            </button>
-
-            {/* Platform */}
-            <button
-              className="text-title flex items-center gap-2"
-              style={{ color: colors.gray1 }}
-            >
-              <span>Platform</span>
-              <img
-                src="/Dropdown.svg"
-                alt=""
-                className="w-3 h-3 brightness-[0.6]"
-              />
-            </button>
-
-            {/* Info */}
-            <button
-              className="text-title"
-              style={{ color: isActive('/info') ? colors.white : colors.gray1 }}
-              onClick={() => {
-                window.location.href = '/info';
-                setIsMobileMenuOpen(false);
-              }}
-            >
-              Info
-            </button>
-
-            {/* Create post button */}
-            <div>
-              <Button
-                variant="primary"
+              {/* Search */}
+              <button
+                className="text-title"
+                style={{ color: isActive('/') ? colors.white : colors.gray1 }}
                 onClick={() => {
-                  window.location.href = '/listings/create';
+                  window.location.href = '/';
                   setIsMobileMenuOpen(false);
                 }}
               >
-                CREATE A POST
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-    </nav>
+                Search
+              </button>
+
+              {/* Platform */}
+              <button
+                className="text-title flex items-center gap-2"
+                style={{ color: colors.gray1 }}
+              >
+                <span>Platform</span>
+                <img
+                  src="/Dropdown.svg"
+                  alt=""
+                  className="w-3 h-3 brightness-[0.6]"
+                />
+              </button>
+
+              {/* Info */}
+              <button
+                className="text-title"
+                style={{
+                  color: isActive('/info') ? colors.white : colors.gray1,
+                }}
+                onClick={() => {
+                  window.location.href = '/info';
+                  setIsMobileMenuOpen(false);
+                }}
+              >
+                Info
+              </button>
+
+              {/* Create post button */}
+              <div>
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    window.location.href = '/listings/create';
+                    setIsMobileMenuOpen(false);
+                  }}
+                >
+                  CREATE A POST
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.nav>
   );
 };

@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { colors, gradients } from '@/lib/colors';
 import { COUNTRIES } from '@/lib/countries';
+import { motion } from 'motion/react';
 
 interface LocationSelectorProps {
   value: string;
@@ -52,9 +53,15 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
   return (
     <div className="relative" ref={dropdownRef}>
       {showLabel && <label className="block mb-6 text-field">Location</label>}
-      <button
+      <motion.button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
+        whileHover={{
+          boxShadow: gradient
+            ? '0 0 15px rgba(195, 194, 245, 0.4), 0 0 30px rgba(195, 194, 245, 0.2)'
+            : '0 0 15px rgba(195, 194, 245, 0.3), 0 0 30px rgba(195, 194, 245, 0.15)',
+        }}
+        transition={{ duration: 0.3 }}
         className={`${
           compact ? 'text-field' : 'text-small-title'
         } appearance-none cursor-pointer p-4 pr-10 text-left flex items-center gap-2`}
@@ -91,7 +98,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
         ) : (
           <span>--</span>
         )}
-      </button>
+      </motion.button>
       <div
         className={`absolute pointer-events-none ${
           compact

@@ -15,16 +15,28 @@ import { PlatformSelector } from '@/components/listings/PlatformSelector';
 import { GameSection } from '@/components/listings/GameSection';
 import { DescriptionTextarea } from '@/components/listings/DescriptionTextarea';
 import { VerificationModal } from '@/components/verification/VerificationModal';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
-import { colors } from '@/lib/colors';
+import { colors, gradients } from '@/lib/colors';
 import { COUNTRIES } from '@/lib/countries';
 import { useSteamVerification } from '@/hooks/useSteamVerification';
 import { useVerification } from '@/hooks/useVerification';
 import { extractCleanSteamId, normalizeSteamId } from '@/lib/steam/utils';
 import { removeDuplicateGames } from '@/lib/utils/games';
+import { motion } from 'motion/react';
+import {
+  setupGlobalErrorHandlers,
+  cleanupGlobalErrorHandlers,
+} from '@/lib/utils/errors';
 
 export default function CreateListingPage() {
+  // Setup global error handlers for compatibility
+  useEffect(() => {
+    setupGlobalErrorHandlers();
+    return () => {
+      cleanupGlobalErrorHandlers();
+    };
+  }, []);
   /*
     State variables
   */
@@ -93,6 +105,16 @@ export default function CreateListingPage() {
       verifySteamId('');
     }
   };
+
+  const handleSteamIdKeyDown = async (
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    if (e.key === 'Enter' && steamId.trim()) {
+      e.preventDefault();
+      await handleSteamIdBlur();
+    }
+  };
+
   const handleSteamIdBlur = async () => {
     if (steamId.trim()) {
       const result = await verifySteamId(steamId);
@@ -303,16 +325,28 @@ export default function CreateListingPage() {
           <Navbar />
           <MainContentContainer>
             <GoBackButton />
-            <form onSubmit={handleSubmit} className="mt-14 text-white">
+            <motion.form
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              onSubmit={handleSubmit}
+              className="mt-14 text-white"
+            >
               {/* Main Grid */}
               <div className="flex flex-col md:flex-row gap-8 mb-12">
                 {/* Left Column */}
-                <div className="flex-1 flex flex-col">
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.4, delay: 0.1 }}
+                  className="flex-1 flex flex-col"
+                >
                   {/* Steam ID */}
                   <SteamIdInput
                     value={steamId}
                     onChange={handleSteamIdChange}
                     onBlur={handleSteamIdBlur}
+                    onKeyDown={handleSteamIdKeyDown}
                     isVerifying={isVerifying}
                     isValid={isSteamIdValid}
                     isInvalid={isSteamIdInvalid}
@@ -338,18 +372,28 @@ export default function CreateListingPage() {
                       disabled
                     />
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Right Column - Description */}
-                <div className="flex-1 md:mt-0 mt-6">
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.4, delay: 0.2 }}
+                  className="flex-1 md:mt-0 mt-6"
+                >
                   <DescriptionTextarea
                     value={description}
                     onChange={setDescription}
                   />
-                </div>
+                </motion.div>
               </div>
               {/* Looking for & Offering */}
-              <div className="flex flex-col md:flex-row gap-8 mb-12">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.3 }}
+                className="flex flex-col md:flex-row gap-8 mb-12"
+              >
                 <GameSection
                   label="Looking for"
                   games={lookingFor}
@@ -364,7 +408,7 @@ export default function CreateListingPage() {
                   onRemove={handleRemoveOffering}
                   maxGames={10}
                 />
-              </div>
+              </motion.div>
               {/* Terms and conditions */}
               <div className="mt-32">
                 <TermsCheckbox
@@ -373,15 +417,35 @@ export default function CreateListingPage() {
                   hasError={termsError}
                 />
                 {/* Submit button */}
-                <Button
-                  type="submit"
-                  disabled={!termsAccepted || isSubmitting}
-                  className="mx-auto block px-6 py-2.5 text-button"
-                >
-                  {isSubmitting ? 'POSTING...' : 'POST'}
-                </Button>
+                <div className="flex justify-center">
+                  <motion.button
+                    type="submit"
+                    disabled={!termsAccepted || isSubmitting}
+                    whileHover={{
+                      boxShadow:
+                        '0 0 20px rgba(195, 194, 245, 0.6), 0 0 40px rgba(195, 194, 245, 0.3)',
+                      filter: 'brightness(1.1)',
+                    }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ duration: 0.2 }}
+                    className="text-button px-6 py-2.5 cursor-pointer"
+                    style={{
+                      background:
+                        !termsAccepted || isSubmitting
+                          ? colors.gray2
+                          : gradients.main,
+                      color:
+                        !termsAccepted || isSubmitting
+                          ? colors.gray1
+                          : colors.black,
+                      opacity: !termsAccepted || isSubmitting ? 0.5 : 1,
+                    }}
+                  >
+                    {isSubmitting ? 'POSTING...' : 'POST'}
+                  </motion.button>
+                </div>
               </div>
-            </form>
+            </motion.form>
           </MainContentContainer>
           <Footer />
         </Container>

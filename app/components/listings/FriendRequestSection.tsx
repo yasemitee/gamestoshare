@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { InvitationFlowModal } from '@/components/verification/InvitationFlowModal';
 import { useInvitationFlow } from '@/hooks/useInvitationFlow';
 import { colors } from '@/lib/colors';
+import { motion } from 'motion/react';
 
 interface FriendRequestSectionProps {
   listingId: string;
@@ -114,13 +115,23 @@ export function FriendRequestSection({
       <Toaster position="top-center" />
       <div className="">
         <TermsCheckbox checked={termsAccepted} onChange={setTermsAccepted} />
-        <Button
-          onClick={handleSendRequest}
-          disabled={!termsAccepted}
-          className="mx-auto block px-6 py-2.5 text-button"
+        <motion.div
+          whileHover={{
+            boxShadow:
+              '0 0 20px rgba(195, 194, 245, 0.6), 0 0 40px rgba(195, 194, 245, 0.3)',
+          }}
+          whileTap={{ scale: 0.98 }}
+          transition={{ duration: 0.2 }}
+          className="mx-auto block w-fit"
         >
-          SEND INVITATION
-        </Button>
+          <Button
+            onClick={handleSendRequest}
+            disabled={!termsAccepted}
+            className="px-6 py-2.5 text-button"
+          >
+            SEND INVITATION
+          </Button>
+        </motion.div>
       </div>
 
       <InvitationFlowModal

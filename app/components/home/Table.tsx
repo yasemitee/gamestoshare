@@ -25,7 +25,7 @@ export const Table: React.FC<TableProps> = ({ data }) => {
             }
           }
         `}</style>
-        <div>User</div>
+        <div className="pl-2">User</div>
         <div className="hidden md:block">Location</div>
         <div>Looking for</div>
         <div>Offering</div>
@@ -42,7 +42,7 @@ export const Table: React.FC<TableProps> = ({ data }) => {
       ) : (
         <div className="overflow-y-auto custom-scrollbar max-h-[40vh] md:max-h-[400px]">
           {data.map((row, idx) => (
-            <TableRow key={idx} {...row} />
+            <TableRow key={idx} index={idx} {...row} />
           ))}
         </div>
       )}

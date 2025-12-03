@@ -1,0 +1,129 @@
+'use client';
+
+import { motion } from 'motion/react';
+import { colors } from '@/lib/colors';
+import { GoBackButton } from '@/components/ui/GoBackButton';
+import { GamesList } from './GamesList';
+import { FriendRequestSection } from './FriendRequestSection';
+import { ListingUserHeader } from './ListingUserHeader';
+
+interface Game {
+  id: string;
+  name: string;
+  steamAppId: number;
+  iconUrl: string | null;
+  headerImage: string | null;
+  releaseYear: number | null;
+  priceInCents: number | null;
+}
+
+interface ListingDetailContentProps {
+  listing: {
+    id: string;
+    username: string | null;
+    showSteamId: boolean;
+    avatarUrl: string | null;
+    location: string;
+    steamLevel: number | null;
+    accountYears: number | null;
+    description: string | null;
+  };
+  lookingForGames: Game[];
+  offeringGames: Game[];
+  postingDate: string;
+}
+
+export const ListingDetailContent: React.FC<ListingDetailContentProps> = ({
+  listing,
+  lookingForGames,
+  offeringGames,
+  postingDate,
+}) => {
+  return (
+    <div className="">
+      {/* Go Back Button */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="mb-14"
+      >
+        <GoBackButton />
+      </motion.div>
+      {/* Main Content */}
+      <div className="flex flex-col">
+        {/* Top Section - Avatar and User Info */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+        >
+          <ListingUserHeader
+            username={listing.username}
+            showSteamId={listing.showSteamId}
+            avatarUrl={listing.avatarUrl}
+            location={listing.location}
+            steamLevel={listing.steamLevel}
+            accountYears={listing.accountYears}
+          />
+        </motion.div>
+        {/* Divider */}
+        <motion.div
+          initial={{ opacity: 0, scaleX: 0 }}
+          animate={{ opacity: 1, scaleX: 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          style={{
+            borderTop: `1px solid ${colors.gray2}`,
+          }}
+          className="mt-5 mb-6 md:mb-13"
+        />
+        {/* Content Section: Description | Games */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-22">
+          {/* Left: Description */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4, delay: 0.3 }}
+          >
+            <div className="flex items-center gap-4 pb-4 md:mb-8">
+              <p className="text-small-title" style={{ color: colors.white }}>
+                DESCRIPTION
+              </p>
+              <span
+                className="text-field-small"
+                style={{ color: colors.gray1 }}
+              >
+                {postingDate}
+              </span>
+            </div>
+            <p className="text-field-small" style={{ color: colors.gray1 }}>
+              {listing.description || 'No description provided.'}
+            </p>
+          </motion.div>
+          {/* Right: Games Section */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4, delay: 0.4 }}
+            className="grid grid-cols-1 md:grid-cols-2 gap-9"
+          >
+            <GamesList title="LOOKING FOR" games={lookingForGames} />
+            <GamesList title="OFFERING" games={offeringGames} />
+          </motion.div>
+        </div>
+      </div>
+      {/* Friend Request Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.5 }}
+        className="mt-14 md:mt-32"
+      >
+        <FriendRequestSection
+          listingId={listing.id}
+          username={listing.username}
+        />
+      </motion.div>
+    </div>
+  );
+};

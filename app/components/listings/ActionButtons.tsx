@@ -2,6 +2,7 @@
 
 import toast, { Toaster } from 'react-hot-toast';
 import { colors } from '@/lib/colors';
+import { motion } from 'motion/react';
 
 interface ActionButtonsProps {
   showReport?: boolean;
@@ -60,14 +61,20 @@ export function ActionButtons({
 
         {/* Share Button */}
         {showShare && (
-          <button
+          <motion.button
             onClick={handleShare}
-            className="p-3.5 transition-all hover:bg-opacity-80 hover:cursor-pointer"
+            whileHover={{
+              boxShadow:
+                '0 0 20px rgba(195, 194, 245, 0.6), 0 0 40px rgba(195, 194, 245, 0.3)',
+            }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className="p-3.5 hover:cursor-pointer"
             style={{ backgroundColor: colors.blue1 }}
             title="Share"
           >
             <img src="/Share.svg" alt="Share" width="20" height="20" />
-          </button>
+          </motion.button>
         )}
       </div>
     </>
