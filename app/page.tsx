@@ -6,6 +6,59 @@ import { GameListingData } from '@/lib/db/types';
 import { prisma } from '@/lib/db/db';
 import { headers } from 'next/headers';
 
+export const metadata = {
+  title: 'Home - GamesToShare',
+  description:
+    'Discover gamers to share your Steam library with on GamesToShare. Find and connect with fellow gamers for seamless game sharing experiences.',
+  keywords: [
+    'game sharing',
+    'steam family sharing',
+    'game library sharing',
+    'gaming community',
+    'meet gamers',
+    'share games',
+    'gaming friends',
+    'no registration',
+  ],
+  openGraph: {
+    title: 'Home - GamesToShare',
+    description:
+      'Discover gamers to share your Steam library with on GamesToShare. Find and connect with fellow gamers for seamless game sharing experiences.',
+    url: 'https://www.gamestoshare.com/',
+    images: [
+      {
+        url: '/WebsiteBanner.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'GamesToShare Home',
+      },
+    ],
+    siteName: 'GamesToShare',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Home - GamesToShare',
+    description:
+      'Discover gamers to share your Steam library with on GamesToShare. Find and connect with fellow gamers for seamless game sharing experiences.',
+    images: ['/WebsiteBanner.jpg'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    nocache: false,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-snippet': -1,
+      'max-image-preview': 'large',
+      'max-video-preview': -1,
+    },
+  },
+  alternates: {
+    canonical: 'https://www.gamestoshare.com/',
+  },
+};
+
 // Revalidate every 60 seconds on server - reduces function invocations
 // Browser will check for fresh content on manual refresh
 export const revalidate = 60;

@@ -20,6 +20,58 @@ import { CodeBlock } from '@/components/ui/CodeBlock';
 import { SupportCard } from '@/components/content/SupportCard';
 import { AnimatedContentWrapper } from '@/components/content/AnimatedContentWrapper';
 
+export const metadata = {
+  title: 'Guide: How to use GTS - GamesToShare',
+  description:
+    'Learn how to use GamesToShare to share and access Steam game libraries through our comprehensive guide.',
+  keywords: [
+    'game sharing guide',
+    'how to use gamestoshare',
+    'steam family sharing tutorial',
+    'game library sharing instructions',
+    'gaming community guide',
+    'share games tutorial',
+    'using gamestoshare platform',
+  ],
+  openGraph: {
+    title: 'Guide: How to use GTS - GamesToShare',
+    description:
+      'Learn how to use GamesToShare to share and access Steam game libraries through our comprehensive guide.',
+    url: 'https://www.gamestoshare.com/info',
+    images: [
+      {
+        url: '/WebsiteBanner.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'GamesToShare How to Use Guide',
+      },
+    ],
+    siteName: 'GamesToShare',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Guide: How to use GTS - GamesToShare',
+    description:
+      'Learn how to use GamesToShare to share and access Steam game libraries through our comprehensive guide.',
+    images: ['/WebsiteBanner.jpg'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    nocache: false,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-snippet': -1,
+      'max-image-preview': 'large',
+      'max-video-preview': -1,
+    },
+  },
+  alternates: {
+    canonical: 'https://www.gamestoshare.com/info',
+  },
+};
+
 // Static page - no need for function invocations
 export const dynamic = 'force-static';
 

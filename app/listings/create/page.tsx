@@ -29,6 +29,58 @@ import {
   cleanupGlobalErrorHandlers,
 } from '@/lib/utils/errors';
 
+export const metadata = {
+  title: 'Create Listing - GamesToShare',
+  description:
+    'Create a new game sharing listing on GamesToShare and connect with fellow gamers.',
+  keywords: [
+    'create listing',
+    'game sharing',
+    'steam games',
+    'gaming community',
+    'games to share',
+  ],
+  openGraph: {
+    title: 'Create Listing - GamesToShare',
+    description:
+      'Create a new game sharing listing on GamesToShare and connect with fellow gamers.',
+    url: 'https://www.gamestoshare.com/listings/create',
+    siteName: 'GamesToShare',
+    images: [
+      {
+        url: '/WebsiteBanner.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Create Listing - GamesToShare',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Create Listing - GamesToShare',
+    description:
+      'Create a new game sharing listing on GamesToShare and connect with fellow gamers.',
+    images: ['/WebsiteBanner.jpg'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    nocache: false,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-snippet': -1,
+      'max-image-preview': 'large',
+      'max-video-preview': -1,
+    },
+  },
+  alternates: {
+    canonical: 'https://www.gamestoshare.com/listings/create',
+  },
+};
+
 export default function CreateListingPage() {
   // Setup global error handlers for compatibility
   useEffect(() => {

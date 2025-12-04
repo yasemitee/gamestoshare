@@ -11,7 +11,74 @@ import {
   getDaysSincePosting,
 } from '@/lib/utils/listing';
 
-// Cache listing pages for 60 seconds to reduce database queries
+export async function generateMetadata({ params }: { params: { id: string } }) {
+  const listing = await getListing(params.id);
+
+  if (!listing) {
+    return {
+      title: 'Listing Not Found - GamesToShare',
+      description:
+        'The requested listing could not be found or is no longer active.',
+    };
+  }
+
+  return {
+    title: `${listing.username || 'Anonymous User'}'s Listing - GamesToShare`,
+    description: `View ${
+      listing.username || 'this user'
+    }'s game sharing listing on GamesToShare.`,
+    keywords: [
+      'game sharing',
+      'steam family sharing',
+      'game library sharing',
+      'gaming community',
+      'meet gamers',
+      'share games',
+      'gaming friends',
+      'no registration',
+    ],
+    openGraph: {
+      title: `${listing.username || 'Anonymous User'}'s Listing - GamesToShare`,
+      description: `View ${
+        listing.username || 'this user'
+      }'s game sharing listing on GamesToShare.`,
+      url: `https://www.gamestoshare.com/listings/${listing.id}`,
+      images: [
+        {
+          url: '/WebsiteBanner.jpg',
+          width: 1200,
+          height: 630,
+          alt: 'GamesToShare Listing Details',
+        },
+      ],
+      siteName: 'GamesToShare',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${listing.username || 'Anonymous User'}'s Listing - GamesToShare`,
+      description: `View ${
+        listing.username || 'this user'
+      }'s game sharing listing on GamesToShare.`,
+      images: ['/WebsiteBanner.jpg'],
+    },
+    robots: {
+      index: true,
+      follow: true,
+      nocache: false,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-snippet': -1,
+        'max-image-preview': 'large',
+        'max-video-preview': -1,
+      },
+    },
+    alternates: {
+      canonical: `https://www.gamestoshare.com/listings/${listing.id}`,
+    },
+  };
+}
+
 export const revalidate = 60;
 
 interface ListingDetailPageProps {

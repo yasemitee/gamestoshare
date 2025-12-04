@@ -12,8 +12,65 @@ import { PageHeaderMeta } from '@/components/ui/PageHeaderMeta';
 import { colors } from '@/lib/colors';
 import { getTimeAgo } from '@/lib/utils/time';
 import { AnimatedContentWrapper } from '@/components/content/AnimatedContentWrapper';
+import { g } from 'motion/react-client';
 
-// Static page - no need for function invocations
+export const metadata = {
+  title: 'Terms & Conditions - GamesToShare',
+  description:
+    'Read the Terms & Conditions for GamesToShare, outlining user responsibilities, platform purpose, and compliance with Steam policies.',
+  keywords: [
+    'Terms and Conditions',
+    'GTS Terms',
+    'Steam Family Sharing',
+    'User Agreement',
+    'Platform Policies',
+    'Game Sharing Rules',
+    'Steam Compliance',
+    'User Responsibilities',
+    'GTS Guidelines',
+    'Legal Information',
+  ],
+  openGraph: {
+    title: 'Terms & Conditions - GamesToShare',
+    description:
+      'Read the Terms & Conditions for GamesToShare, outlining user responsibilities, platform purpose, and compliance with Steam policies.',
+    url: 'https://gamestoshare.it/terms',
+    siteName: 'GamesToShare',
+    images: [
+      {
+        url: '/WebsiteBanner.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'GamesToShare Terms & Conditions',
+      },
+    ],
+    locale: 'en_IT',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Terms & Conditions - GamesToShare',
+    description:
+      'Read the Terms & Conditions for GamesToShare, outlining user responsibilities, platform purpose, and compliance with Steam policies.',
+    images: ['/WebsiteBanner.jpg'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    nocache: false,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-snippet': -1,
+      'max-image-preview': 'large',
+      'max-video-preview': -1,
+    },
+  },
+  alternates: {
+    canonical: 'https://gamestoshare.it/terms',
+  },
+};
+
 export const dynamic = 'force-static';
 
 // Update this date when Terms & Conditions are modified
