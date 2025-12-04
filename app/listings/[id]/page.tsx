@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
       url: `https://www.gamestoshare.com/listings/${listing.id}`,
       images: [
         {
-          url: '/WebsiteBanner.jpg',
+          url: 'https://www.gamestoshare.com/WebsiteBanner.jpg',
           width: 1200,
           height: 630,
           alt: 'GamesToShare Listing Details',
@@ -59,7 +59,7 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
       description: `View ${
         listing.username || 'this user'
       }'s game sharing listing on GamesToShare.`,
-      images: ['/WebsiteBanner.jpg'],
+      images: ['https://www.gamestoshare.com/WebsiteBanner.jpg'],
     },
     robots: {
       index: true,

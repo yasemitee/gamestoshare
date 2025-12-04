@@ -38,7 +38,7 @@ export const metadata = {
     siteName: 'GamesToShare',
     images: [
       {
-        url: '/WebsiteBanner.jpg',
+        url: 'https://www.gamestoshare.com/WebsiteBanner.jpg',
         width: 1200,
         height: 630,
         alt: 'GamesToShare Terms & Conditions',
@@ -52,7 +52,7 @@ export const metadata = {
     title: 'Terms & Conditions - GamesToShare',
     description:
       'Read the Terms & Conditions for GamesToShare, outlining user responsibilities, platform purpose, and compliance with Steam policies.',
-    images: ['/WebsiteBanner.jpg'],
+    images: ['https://www.gamestoshare.com/WebsiteBanner.jpg'],
   },
   robots: {
     index: true,

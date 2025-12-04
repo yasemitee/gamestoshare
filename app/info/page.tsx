@@ -40,7 +40,7 @@ export const metadata = {
     url: 'https://www.gamestoshare.com/info',
     images: [
       {
-        url: '/WebsiteBanner.jpg',
+        url: 'https://www.gamestoshare.com/WebsiteBanner.jpg',
         width: 1200,
         height: 630,
         alt: 'GamesToShare How to Use Guide',
@@ -53,7 +53,7 @@ export const metadata = {
     title: 'Guide: How to use GTS - GamesToShare',
     description:
       'Learn how to use GamesToShare to share and access Steam game libraries through our comprehensive guide.',
-    images: ['/WebsiteBanner.jpg'],
+    images: ['https://www.gamestoshare.com/WebsiteBanner.jpg'],
   },
   robots: {
     index: true,

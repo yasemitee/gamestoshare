@@ -27,7 +27,7 @@ export const metadata = {
     url: 'https://www.gamestoshare.com/',
     images: [
       {
-        url: '/WebsiteBanner.jpg',
+        url: 'https://www.gamestoshare.com/WebsiteBanner.jpg',
         width: 1200,
         height: 630,
         alt: 'GamesToShare Home',
@@ -40,7 +40,7 @@ export const metadata = {
     title: 'Home - GamesToShare',
     description:
       'Discover gamers to share your Steam library with on GamesToShare. Find and connect with fellow gamers for seamless game sharing experiences.',
-    images: ['/WebsiteBanner.jpg'],
+    images: ['https://www.gamestoshare.com/WebsiteBanner.jpg'],
   },
   robots: {
     index: true,
