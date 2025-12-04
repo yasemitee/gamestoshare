@@ -21,6 +21,9 @@ export const metadata: Metadata = {
   description:
     'Platform to share your game library with friends and meet new gamers. No registration required.',
   themeColor: '#0B0B0C',
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export default function RootLayout({
@@ -30,19 +33,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="it" className={`${lexendExa.variable} ${quando.variable}`}>
-      <head>
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta
-          name="apple-mobile-web-app-status-bar-style"
-          content="black-translucent"
-        />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        {/*Simple Analytics*/}
-        <script
-          async
-          src="https://scripts.simpleanalyticscdn.com/latest.js"
-        ></script>
-      </head>
       <body
         className={lexendExa.className}
         style={{ backgroundColor: '#2C3137' }}
