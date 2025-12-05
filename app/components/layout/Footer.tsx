@@ -36,22 +36,6 @@ export function Footer() {
             />
           </a>
           <a
-            href="https://github.com/yasemitee/gamestoshare"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-navbar flex items-center gap-2 text-navbar hover:opacity-80 transition-opacity"
-            style={{ color: colors.white }}
-          >
-            GitHub
-            <img
-              src="/GithubLogo.svg"
-              alt="GitHub"
-              width={16}
-              height={16}
-              style={{ filter: 'brightness(0) invert(1)' }}
-            />
-          </a>
-          <a
             href="https://discord.gg/mavhKaDRCv"
             target="_blank"
             rel="noopener noreferrer"
