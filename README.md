@@ -11,54 +11,96 @@
 
 _Share your Steam library, find players with common interests, send friend requests. No registration needed._
 
-[Report Bug](https://github.com/yasemitee/gamestoshare/issues) · [Request Feature](https://github.com/yasemitee/gamestoshare/issues)
-
 </div>
 
 ---
 
-## About The Project
+## Overview
 
-GamesToShare is a **full-stack web application** that solves a common problem in the gaming community: finding players who own or want the same games as you.
+GamesToShare allows Steam users to create listings indicating which games they're looking for and which games they can offer. The platform automatically fetches game data from Steam profiles and helps users find compatible sharing partners in their region.
 
-### Why was this platform made
+## Tech Stack
 
-Gamers often struggle to find friends to play specific games with. Traditional methods involve:
+- Next.js 15, TypeScript, Tailwind CSS,  Motion (Framer Motion)
+- PostgreSQL, Prisma ORM
+- Deployed on Vercel.
 
-- Posting in Discord servers with hundreds of messages
-- Scrolling through Steam community forums
-- Manually checking friends' libraries one by one
-
-So GTS can be used as a centralized platform where users can:
-
-1. **Create listings** with games they're looking for and games they can offer
-2. **Browse other players** filtered by location and platform
-3. **Send friend requests** directly through Steam
-4. **No registration required** - just Steam ID verification
-
----
+## Project Structure
+```
+gamestoshare/
+├── app/                          
+│   ├── api/                      # API Routes (Backend)
+│   │   ├── listings/             
+│   │   └── steam/                
+│   │
+│   ├── components/               # React components
+│   │   ├── content/              
+│   │   ├── home/                 
+│   │   ├── layout/               
+│   │   ├── listings/             
+│   │   ├── ui/                   
+│   │   └── verification/         # Steam verification flow
+│   │
+│   ├── hooks/                    # Custom React hooks
+│   ├── lib/                      
+│   │   ├── db/                   
+│   │   ├── steam/                
+│   │   └── utils/                
+│   │
+│   ├── listings/                 
+│   │   ├── [id]/                 
+│   │   └── create/               
+│   │
+│   ├── info/                     
+│   ├── terms/                    
+│   ├── globals.css               
+│   ├── layout.tsx                
+│   └── page.tsx                  
+│
+└── prisma/                       # Database schema
+    ├── schema.prisma             
+    └── migrations/               
+```
 
 ## Key Features
 
-### **Anonymous Authentication System**
+No registration required (Steam ID only), automatic game import from Steam profiles, optional username visibility, Steam bio verification system, region filtering for Steam Family Sharing compatibility, and game matching between users.
 
-- **No traditional registration** - uses Steam ID as unique identifier
-- **Bio verification** system with security codes (prevents impersonation)
-- **Privacy controls** - users choose whether to display their username publicly
-- **Smart upsert logic** - one active listing per user (prevents spam)
+## Prerequisites
 
-### **Intelligent Matching System**
+Node.js 20+, PostgreSQL database, Steam Web API key.
 
-- **Game crossmatch algorithm** - finds common games between users
-- **Real-time search** with debouncing and caching
-- **Filters by location, platform, and game titles**
+## Installation
 
----
+Install dependencies:
+```bash
+npm install
+```
 
-<div align="center">
+Set up environment variables by creating a `.env` file:
+```env
+DATABASE_URL="postgresql://user:password@host:5432/database"
+STEAM_API_KEY="your_steam_api_key"
+CRON_SECRET="your_cron_secret"
+```
 
-**Built with ❤️ using Next.js, TypeScript, and modern web technologies**
+Initialize the database:
+```bash
+npx prisma generate
+npx prisma migrate deploy
+```
 
-If you found this project interesting, consider giving it a ⭐!
+Run the development server:
+```bash
+npm run dev
+```
 
-</div>
+Open http://localhost:3000 to view the application.
+
+## Database Schema
+
+The database has three main models: **Listing** (user game sharing announcements with Steam profile info and location, one active listing per Steam ID using upsert pattern), **Game** (Steam games metadata auto-populated from Steam API), and **ListingGame** (junction table linking listings to games, distinguishing between "looking for" and "offering").
+
+## Security
+
+Bio verification system prevents unauthorized listing creation. Soft delete pattern for data retention. Rate limiting on Steam API calls. Input sanitization on all user data. CORS configured for API routes.
