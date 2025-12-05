@@ -33,6 +33,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="it" className={`${lexendExa.variable} ${quando.variable}`}>
+      <head>
+        {/*Simple Analytics*/}
+        <script
+          async
+          src="https://scripts.simpleanalyticscdn.com/latest.js"
+        ></script>
+      </head>
       <body
         className={lexendExa.className}
         style={{ backgroundColor: '#2C3137' }}
