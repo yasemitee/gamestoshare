@@ -55,7 +55,7 @@ export async function POST(
       return NextResponse.json({
         hasMatch: false,
         matchedGame: null,
-        message: 'No looking for games specified in listing',
+        message: 'No wishlist games specified in listing',
       });
     }
 

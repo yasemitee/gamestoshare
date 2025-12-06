@@ -66,11 +66,11 @@ export function HomeContent({ listings }: HomeContentProps) {
           />
           <FAQItem
             question="CAN I SHARE A SPECIFIC GAME?"
-            answer="Yes, you can share a specific game by flagging all the other games as private. Check the guide here for further information."
+            answer="Yes, you can share a specific game by flagging all the other games as private."
           />
           <FAQItem
             question="CAN I GET BANNED FROM FAMILY SHARING?"
-            answer="Offline and solo games are 100% safe, but you can get a VAC ban if you're sharing a game with someone who cheats or hacks a multiplayer or online game. We encourage our community to be mindful."
+            answer="Offline and solo games are 100% safe, but you can get a VAC ban if your copy is used to cheat in a multiplayer game protected by Valve Anti-Cheat (VAC). Only the cheater and the owner of the copy will be affected by the ban. "
           />
         </div>
       </div>

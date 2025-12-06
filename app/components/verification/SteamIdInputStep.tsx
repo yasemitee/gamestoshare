@@ -133,7 +133,7 @@ export function SteamIdInputStep({
                 className="text-field-small mb-6.5"
                 style={{ color: colors.gray1 }}
               >
-                We found at least one game matching the offer
+                We found at least one game matching the wishlist
               </p>
             </div>
 
@@ -161,7 +161,7 @@ export function SteamIdInputStep({
               className="text-field-small mb-8"
               style={{ color: colors.gray1 }}
             >
-              You need to own at least 1 game of their Looking For.
+              You need to own at least 1 game of their Wishlist.
             </p>
             <div className="">
               <svg width="80" height="80" viewBox="0 0 80 80" fill="none">

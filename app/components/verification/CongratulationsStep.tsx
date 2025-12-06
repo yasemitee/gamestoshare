@@ -27,7 +27,7 @@ export function CongratulationsStep({
           CONGRATULATIONS!
         </p>
         <p className="text-field-small" style={{ color: colors.gray1 }}>
-          We found at least one game matching the offer
+          We found at least one game matching the wishlist
         </p>
       </div>
 

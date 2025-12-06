@@ -27,8 +27,8 @@ export const Table: React.FC<TableProps> = ({ data }) => {
         `}</style>
         <div className="pl-2">User</div>
         <div className="hidden md:block">Location</div>
-        <div>Looking for</div>
-        <div>Offering</div>
+        <div>Wishlist</div>
+        <div>Library</div>
         <div className="hidden md:block">Posted</div>
       </div>
       {/* Table Body */}

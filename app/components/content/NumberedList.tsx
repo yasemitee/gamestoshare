@@ -13,7 +13,7 @@ export function NumberedList({ items, className = 'my-8' }: NumberedListProps) {
     >
       {items.map((item, index) => (
         <li key={index}>
-          <span className="pl-4" style={{ color: colors.gray1 }}>
+          <span className="pl-1" style={{ color: colors.gray1 }}>
             {item}
           </span>
         </li>

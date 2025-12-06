@@ -387,7 +387,7 @@ export default function CreateListingPage() {
                   />
                 </motion.div>
               </div>
-              {/* Looking for & Offering */}
+              {/* Wishlist & Library */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -395,14 +395,14 @@ export default function CreateListingPage() {
                 className="flex flex-col md:flex-row gap-8 mb-12"
               >
                 <GameSection
-                  label="Looking for"
+                  label="Wishlist"
                   games={lookingFor}
                   onGameSelect={handleAddGameToLookingFor}
                   onRemove={handleRemoveLookingFor}
                   maxGames={10}
                 />
                 <GameSection
-                  label="Offering"
+                  label="Library"
                   games={offering}
                   onGameSelect={handleAddGameToOffering}
                   onRemove={handleRemoveOffering}

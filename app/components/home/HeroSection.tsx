@@ -58,9 +58,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         className="mb-16"
         style={{ color: colors.gray1 }}
       >
-        Choose a platform, search a game and send a friend request.
+        Connecting people through games has never been easier.
         <br className="hidden md:block" />
-        Owning a large library of games has never been easier.
+        Choose a platform, search a game and send a friend request.
       </motion.h4>
 
       {/* Search Bar */}

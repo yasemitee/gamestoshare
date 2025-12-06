@@ -34,6 +34,7 @@ export default function RootLayout({
   return (
     <html lang="it" className={`${lexendExa.variable} ${quando.variable}`}>
       <head>
+        <link rel="icon" href="/favicon.ico" sizes="any"></link>
         {/*Simple Analytics*/}
         <script
           async

@@ -107,8 +107,8 @@ export const ListingDetailContent: React.FC<ListingDetailContentProps> = ({
             transition={{ duration: 0.4, delay: 0.4 }}
             className="grid grid-cols-1 md:grid-cols-2 gap-9"
           >
-            <GamesList title="LOOKING FOR" games={lookingForGames} />
-            <GamesList title="OFFERING" games={offeringGames} />
+            <GamesList title="WISHLIST" games={lookingForGames} />
+            <GamesList title="LIBRARY" games={offeringGames} />
           </motion.div>
         </div>
       </div>
