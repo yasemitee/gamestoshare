@@ -111,10 +111,12 @@ export default function TermsPage() {
               {/* 1. Purpose of GTS */}
               <ContentSection title="1. Purpose of GTS">
                 <ContentParagraph>
-                  GTS is a discovery platform that helps users find other Steam
-                  users who own games they may want to play and who may be
-                  looking for games the user owns in return. The platform allows
-                  users to:
+                  GTS is a discovery platform that helps users connect with
+                  others who share similar interests in videogames. Users may
+                  choose to display publicly available information from their
+                  Steam profiles, such as game libraries and wishlists, strictly
+                  for social and discovery purposes. The platform allows users
+                  to:
                 </ContentParagraph>
                 <NumberedList
                   items={[
@@ -200,6 +202,11 @@ export default function TermsPage() {
                   Therefore, the use of GTS does not inherently violate the
                   Steam Subscriber Agreement, because the platform does not
                   initiate, promote, automate, or manage Steam Family Sharing.
+                  GTS does not encourage or recommend the use of Steam Family
+                  Sharing in any manner that contradicts Valve’s policies,
+                  including but not limited to sharing libraries outside the
+                  intended scope of family members or trusted individuals, as
+                  defined by Valve.
                 </ContentParagraph>
               </ContentSection>
 
@@ -292,6 +299,12 @@ export default function TermsPage() {
                 <ContentParagraph className="">
                   Users may remove the verification code after their post is
                   published.
+                </ContentParagraph>
+                <ContentParagraph className="mt-4">
+                  The verification process is solely intended to confirm profile
+                  ownership and does not relate to any Steam feature, including
+                  Steam Family Sharing, nor does it grant GTS any Steam
+                  permissions.
                 </ContentParagraph>
               </ContentSection>
 

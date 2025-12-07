@@ -19,6 +19,7 @@ import { QuickNavigation } from '@/components/ui/QuickNavigation';
 import { CodeBlock } from '@/components/ui/CodeBlock';
 import { SupportCard } from '@/components/content/SupportCard';
 import { AnimatedContentWrapper } from '@/components/content/AnimatedContentWrapper';
+import { Content } from 'next/font/google';
 
 export const metadata = {
   title: 'Guide: How to use GTS - GamesToShare',
@@ -121,7 +122,8 @@ export default function InfoPage() {
                 <ContentParagraph className="mb-0">
                   GTS was designed specifically for steam users, altough we are
                   working on implementing new platforms. The ultimate goal is
-                  for users to connect through friend requests.
+                  for users to connect through friend requests and discover
+                  other players with similar interests.
                 </ContentParagraph>
               </ContentSection>
 
@@ -144,9 +146,9 @@ export default function InfoPage() {
                     Additionally you can use the location filter to find friends
                     close to you.
                   </ContentParagraph>
-                  {/* <Image
-                    img={{ src: '/BrowsingOffer.png', alt: 'Location Filter' }}
-                  /> */}
+                  <Image
+                    img={{ src: '/Browsing.png', alt: 'Location Filter' }}
+                  />
                 </ContentSection>
                 {/* Sending a Request */}
                 <ContentSection
@@ -167,7 +169,7 @@ export default function InfoPage() {
                     match, you'll be able to send a friend request or open the
                     user's Steam profile directly.
                   </ContentParagraph>
-                  {/* <div className="md:flex gap-6">
+                  <div className="md:flex gap-6">
                     <Image
                       img={{
                         src: '/SendingRequest1.png',
@@ -186,7 +188,7 @@ export default function InfoPage() {
                         alt: 'Sending Request',
                       }}
                     />
-                  </div> */}
+                  </div>
                 </ContentSection>
               </section>
               <section id="how-to-use">
@@ -242,9 +244,9 @@ export default function InfoPage() {
                   {/* Platform */}
                   <ContentSubtitle>Platform</ContentSubtitle>
                   <ContentParagraph className="mb-8">
-                    The platform is currently GTS only supports Steam.
-                    Additional platforms for consoles and PC are planned for
-                    future updates.
+                    The platform currently supports Steam only. Additional
+                    platforms for consoles and PC are planned for future
+                    updates.
                   </ContentParagraph>
 
                   {/* Description */}
@@ -274,10 +276,10 @@ export default function InfoPage() {
                     games the same way as in the "Wishlist" section.
                   </ContentParagraph>
 
-                  {/* <Image
+                  <Image
                     className="mb-12 mb-16"
-                    img={{ src: '/Offering.png', alt: 'Library Games' }}
-                  /> */}
+                    img={{ src: '/Create.png', alt: 'Library Games' }}
+                  />
 
                   {/* Verification Step */}
                   <ContentSubtitle>Verification Step</ContentSubtitle>
@@ -288,13 +290,6 @@ export default function InfoPage() {
                     place the provided verification code ("GTS") in your Steam
                     profile bio. Once verified, your post will be published.
                   </ContentParagraph>
-
-                  {/* <Image
-                    img={{
-                      src: '/VerificationStep.png',
-                      alt: 'Verification Step',
-                    }}
-                  /> */}
                 </ContentSection>
               </section>
 
@@ -304,6 +299,12 @@ export default function InfoPage() {
                 title="Frequent Asked Questions"
                 className="mb-8"
               >
+                <ContentParagraph className="mb-8">
+                  The following information is general guidance about how Steam
+                  Family Sharing works on Steam itself. These features belong to
+                  Valve and are not part of GTS. GTS does not manage, automate,
+                  or provide Family Sharing.
+                </ContentParagraph>
                 <FAQItem
                   question="How do I enable Family Sharing?"
                   answer="Log into Steam > Settings > Family > Authorize Library Sharing on this device."
@@ -321,7 +322,7 @@ export default function InfoPage() {
 
                 <FAQItem
                   question="Can I share a specific game?"
-                  answer="Yes, you can share a specific game by flagging all the other games as private."
+                  answer="Yes, you can share a specific game by flagging all the other games as private. This is a Steam feature and is not provided or managed by GTS."
                 />
 
                 <FAQItem

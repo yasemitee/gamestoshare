@@ -50,7 +50,19 @@ export function HomeContent({ listings }: HomeContentProps) {
       />
       <Table data={filteredListings} />
       <div className="mt-32">
-        <GradientTitle className="text-center mb-12">FAQ</GradientTitle>
+        <GradientTitle className="text-center mb-4">FAQ</GradientTitle>
+        <div
+          className="mb-12 text-small-title upper text-center"
+          style={{ color: colors.gray1 }}
+        >
+          <p>
+            This information refers to Steam’s own features. GTS only helps
+            users connect
+          </p>
+          <p className="text-small-title upper text-center mt-1">
+            it does not provide Family Sharing
+          </p>
+        </div>
         <div className="mx-auto">
           <FAQItem
             question="HOW DO I ENABLE FAMILY SHARING?"
@@ -66,7 +78,7 @@ export function HomeContent({ listings }: HomeContentProps) {
           />
           <FAQItem
             question="CAN I SHARE A SPECIFIC GAME?"
-            answer="Yes, you can share a specific game by flagging all the other games as private."
+            answer="Yes, you can share a specific game by flagging all the other games as private. This is a Steam feature and is not provided or managed by GTS."
           />
           <FAQItem
             question="CAN I GET BANNED FROM FAMILY SHARING?"
