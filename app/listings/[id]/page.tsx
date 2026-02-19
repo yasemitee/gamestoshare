@@ -33,7 +33,7 @@ async function getListing(id: string) {
     },
   });
 
-  if (!listing || !listing.isActive || listing.expiresAt <= new Date()) {
+  if (!listing || !listing.isActive) {
     return null;
   }
 
@@ -61,11 +61,13 @@ export default async function ListingDetailPage({
   }
 
   const lookingForGames = sortGamesByYearAndPrice(
-    listing.games.filter((lg) => lg.type === 'LOOKING_FOR').map((lg) => lg.game)
+    listing.games
+      .filter((lg) => lg.type === 'LOOKING_FOR')
+      .map((lg) => lg.game),
   );
 
   const offeringGames = sortGamesByYearAndPrice(
-    listing.games.filter((lg) => lg.type === 'OFFERING').map((lg) => lg.game)
+    listing.games.filter((lg) => lg.type === 'OFFERING').map((lg) => lg.game),
   );
 
   const postingDate = getDaysSincePosting(new Date(listing.createdAt));

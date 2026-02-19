@@ -13,9 +13,6 @@ export async function GET(request: NextRequest) {
     const listings = await prisma.listing.findMany({
       where: {
         isActive: true,
-        expiresAt: {
-          gt: new Date(),
-        },
         ...(location && { location }),
         ...(platform && { platform: platform as any }),
       },

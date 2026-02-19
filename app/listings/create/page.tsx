@@ -53,7 +53,7 @@ export default function CreateListingPage() {
   const [offering, setOffering] = useState<
     Array<{ id: string; name: string; iconUrl?: string; appId?: number }>
   >([]);
-  const [showSteamId, setShowSteamId] = useState(false);
+  const [showSteamId, setShowSteamId] = useState(true);
   const [description, setDescription] = useState('');
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -77,7 +77,7 @@ export default function CreateListingPage() {
     Handlers
   */
   const handleAddGameToLookingFor = (
-    game: { appId: number; name: string; iconUrl: string } | null
+    game: { appId: number; name: string; iconUrl: string } | null,
   ) => {
     if (!game) return;
     const isDuplicate = lookingFor.some((g) => g.appId === game.appId);
@@ -90,7 +90,7 @@ export default function CreateListingPage() {
   };
 
   const handleAddGameToOffering = (
-    game: { appId: number; name: string; iconUrl: string } | null
+    game: { appId: number; name: string; iconUrl: string } | null,
   ) => {
     if (!game) return;
     const isDuplicate = offering.some((g) => g.appId === game.appId);
@@ -107,7 +107,7 @@ export default function CreateListingPage() {
   };
 
   const handleSteamIdKeyDown = async (
-    e: React.KeyboardEvent<HTMLInputElement>
+    e: React.KeyboardEvent<HTMLInputElement>,
   ) => {
     if (e.key === 'Enter' && steamId.trim()) {
       e.preventDefault();
@@ -189,7 +189,7 @@ export default function CreateListingPage() {
             textAlign: 'left',
             textTransform: 'none',
           },
-        }
+        },
       );
     }
   };
@@ -275,7 +275,7 @@ export default function CreateListingPage() {
             fontSize: '12px',
             textTransform: 'none',
           },
-        }
+        },
       );
     } finally {
       setIsSubmitting(false);

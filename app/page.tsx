@@ -82,9 +82,6 @@ export default async function Home() {
   const listings = await prisma.listing.findMany({
     where: {
       isActive: true,
-      expiresAt: {
-        gt: new Date(),
-      },
     },
     include: {
       games: {
