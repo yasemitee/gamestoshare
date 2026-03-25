@@ -31,7 +31,7 @@ export function useInvitationFlow(
   const [hasNoMatch, setHasNoMatch] = useState(false);
 
   const openFlow = useCallback(() => {
-    setCurrentStep('bio-verification');
+    setCurrentStep('steam-id-input');
   }, []);
 
   const closeFlow = useCallback(() => {
@@ -51,123 +51,44 @@ export function useInvitationFlow(
   }, []);
 
   const goToSteamIdInput = useCallback(async () => {
-    try {
-      const response = await fetch('/api/steam/verify', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          steamId: userSteamId,
-          verificationCode: STEAM_VERIFICATION_CODE,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (data.verified) {
-        setCurrentStep('steam-id-input');
-      } else {
-        showVerificationError();
-      }
-    } catch (error) {
-      console.error('Verification error:', error);
-      showGenericError();
-    }
-  }, [userSteamId]);
+    setCurrentStep('steam-id-input');
+  }, []);
 
   const goToCongratulations = useCallback(
     async (steamId: string) => {
-      setIsLoading(true);
-      setHasNoMatch(false);
+      const cleanSteamId = extractCleanSteamId(steamId);
+      setUserSteamId(cleanSteamId);
       setMatchedGame(null);
-      
-      try {
-        const cleanSteamId = extractCleanSteamId(steamId);
-        
-        const verifyResponse = await fetch('/api/steam/verify', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            steamId: cleanSteamId,
-            verificationCode: STEAM_VERIFICATION_CODE,
-          }),
-        });
-
-        const verifyData = await verifyResponse.json();
-
-        if (!verifyData.verified) {
-          setIsLoading(false);
-          showVerificationError();
-          return;
-        }
-
-        setUserSteamId(cleanSteamId);
-
-        const gamesResponse = await fetch(`/api/listings/${listingId}/check-games`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            steamId: cleanSteamId,
-          }),
-        });
-
-        const gamesData = await gamesResponse.json();
-
-        if (gamesData.hasMatch && gamesData.matchedGame) {
-          setMatchedGame(gamesData.matchedGame);
-          setHasNoMatch(false);
-          setCurrentStep('congratulations');
-        } else {
-          setMatchedGame(null);
-          setHasNoMatch(true);
-          setCurrentStep('congratulations');
-        }
-      } catch (error) {
-        console.error('Error checking games:', error);
-        if (typeof window !== 'undefined' && (window as any).showVerificationErrorGeneric) {
-          (window as any).showVerificationErrorGeneric();
-        }
-      } finally {
-        setIsLoading(false);
-      }
+      setHasNoMatch(false);
+      setCurrentStep('congratulations');
     },
     []
   );
 
   const sendInvitation = useCallback(async () => {
     try {
-      if (!userSteamId) {
-        showSteamIdNotFoundError();
-        return;
-      }
-
       const listingResponse = await fetch(`/api/listings/${listingId}`);
       const listingData = await listingResponse.json();
-      
+
       if (!listingData?.steamId) {
         showGenericError();
         return;
       }
 
       const isNumericId = /^\d{17}$/.test(listingData.steamId);
-      const steamProfileUrl = isNumericId 
+      const steamProfileUrl = isNumericId
         ? `https://steamcommunity.com/profiles/${listingData.steamId}`
         : `https://steamcommunity.com/id/${listingData.steamId}`;
-      
+
       window.open(steamProfileUrl, '_blank');
       window.location.href = `steam://openurl/${steamProfileUrl}`;
-      
+
       closeFlow();
     } catch (error) {
       console.error('Error sending invitation:', error);
       showGenericError();
     }
-  }, [listingId, userSteamId, closeFlow]);
+  }, [listingId, closeFlow]);
 
   return {
     currentStep,

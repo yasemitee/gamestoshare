@@ -107,7 +107,7 @@ export function FriendRequestSection({
 
   const handleSendRequest = () => {
     if (!termsAccepted) return;
-    openFlow();
+    sendInvitation();
   };
 
   return (
