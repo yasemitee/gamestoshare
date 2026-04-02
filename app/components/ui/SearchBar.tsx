@@ -15,6 +15,7 @@ interface SearchBarProps {
   placeholder?: string;
   showLocationFilter?: boolean;
   onGameSelect?: (game: Game | null) => void;
+  onSearchTermChange?: (term: string) => void;
   onLocationChange?: (location: string) => void;
   selectedLocation?: string;
   clearOnSelect?: boolean;
@@ -25,6 +26,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   placeholder = 'Search any game',
   showLocationFilter = false,
   onGameSelect,
+  onSearchTermChange,
   onLocationChange,
   selectedLocation = '',
   clearOnSelect = false,
@@ -122,7 +124,16 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             type="text"
             placeholder={placeholder}
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              const nextValue = e.target.value;
+              setQuery(nextValue);
+              if (onGameSelect) {
+                onGameSelect(null);
+              }
+              if (onSearchTermChange) {
+                onSearchTermChange(nextValue);
+              }
+            }}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             className="text-field w-full pl-12 pr-4 py-4 focus:outline-none focus:ring-2 focus:ring-offset-0 transition-all"

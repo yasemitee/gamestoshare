@@ -4,7 +4,8 @@ import { MainContentContainer } from '@/components/layout/MainContentContainer';
 import { HomeContent } from '@/components/home/HomeContent';
 import { GameListingData } from '@/lib/db/types';
 import { prisma } from '@/lib/db/db';
-import { headers } from 'next/headers';
+import { MAX_LISTINGS_PER_PAGE } from '@/lib/constants';
+import { formatTimeAgo } from '@/lib/utils/time';
 
 export const metadata = {
   title: 'Home - GamesToShare',
@@ -64,20 +65,6 @@ export const metadata = {
 export const revalidate = 60;
 export const fetchCache = 'default-cache';
 
-function formatTimeAgo(date: Date): string {
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-  if (diffDays === 0) return 'Today';
-  if (diffDays === 1) return '1 day ago';
-  if (diffDays < 30) return `${diffDays} days ago`;
-
-  const diffMonths = Math.floor(diffDays / 30);
-  if (diffMonths === 1) return '1 month ago';
-  return `${diffMonths} months ago`;
-}
-
 export default async function Home() {
   const listings = await prisma.listing.findMany({
     where: {
@@ -90,13 +77,15 @@ export default async function Home() {
         },
       },
     },
-    orderBy: {
-      createdAt: 'desc',
-    },
-    take: 30,
+    orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+    take: MAX_LISTINGS_PER_PAGE + 1,
   });
 
-  const tableData: GameListingData[] = listings.map((listing) => {
+  const hasMore = listings.length > MAX_LISTINGS_PER_PAGE;
+  const pageItems = hasMore ? listings.slice(0, MAX_LISTINGS_PER_PAGE) : listings;
+  const nextCursor = hasMore ? pageItems[pageItems.length - 1]?.id ?? null : null;
+
+  const tableData: GameListingData[] = pageItems.map((listing) => {
     const allGames = listing.games || [];
 
     const lookingForGames = allGames
@@ -130,7 +119,10 @@ export default async function Home() {
     <Container>
       <Navbar />
       <MainContentContainer>
-        <HomeContent listings={tableData} />
+        <HomeContent
+          initialListings={tableData}
+          initialNextCursor={nextCursor}
+        />
       </MainContentContainer>
     </Container>
   );

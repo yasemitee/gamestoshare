@@ -19,12 +19,14 @@ interface Game {
 
 interface HeroSectionProps {
   onGameSelect?: (game: Game | null) => void;
+  onSearchTermChange?: (term: string) => void;
   onLocationChange?: (location: string) => void;
   selectedLocation?: string;
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({
   onGameSelect,
+  onSearchTermChange,
   onLocationChange,
   selectedLocation = '',
 }) => {
@@ -73,6 +75,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         <SearchBar
           showLocationFilter={true}
           onGameSelect={onGameSelect}
+          onSearchTermChange={onSearchTermChange}
           onLocationChange={onLocationChange}
           selectedLocation={selectedLocation}
         />

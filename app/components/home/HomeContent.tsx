@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { HeroSection } from '@/components/home/HeroSection';
 import { Table } from '@/components/home/Table';
 import { FAQItem } from '@/components/home/FAQItem';
@@ -9,6 +9,8 @@ import { Footer } from '@/components/layout/Footer';
 import { GradientTitle } from '@/components/ui/GradientTitle';
 import { GameListingData } from '@/lib/db/types';
 import { colors } from '@/lib/colors';
+import { MAX_LISTINGS_PER_PAGE } from '@/lib/constants';
+import { formatTimeAgo } from '@/lib/utils/time';
 
 interface Game {
   appId: number;
@@ -16,39 +18,227 @@ interface Game {
   iconUrl: string;
 }
 
-interface HomeContentProps {
-  listings: GameListingData[];
+interface ListingsApiGame {
+  type: 'LOOKING_FOR' | 'OFFERING';
+  game: {
+    name?: string | null;
+    iconUrl?: string | null;
+  };
 }
 
-export function HomeContent({ listings }: HomeContentProps) {
-  const [selectedGame, setSelectedGame] = useState<Game | null>(null);
+interface ListingsApiItem {
+  id: string;
+  username: string | null;
+  steamId: string | null;
+  showSteamId: boolean;
+  location: string;
+  platform: string;
+  createdAt: string;
+  games?: ListingsApiGame[];
+}
+
+interface ListingsApiResponse {
+  items: ListingsApiItem[];
+  nextCursor: string | null;
+}
+
+interface HomeContentProps {
+  initialListings: GameListingData[];
+  initialNextCursor?: string | null;
+}
+
+function mapListingToTableData(listing: ListingsApiItem): GameListingData {
+  const allGames = listing.games || [];
+
+  const lookingForGames = allGames
+    .filter((lg) => lg.type === 'LOOKING_FOR')
+    .map((lg) => ({
+      iconUrl: lg.game?.iconUrl || '',
+      name: lg.game?.name || '',
+    }));
+
+  const offeringGames = allGames
+    .filter((lg) => lg.type === 'OFFERING')
+    .map((lg) => ({
+      iconUrl: lg.game?.iconUrl || '',
+      name: lg.game?.name || '',
+    }));
+
+  return {
+    id: listing.id,
+    user: listing.showSteamId ? listing.username || listing.steamId : null,
+    steamId: listing.steamId || '',
+    showSteamId: listing.showSteamId,
+    location: listing.location,
+    platform: listing.platform,
+    lookingFor: lookingForGames,
+    offering: offeringGames,
+    postingDate: formatTimeAgo(listing.createdAt),
+  };
+}
+
+function mapListingsToTableData(listings: ListingsApiItem[]): GameListingData[] {
+  return listings.map(mapListingToTableData);
+}
+
+export function HomeContent({
+  initialListings,
+  initialNextCursor = null,
+}: HomeContentProps) {
+  const [listings, setListings] = useState<GameListingData[]>(initialListings);
+  const [nextCursor, setNextCursor] = useState<string | null>(
+    initialNextCursor
+  );
   const [selectedLocation, setSelectedLocation] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasError, setHasError] = useState(false);
+  const [showLoadMoreLink, setShowLoadMoreLink] = useState(false);
+  const hasMountedRef = useRef(false);
 
-  const filteredListings = listings.filter((listing) => {
-    if (selectedGame) {
-      const hasInOffering = listing.offering.some((game) =>
-        game.name.toLowerCase().includes(selectedGame.name.toLowerCase())
-      );
-      if (!hasInOffering) {
-        return false;
+  const fetchListings = useCallback(
+    async ({ cursor, append }: { cursor?: string | null; append?: boolean }) => {
+      const isAppend = Boolean(append);
+      if (!isAppend) {
+        setShowLoadMoreLink(false);
       }
+      if (isAppend) {
+        setIsLoadingMore(true);
+      } else {
+        setIsLoading(true);
+      }
+      setHasError(false);
+
+      try {
+        const params = new URLSearchParams();
+        params.set('limit', MAX_LISTINGS_PER_PAGE.toString());
+        if (cursor) {
+          params.set('cursor', cursor);
+        }
+        if (selectedLocation) {
+          params.set('location', selectedLocation);
+        }
+        const trimmedSearch = searchTerm.trim();
+        if (trimmedSearch) {
+          params.set('search', trimmedSearch);
+        }
+
+        const response = await fetch(`/api/listings?${params.toString()}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch listings');
+        }
+
+        const data = (await response.json()) as
+          | ListingsApiResponse
+          | ListingsApiItem[];
+        const items = Array.isArray(data) ? data : data.items || [];
+        const mapped = mapListingsToTableData(items);
+
+        setListings((prev) => (isAppend ? [...prev, ...mapped] : mapped));
+        setNextCursor(Array.isArray(data) ? null : data.nextCursor ?? null);
+      } catch (error) {
+        console.error('Error fetching listings:', error);
+        setHasError(true);
+        if (!isAppend) {
+          setListings([]);
+          setNextCursor(null);
+        }
+      } finally {
+        if (isAppend) {
+          setIsLoadingMore(false);
+        } else {
+          setIsLoading(false);
+        }
+      }
+    },
+    [selectedLocation, searchTerm]
+  );
+
+  useEffect(() => {
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true;
+      return;
     }
 
-    if (selectedLocation && listing.location !== selectedLocation) {
-      return false;
-    }
+    const timeoutId = setTimeout(() => {
+      fetchListings({ append: false });
+    }, 300);
 
-    return true;
-  });
+    return () => clearTimeout(timeoutId);
+  }, [selectedLocation, searchTerm, fetchListings]);
+
+  const handleGameSelect = useCallback((game: Game | null) => {
+    if (!game) {
+      setSearchTerm('');
+      return;
+    }
+    setSearchTerm(game.appId.toString());
+  }, []);
+
+  const handleSearchTermChange = useCallback((term: string) => {
+    setSearchTerm(term);
+  }, []);
+
+  const handleLoadMore = useCallback(async () => {
+    if (!nextCursor || isLoadingMore) {
+      return;
+    }
+    setShowLoadMoreLink(false);
+    await fetchListings({ cursor: nextCursor, append: true });
+  }, [nextCursor, isLoadingMore, fetchListings]);
+
+  const handleReachTableEnd = useCallback(() => {
+    if (nextCursor) {
+      setShowLoadMoreLink(true);
+    }
+  }, [nextCursor]);
 
   return (
     <>
       <HeroSection
-        onGameSelect={setSelectedGame}
+        onGameSelect={handleGameSelect}
+        onSearchTermChange={handleSearchTermChange}
         onLocationChange={setSelectedLocation}
         selectedLocation={selectedLocation}
       />
-      <Table data={filteredListings} />
+      <Table
+        data={listings}
+        isLoading={isLoading}
+        onReachEnd={handleReachTableEnd}
+      />
+      {hasError && (
+        <div
+          className="text-center mt-4 text-field"
+          style={{ color: colors.gray1 }}
+        >
+          Could not load listings. Please try again.
+        </div>
+      )}
+      {nextCursor && showLoadMoreLink && (
+        <div className="mt-6 flex justify-center">
+          <button
+            onClick={handleLoadMore}
+            disabled={isLoadingMore || isLoading}
+            className="text-navbar flex items-center gap-2 cursor-pointer transition-colors hover:!text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{ color: colors.gray1 }}
+          >
+            <span>{isLoadingMore ? 'Loading...' : 'Load more listings'}</span>
+            {isLoadingMore ? (
+              <div
+                className="w-3 h-3 border border-t-transparent rounded-full animate-spin"
+                style={{ color: colors.gray1 }}
+              />
+            ) : (
+              <img
+                src="/Dropdown.svg"
+                alt=""
+                className="w-3 h-3 pt-1 transition-[filter] brightness-[0.6]"
+              />
+            )}
+          </button>
+        </div>
+      )}
       <div className="mt-32">
         <GradientTitle className="text-center mb-4">FAQ</GradientTitle>
         <div

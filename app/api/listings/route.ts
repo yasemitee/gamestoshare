@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
+import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/db/db';
 import { getSteamIdFromUrl } from '@/lib/steam/api';
+import { MAX_LISTINGS_PER_PAGE } from '@/lib/constants';
 
 export async function GET(request: NextRequest) {
   try {
@@ -9,13 +11,67 @@ export async function GET(request: NextRequest) {
     const location = searchParams.get('location');
     const platform = searchParams.get('platform');
     const search = searchParams.get('search');
+    const cursor = searchParams.get('cursor');
+    const limitParam = searchParams.get('limit');
+
+    const parsedLimit = limitParam ? Number.parseInt(limitParam, 10) : NaN;
+    const normalizedLimit = Number.isFinite(parsedLimit)
+      ? Math.min(Math.max(parsedLimit, 1), MAX_LISTINGS_PER_PAGE)
+      : null;
+    const usePagination = Boolean(cursor) || normalizedLimit !== null;
+    const pageSize = normalizedLimit ?? MAX_LISTINGS_PER_PAGE;
+
+    const where: Prisma.ListingWhereInput = {
+      isActive: true,
+      ...(location && { location }),
+      ...(platform && { platform: platform as any }),
+    };
+
+    const searchTerm = search?.trim();
+    if (searchTerm) {
+      const searchConditions: Prisma.ListingWhereInput[] = [
+        { id: searchTerm },
+        { steamId: { contains: searchTerm } },
+        {
+          username: {
+            contains: searchTerm,
+            mode: 'insensitive',
+          },
+        },
+        {
+          games: {
+            some: {
+              type: 'OFFERING',
+              game: {
+                name: {
+                  contains: searchTerm,
+                  mode: 'insensitive',
+                },
+              },
+            },
+          },
+        },
+      ];
+
+      const numericSearch = Number.parseInt(searchTerm, 10);
+      if (!Number.isNaN(numericSearch)) {
+        searchConditions.push({
+          games: {
+            some: {
+              type: 'OFFERING',
+              game: {
+                steamAppId: numericSearch,
+              },
+            },
+          },
+        });
+      }
+
+      where.OR = searchConditions;
+    }
 
     const listings = await prisma.listing.findMany({
-      where: {
-        isActive: true,
-        ...(location && { location }),
-        ...(platform && { platform: platform as any }),
-      },
+      where,
       include: {
         games: {
           include: {
@@ -23,14 +79,29 @@ export async function GET(request: NextRequest) {
           },
         },
       },
-      orderBy: {
-        createdAt: 'desc',
-      },
-      take: 30,
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+      ...(usePagination && cursor
+        ? {
+          cursor: { id: cursor },
+          skip: 1,
+        }
+        : {}),
+      ...(usePagination ? { take: pageSize + 1 } : {}),
     });
 
+    let nextCursor: string | null = null;
+    let pageItems = listings;
+
+    if (usePagination) {
+      const hasMore = listings.length > pageSize;
+      if (hasMore) {
+        pageItems = listings.slice(0, pageSize);
+        nextCursor = pageItems[pageItems.length - 1]?.id ?? null;
+      }
+    }
+
     // Filter sensitive data for anonymous users
-    const sanitizedListings = listings.map(listing => {
+    const sanitizedListings = pageItems.map((listing) => {
       if (!listing.showSteamId) {
         // Remove sensitive data for anonymous listings (but keep avatarUrl)
         return {
@@ -44,11 +115,19 @@ export async function GET(request: NextRequest) {
     });
 
     // Add cache headers to reduce API calls
-    return NextResponse.json(sanitizedListings, {
-      headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
-      },
-    });
+    return NextResponse.json(
+      usePagination
+        ? {
+          items: sanitizedListings,
+          nextCursor,
+        }
+        : sanitizedListings,
+      {
+        headers: {
+          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
+        },
+      }
+    );
   } catch (error) {
     console.error('Error fetching listings:', error);
     return NextResponse.json(
@@ -62,7 +141,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     console.log('Received listing data:', JSON.stringify(body, null, 2));
-    
+
     const {
       steamId,
       username,
@@ -89,7 +168,7 @@ export async function POST(request: NextRequest) {
 
     // Convert any vanity URL or case-sensitive ID to numeric Steam64 ID
     const normalizedSteamId = await getSteamIdFromUrl(steamProfileUrl);
-    
+
     if (!normalizedSteamId) {
       return NextResponse.json(
         { error: 'Invalid Steam ID or unable to resolve Steam profile' },
@@ -114,7 +193,7 @@ export async function POST(request: NextRequest) {
     }
 
     const allGames = [...lookingFor, ...offering];
-    
+
     // Validate all games have appId
     const invalidGames = allGames.filter((g: any) => !g.appId);
     if (invalidGames.length > 0) {
@@ -124,7 +203,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    
+
     const gameRecords = await Promise.all(
       allGames.map(async (gameData: any) => {
         try {
