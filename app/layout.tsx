@@ -40,6 +40,11 @@ export default function RootLayout({
           async
           src="https://scripts.simpleanalyticscdn.com/latest.js"
         ></script>
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4146851439004145"
+          crossOrigin="anonymous"
+        ></script>
       </head>
       <body
         className={lexendExa.className}
