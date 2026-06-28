@@ -23,6 +23,8 @@ interface ListingsApiGame {
   game: {
     name?: string | null;
     iconUrl?: string | null;
+    steamAppId?: number | null;
+    headerImage?: string | null;
   };
 }
 
@@ -34,6 +36,9 @@ interface ListingsApiItem {
   location: string;
   platform: string;
   createdAt: string;
+  avatarUrl?: string | null;
+  steamLevel?: number | null;
+  accountYears?: number | null;
   games?: ListingsApiGame[];
 }
 
@@ -55,6 +60,8 @@ function mapListingToTableData(listing: ListingsApiItem): GameListingData {
     .map((lg) => ({
       iconUrl: lg.game?.iconUrl || '',
       name: lg.game?.name || '',
+      appId: lg.game?.steamAppId ?? undefined,
+      headerImage: lg.game?.headerImage ?? undefined,
     }));
 
   const offeringGames = allGames
@@ -62,6 +69,8 @@ function mapListingToTableData(listing: ListingsApiItem): GameListingData {
     .map((lg) => ({
       iconUrl: lg.game?.iconUrl || '',
       name: lg.game?.name || '',
+      appId: lg.game?.steamAppId ?? undefined,
+      headerImage: lg.game?.headerImage ?? undefined,
     }));
 
   return {
@@ -74,6 +83,9 @@ function mapListingToTableData(listing: ListingsApiItem): GameListingData {
     lookingFor: lookingForGames,
     offering: offeringGames,
     postingDate: formatTimeAgo(listing.createdAt),
+    avatarUrl: listing.avatarUrl ?? null,
+    level: listing.steamLevel ?? null,
+    years: listing.accountYears ?? null,
   };
 }
 

@@ -33,6 +33,13 @@ export interface ListingFilters {
   search?: string;
 }
 
+export interface FeedGame {
+  iconUrl: string;
+  name: string;
+  appId?: number;
+  headerImage?: string;
+}
+
 export interface GameListingData {
   id: string;
   user: string | null;
@@ -40,7 +47,10 @@ export interface GameListingData {
   showSteamId: boolean;
   location: string;
   platform: string;
-  lookingFor: Array<{ iconUrl: string; name: string }>;
-  offering: Array<{ iconUrl: string; name: string }>;
+  lookingFor: FeedGame[];
+  offering: FeedGame[];
   postingDate: string;
+  avatarUrl?: string | null;
+  level?: number | null;
+  years?: number | null;
 }

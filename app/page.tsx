@@ -95,6 +95,8 @@ export default async function Home() {
       .map((lg) => ({
         iconUrl: lg.game?.iconUrl || '',
         name: lg.game?.name || '',
+        appId: lg.game?.steamAppId ?? undefined,
+        headerImage: lg.game?.headerImage ?? undefined,
       }));
 
     const offeringGames = allGames
@@ -102,6 +104,8 @@ export default async function Home() {
       .map((lg) => ({
         iconUrl: lg.game?.iconUrl || '',
         name: lg.game?.name || '',
+        appId: lg.game?.steamAppId ?? undefined,
+        headerImage: lg.game?.headerImage ?? undefined,
       }));
 
     return {
@@ -114,6 +118,9 @@ export default async function Home() {
       lookingFor: lookingForGames,
       offering: offeringGames,
       postingDate: formatTimeAgo(listing.createdAt),
+      avatarUrl: listing.avatarUrl ?? null,
+      level: listing.steamLevel ?? null,
+      years: listing.accountYears ?? null,
     };
   });
 
