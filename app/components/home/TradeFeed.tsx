@@ -10,6 +10,7 @@ interface TradeFeedProps {
   selectedLocation: string;
   isLoading?: boolean;
   onReachEnd?: () => void;
+  scrollRef?: React.RefObject<HTMLDivElement | null>;
 }
 
 function countryName(code: string): string {
@@ -22,8 +23,10 @@ export const TradeFeed: React.FC<TradeFeedProps> = ({
   selectedLocation,
   isLoading = false,
   onReachEnd,
+  scrollRef: externalScrollRef,
 }) => {
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const internalScrollRef = useRef<HTMLDivElement>(null);
+  const scrollRef = externalScrollRef ?? internalScrollRef;
   const handleScroll: React.UIEventHandler<HTMLDivElement> = (event) => {
     if (!onReachEnd) return;
     const { scrollTop, scrollHeight, clientHeight } = event.currentTarget;
@@ -75,6 +78,12 @@ export const TradeFeed: React.FC<TradeFeedProps> = ({
             ref={scrollRef}
             className="overflow-y-auto feed-scrollbar max-h-[60vh] md:max-h-[460px] pr-3"
             onScroll={handleScroll}
+            style={{
+              WebkitMaskImage:
+                'linear-gradient(to bottom, #000 calc(100% - 64px), transparent 100%)',
+              maskImage:
+                'linear-gradient(to bottom, #000 calc(100% - 64px), transparent 100%)',
+            }}
           >
             <AnimatePresence>
               {data.map((row, idx) => (
