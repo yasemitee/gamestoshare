@@ -48,31 +48,34 @@ export const TradeFeedRow: React.FC<TradeFeedRowProps> = ({
   const initial = displayName.charAt(0).toUpperCase();
 
   return (
-    <Link href={`/listings/${id}`}>
-      <motion.div
-        className="group flex flex-col md:flex-row md:items-center gap-4 md:gap-5 cursor-pointer transition-colors"
-        style={{
-          padding: '18px 8px',
-          borderTop: first ? 'none' : '1px solid rgba(255,255,255,.07)',
-          background: first ? 'rgba(255,255,255,.02)' : 'transparent',
-        }}
-        initial={{ opacity: 0, y: reduce ? 0 : MOTION.rise }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-40px', root: scrollRoot }}
-        transition={{
-          duration: MOTION.duration,
-          ease: MOTION.ease,
-          delay: Math.min(index, 6) * MOTION.stagger,
-        }}
-        onMouseEnter={(e) =>
-          (e.currentTarget.style.background = 'rgba(255,255,255,.04)')
-        }
-        onMouseLeave={(e) =>
-          (e.currentTarget.style.background = first
-            ? 'rgba(255,255,255,.02)'
-            : 'transparent')
-        }
-      >
+    <motion.div
+      initial={{ opacity: 0, y: reduce ? 0 : MOTION.rise }}
+      whileInView={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, transition: { duration: 0.2 } }}
+      viewport={{ once: true, margin: '-40px', root: scrollRoot }}
+      transition={{
+        duration: MOTION.duration,
+        ease: MOTION.ease,
+        delay: Math.min(index, 6) * MOTION.stagger,
+      }}
+    >
+      <Link href={`/listings/${id}`} className="block">
+        <div
+          className="group flex flex-col md:flex-row md:items-center gap-4 md:gap-5 cursor-pointer transition-colors"
+          style={{
+            padding: '18px 8px',
+            borderTop: first ? 'none' : '1px solid rgba(255,255,255,.07)',
+            background: first ? 'rgba(255,255,255,.02)' : 'transparent',
+          }}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.background = 'rgba(255,255,255,.04)')
+          }
+          onMouseLeave={(e) =>
+            (e.currentTarget.style.background = first
+              ? 'rgba(255,255,255,.02)'
+              : 'transparent')
+          }
+        >
         <div className="flex items-center gap-3 md:w-[210px] md:flex-shrink-0">
           <div
             className="flex items-center justify-center flex-shrink-0 overflow-hidden"
@@ -162,7 +165,8 @@ export const TradeFeedRow: React.FC<TradeFeedRowProps> = ({
             View
           </span>
         </div>
-      </motion.div>
-    </Link>
+        </div>
+      </Link>
+    </motion.div>
   );
 };

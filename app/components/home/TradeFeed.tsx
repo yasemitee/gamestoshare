@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
 import { TradeFeedRow } from './TradeFeedRow';
 import { colors } from '@/lib/colors';
 import { COUNTRIES } from '@/lib/countries';
@@ -75,33 +76,43 @@ export const TradeFeed: React.FC<TradeFeedProps> = ({
             className="overflow-y-auto feed-scrollbar max-h-[60vh] md:max-h-[460px] pr-3"
             onScroll={handleScroll}
           >
-            {data.map((row, idx) => (
-              <TradeFeedRow
-                key={row.id}
-                first={idx === 0}
-                index={idx}
-                scrollRoot={scrollRef}
-                {...row}
-              />
-            ))}
+            <AnimatePresence initial={false}>
+              {data.map((row, idx) => (
+                <TradeFeedRow
+                  key={row.id}
+                  first={idx === 0}
+                  index={idx}
+                  scrollRoot={scrollRef}
+                  {...row}
+                />
+              ))}
+            </AnimatePresence>
           </div>
 
-          {isLoading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-[#0B0B0C]/45 pointer-events-none">
-              <div
-                className="flex items-center gap-3 px-4 py-2"
-                style={{ backgroundColor: colors.blue1 }}
+          <AnimatePresence>
+            {isLoading && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="absolute inset-0 flex items-center justify-center bg-[#0B0B0C]/45 pointer-events-none"
               >
                 <div
-                  className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin"
-                  style={{ color: colors.purple }}
-                />
-                <span className="text-field" style={{ color: colors.white }}>
-                  Loading swaps...
-                </span>
-              </div>
-            </div>
-          )}
+                  className="flex items-center gap-3 px-4 py-2"
+                  style={{ backgroundColor: colors.blue1 }}
+                >
+                  <div
+                    className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin"
+                    style={{ color: colors.purple }}
+                  />
+                  <span className="text-field" style={{ color: colors.white }}>
+                    Loading swaps...
+                  </span>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       )}
     </div>
