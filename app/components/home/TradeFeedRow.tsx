@@ -1,47 +1,16 @@
 import React from 'react';
 import Link from 'next/link';
+import { motion, useReducedMotion } from 'motion/react';
 import { colors } from '@/lib/colors';
-import { GameListingData, FeedGame } from '@/lib/db/types';
+import { GameListingData } from '@/lib/db/types';
+import { CapsuleStrip } from '@/components/home/GameCapsule';
+import { MOTION } from '@/lib/constants';
 
 interface TradeFeedRowProps extends GameListingData {
   first?: boolean;
+  index?: number;
+  scrollRoot?: React.RefObject<HTMLElement | null>;
 }
-
-function capsuleUrl(game: FeedGame): string | null {
-  if (game.headerImage) return game.headerImage;
-  if (game.appId)
-    return `https://cdn.cloudflare.steamstatic.com/steam/apps/${game.appId}/header.jpg`;
-  return null;
-}
-
-const CapsuleStrip: React.FC<{ games: FeedGame[]; max?: number }> = ({
-  games,
-  max = 3,
-}) => (
-  <div className="flex items-center gap-1">
-    {games.slice(0, max).map((game, idx) => {
-      const url = capsuleUrl(game);
-      return (
-        <div
-          key={idx}
-          title={game.name}
-          className="flex-shrink-0 bg-cover bg-center"
-          style={{
-            width: 64,
-            height: 30,
-            backgroundColor: colors.gray2,
-            backgroundImage: url ? `url(${url})` : undefined,
-          }}
-        />
-      );
-    })}
-    {games.length > max && (
-      <span style={{ color: colors.gray1, fontSize: 11 }} className="ml-1">
-        +{games.length - max}
-      </span>
-    )}
-  </div>
-);
 
 const Label: React.FC<{ children: React.ReactNode; color?: string }> = ({
   children,
@@ -71,18 +40,29 @@ export const TradeFeedRow: React.FC<TradeFeedRowProps> = ({
   level,
   years,
   first = false,
+  index = 0,
+  scrollRoot,
 }) => {
+  const reduce = useReducedMotion();
   const displayName = showSteamId && user ? user : 'Anonymous';
   const initial = displayName.charAt(0).toUpperCase();
 
   return (
     <Link href={`/listings/${id}`}>
-      <div
+      <motion.div
         className="group flex flex-col md:flex-row md:items-center gap-4 md:gap-5 cursor-pointer transition-colors"
         style={{
           padding: '18px 8px',
           borderTop: first ? 'none' : '1px solid rgba(255,255,255,.07)',
           background: first ? 'rgba(255,255,255,.02)' : 'transparent',
+        }}
+        initial={{ opacity: 0, y: reduce ? 0 : MOTION.rise }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-40px', root: scrollRoot }}
+        transition={{
+          duration: MOTION.duration,
+          ease: MOTION.ease,
+          delay: Math.min(index, 6) * MOTION.stagger,
         }}
         onMouseEnter={(e) =>
           (e.currentTarget.style.background = 'rgba(255,255,255,.04)')
@@ -95,13 +75,16 @@ export const TradeFeedRow: React.FC<TradeFeedRowProps> = ({
       >
         <div className="flex items-center gap-3 md:w-[210px] md:flex-shrink-0">
           <div
-            className="flex items-center justify-center flex-shrink-0 bg-cover bg-center"
+            className="flex items-center justify-center flex-shrink-0 overflow-hidden"
             style={{
               width: 40,
               height: 40,
               borderRadius: '50%',
-              background: colors.gray3,
+              backgroundColor: colors.gray3,
               backgroundImage: avatarUrl ? `url(${avatarUrl})` : undefined,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
               color: colors.white,
               fontSize: 15,
             }}
@@ -138,12 +121,21 @@ export const TradeFeedRow: React.FC<TradeFeedRowProps> = ({
             </div>
             <CapsuleStrip games={lookingFor} max={3} />
           </div>
-          <span
-            style={{ color: colors.gray2, fontSize: 20 }}
-            className="self-end pb-1 flex-shrink-0"
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke={colors.gray2}
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="self-end flex-shrink-0"
+            style={{ marginBottom: 6 }}
           >
-            →
-          </span>
+            <line x1="3" y1="12" x2="20" y2="12" />
+            <polyline points="14 7 20 12 14 17" />
+          </svg>
           <div className="min-w-0">
             <div className="mb-1.5">
               <Label>Offers</Label>
@@ -170,7 +162,7 @@ export const TradeFeedRow: React.FC<TradeFeedRowProps> = ({
             View
           </span>
         </div>
-      </div>
+      </motion.div>
     </Link>
   );
 };

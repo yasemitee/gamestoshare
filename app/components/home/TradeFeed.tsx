@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { TradeFeedRow } from './TradeFeedRow';
 import { colors } from '@/lib/colors';
 import { COUNTRIES } from '@/lib/countries';
@@ -22,6 +22,7 @@ export const TradeFeed: React.FC<TradeFeedProps> = ({
   isLoading = false,
   onReachEnd,
 }) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
   const handleScroll: React.UIEventHandler<HTMLDivElement> = (event) => {
     if (!onReachEnd) return;
     const { scrollTop, scrollHeight, clientHeight } = event.currentTarget;
@@ -38,7 +39,10 @@ export const TradeFeed: React.FC<TradeFeedProps> = ({
 
   return (
     <div style={{ marginTop: 56 }}>
-      <div className="flex justify-between items-center" style={{ marginBottom: 6 }}>
+      <div
+        className="flex justify-between items-center pl-2 pr-5"
+        style={{ marginBottom: 6 }}
+      >
         <span style={{ ...headerLabelStyle, color: colors.white }}>
           Showing {countryName(selectedLocation)} · {data.length} swaps
         </span>
@@ -67,11 +71,18 @@ export const TradeFeed: React.FC<TradeFeedProps> = ({
       ) : (
         <div className="relative">
           <div
-            className="overflow-y-auto custom-scrollbar max-h-[60vh] md:max-h-[460px]"
+            ref={scrollRef}
+            className="overflow-y-auto feed-scrollbar max-h-[60vh] md:max-h-[460px] pr-3"
             onScroll={handleScroll}
           >
             {data.map((row, idx) => (
-              <TradeFeedRow key={row.id} first={idx === 0} {...row} />
+              <TradeFeedRow
+                key={row.id}
+                first={idx === 0}
+                index={idx}
+                scrollRoot={scrollRef}
+                {...row}
+              />
             ))}
           </div>
 
