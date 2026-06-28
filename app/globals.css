@@ -107,6 +107,27 @@ h4 {
   background: var(--color-gray1);
 }
 
+.feed-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(195, 194, 245, 0.3) transparent;
+}
+
+.feed-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.feed-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.feed-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(195, 194, 245, 0.3);
+}
+
+.feed-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(195, 194, 245, 0.5);
+}
+
 textarea::placeholder {
   color: var(--color-gray1);
   opacity: 1;
