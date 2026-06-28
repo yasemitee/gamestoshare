@@ -76,7 +76,7 @@ export const TradeFeed: React.FC<TradeFeedProps> = ({
             className="overflow-y-auto feed-scrollbar max-h-[60vh] md:max-h-[460px] pr-3"
             onScroll={handleScroll}
           >
-            <AnimatePresence initial={false}>
+            <AnimatePresence>
               {data.map((row, idx) => (
                 <TradeFeedRow
                   key={row.id}
