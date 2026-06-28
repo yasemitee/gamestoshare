@@ -26,6 +26,13 @@ export const ANIMATION_DELAY = {
 
 export const ANIMATION_EASING = [0.4, 0.0, 0.2, 1] as const;
 
+export const MOTION = {
+  duration: 0.35,
+  ease: [0.22, 1, 0.36, 1] as const,
+  rise: 8,
+  stagger: 0.05,
+} as const;
+
 // Cache settings
 export const CACHE_DURATION = {
   SHORT: 60, // 1 minute
