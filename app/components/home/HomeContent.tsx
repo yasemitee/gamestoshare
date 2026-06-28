@@ -108,6 +108,7 @@ export function HomeContent({
   const [hasError, setHasError] = useState(false);
   const [showLoadMoreLink, setShowLoadMoreLink] = useState(false);
   const hasMountedRef = useRef(false);
+  const feedScrollRef = useRef<HTMLDivElement>(null);
 
   const fetchListings = useCallback(
     async ({ cursor, append }: { cursor?: string | null; append?: boolean }) => {
@@ -198,6 +199,11 @@ export function HomeContent({
     }
     setShowLoadMoreLink(false);
     await fetchListings({ cursor: nextCursor, append: true });
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        feedScrollRef.current?.scrollBy({ top: 260, behavior: 'smooth' });
+      })
+    );
   }, [nextCursor, isLoadingMore, fetchListings]);
 
   const handleReachTableEnd = useCallback(() => {
@@ -219,6 +225,7 @@ export function HomeContent({
         selectedLocation={selectedLocation}
         isLoading={isLoading}
         onReachEnd={handleReachTableEnd}
+        scrollRef={feedScrollRef}
       />
       {hasError && (
         <div
@@ -229,24 +236,28 @@ export function HomeContent({
         </div>
       )}
       {nextCursor && showLoadMoreLink && (
-        <div className="mt-6 flex justify-center">
+        <div className="mt-8 flex justify-center">
           <button
             onClick={handleLoadMore}
             disabled={isLoadingMore || isLoading}
-            className="text-navbar flex items-center gap-2 cursor-pointer transition-colors hover:!text-white disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{ color: colors.gray1 }}
+            className="group uppercase flex items-center gap-2 cursor-pointer text-white transition-colors hover:!text-[#C3C2F5] disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{ fontSize: 12, letterSpacing: '.08em' }}
           >
-            <span>{isLoadingMore ? 'Loading...' : 'Load more listings'}</span>
+            <span
+              style={{
+                borderBottom: `1px solid ${colors.purple}`,
+                paddingBottom: 3,
+              }}
+            >
+              {isLoadingMore ? 'Loading…' : 'Load more'}
+            </span>
             {isLoadingMore ? (
-              <div
-                className="w-3 h-3 border border-t-transparent rounded-full animate-spin"
-                style={{ color: colors.gray1 }}
-              />
+              <div className="w-3 h-3 border border-t-transparent rounded-full animate-spin" />
             ) : (
               <img
                 src="/Dropdown.svg"
                 alt=""
-                className="w-3 h-3 pt-1 transition-[filter] brightness-[0.6]"
+                className="w-3 h-3 brightness-[0.6] group-hover:brightness-[10]"
               />
             )}
           </button>
