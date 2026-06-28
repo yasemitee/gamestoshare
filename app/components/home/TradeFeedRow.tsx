@@ -51,13 +51,9 @@ export const TradeFeedRow: React.FC<TradeFeedRowProps> = ({
     <motion.div
       initial={{ opacity: 0, y: reduce ? 0 : MOTION.rise }}
       whileInView={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, transition: { duration: 0.2 } }}
+      exit={{ opacity: 0, transition: { duration: 0.15 } }}
       viewport={{ once: true, margin: '-40px', root: scrollRoot }}
-      transition={{
-        duration: MOTION.duration,
-        ease: MOTION.ease,
-        delay: Math.min(index, 6) * MOTION.stagger,
-      }}
+      transition={{ duration: 0.22, ease: MOTION.ease }}
     >
       <Link href={`/listings/${id}`} className="block">
         <div
