@@ -60,9 +60,7 @@ export const metadata = {
   },
 };
 
-// Revalidate every 60 seconds on server - reduces function invocations
-// Browser will check for fresh content on manual refresh
-export const revalidate = 60;
+export const revalidate = false;
 export const fetchCache = 'default-cache';
 
 export default async function Home() {
@@ -82,8 +80,12 @@ export default async function Home() {
   });
 
   const hasMore = listings.length > MAX_LISTINGS_PER_PAGE;
-  const pageItems = hasMore ? listings.slice(0, MAX_LISTINGS_PER_PAGE) : listings;
-  const nextCursor = hasMore ? pageItems[pageItems.length - 1]?.id ?? null : null;
+  const pageItems = hasMore
+    ? listings.slice(0, MAX_LISTINGS_PER_PAGE)
+    : listings;
+  const nextCursor = hasMore
+    ? (pageItems[pageItems.length - 1]?.id ?? null)
+    : null;
 
   const tableData: GameListingData[] = pageItems.map((listing) => {
     const allGames = listing.games || [];

@@ -11,7 +11,7 @@ import {
   getDaysSincePosting,
 } from '@/lib/utils/listing';
 
-export const revalidate = 60;
+export const revalidate = false;
 
 interface ListingDetailPageProps {
   params: Promise<{
