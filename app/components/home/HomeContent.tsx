@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { HeroSection } from '@/components/home/HeroSection';
-import { Table } from '@/components/home/Table';
+import { TradeFeed } from '@/components/home/TradeFeed';
 import { FAQItem } from '@/components/home/FAQItem';
 import { AnimatedButton } from '@/components/ui/AnimatedButton';
 import { Footer } from '@/components/layout/Footer';
@@ -214,8 +214,9 @@ export function HomeContent({
         onLocationChange={setSelectedLocation}
         selectedLocation={selectedLocation}
       />
-      <Table
+      <TradeFeed
         data={listings}
+        selectedLocation={selectedLocation}
         isLoading={isLoading}
         onReachEnd={handleReachTableEnd}
       />
