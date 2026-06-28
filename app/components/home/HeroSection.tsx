@@ -1,10 +1,12 @@
 'use client';
 
 import React from 'react';
+import { motion, useReducedMotion } from 'motion/react';
 import { HomeSearch } from '@/components/home/HomeSearch';
 import { RegionChips } from '@/components/home/RegionChips';
 import { GradientTitle } from '@/components/ui/GradientTitle';
 import { colors } from '@/lib/colors';
+import { MOTION } from '@/lib/constants';
 
 interface Game {
   appId: number;
@@ -25,30 +27,60 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   onLocationChange,
   selectedLocation,
 }) => {
-  return (
-    <div className="text-center mt-32 mb-16">
-      <GradientTitle className="mb-5" style={{ lineHeight: '1.2' }}>
-        Share your games
-        <br />
-        and make new friends
-      </GradientTitle>
+  const reduce = useReducedMotion();
+  const container = {
+    hidden: {},
+    show: { transition: { staggerChildren: MOTION.stagger } },
+  };
+  const item = {
+    hidden: { opacity: 0, y: reduce ? 0 : MOTION.rise },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: MOTION.duration, ease: MOTION.ease },
+    },
+  };
 
-      <h4 className="mb-11" style={{ color: colors.gray1, lineHeight: '24px' }}>
+  return (
+    <motion.div
+      className="text-center mt-32 mb-16"
+      variants={container}
+      initial="hidden"
+      animate="show"
+    >
+      <motion.div variants={item}>
+        <GradientTitle className="mb-5" style={{ lineHeight: '1.2' }}>
+          Share your games
+          <br />
+          and make new friends
+        </GradientTitle>
+      </motion.div>
+
+      <motion.h4
+        variants={item}
+        className="mb-11"
+        style={{ color: colors.gray1, lineHeight: '24px' }}
+      >
         Connecting people through games has never been easier.
         <br className="hidden md:block" />
         Choose a platform, search a game and send a friend request.
-      </h4>
+      </motion.h4>
 
-      <HomeSearch
-        onGameSelect={onGameSelect}
-        onSearchTermChange={onSearchTermChange}
-        selectedLocation={selectedLocation}
-        onLocationChange={onLocationChange}
-      />
+      <motion.div variants={item}>
+        <HomeSearch
+          onGameSelect={onGameSelect}
+          onSearchTermChange={onSearchTermChange}
+          selectedLocation={selectedLocation}
+          onLocationChange={onLocationChange}
+        />
+      </motion.div>
 
-      <RegionChips value={selectedLocation} onChange={onLocationChange} />
+      <motion.div variants={item}>
+        <RegionChips value={selectedLocation} onChange={onLocationChange} />
+      </motion.div>
 
-      <p
+      <motion.p
+        variants={item}
         className="upper"
         style={{
           color: colors.gray1,
@@ -58,7 +90,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         }}
       >
         No registering — No sensitive info shared
-      </p>
-    </div>
+      </motion.p>
+    </motion.div>
   );
 };
