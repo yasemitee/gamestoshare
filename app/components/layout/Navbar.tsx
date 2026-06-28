@@ -117,7 +117,7 @@ export const Navbar: React.FC = () => {
           style={{
             fontSize: '12px',
             letterSpacing: '.06em',
-            border: `1px solid ${colors.gray2}`,
+            border: `1.5px solid ${colors.gray2}`,
             padding: '8px 17px',
           }}
           onMouseEnter={(e) => {
@@ -134,6 +134,7 @@ export const Navbar: React.FC = () => {
               backgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               color: 'transparent',
+              fontWeight: 600,
             }}
           >
             Create a post
