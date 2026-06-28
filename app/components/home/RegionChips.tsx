@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { colors } from '@/lib/colors';
+import { GlobeIcon } from '@/components/home/GlobeIcon';
 
 interface RegionChipsProps {
   value: string;
@@ -44,9 +45,7 @@ export const RegionChips: React.FC<RegionChipsProps> = ({ value, onChange }) => 
                 className="flex-shrink-0"
               />
             ) : (
-              <span style={{ width: 16, fontSize: 11, textAlign: 'center' }}>
-                ◍
-              </span>
+              <GlobeIcon size={16} />
             )}
             {region.label}
           </button>
