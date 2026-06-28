@@ -116,9 +116,9 @@ export const TradeFeedRow: React.FC<TradeFeedRowProps> = ({
         <div className="flex-1 flex items-center gap-4 md:gap-4 min-w-0">
           <div className="min-w-0">
             <div className="mb-1.5">
-              <Label color={colors.purple}>Wants</Label>
+              <Label color={colors.purple}>Offers</Label>
             </div>
-            <CapsuleStrip games={lookingFor} max={3} />
+            <CapsuleStrip games={offering} max={3} />
           </div>
           <svg
             width="24"
@@ -137,9 +137,9 @@ export const TradeFeedRow: React.FC<TradeFeedRowProps> = ({
           </svg>
           <div className="min-w-0">
             <div className="mb-1.5">
-              <Label>Offers</Label>
+              <Label>Wants</Label>
             </div>
-            <CapsuleStrip games={offering} max={3} />
+            <CapsuleStrip games={lookingFor} max={3} />
           </div>
         </div>
 
