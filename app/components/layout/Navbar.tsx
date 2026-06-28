@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
-import { colors } from '@/lib/colors';
+import { colors, gradients } from '@/lib/colors';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -117,20 +117,27 @@ export const Navbar: React.FC = () => {
           style={{
             fontSize: '12px',
             letterSpacing: '.06em',
-            color: colors.white,
             border: `1px solid ${colors.gray2}`,
             padding: '8px 17px',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.color = colors.purple;
             e.currentTarget.style.borderColor = colors.purple;
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.color = colors.white;
             e.currentTarget.style.borderColor = colors.gray2;
           }}
         >
-          Create a post
+          <span
+            style={{
+              background: gradients.main,
+              WebkitBackgroundClip: 'text',
+              backgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              color: 'transparent',
+            }}
+          >
+            Create a post
+          </span>
         </button>
 
         {/* Mobile menu button */}
