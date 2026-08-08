@@ -46,6 +46,18 @@ model Listing {
   @@map("listings")
 }
 
+model ListingManageToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  steamId   String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([steamId])
+  @@index([expiresAt])
+  @@map("listing_manage_tokens")
+}
+
 model Game {
   id           String   @id @default(cuid())
   steamAppId   Int      @unique
