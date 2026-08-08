@@ -7,6 +7,7 @@ import { SteamIdInputStep } from './SteamIdInputStep';
 import { setManageToken } from '@/lib/utils/manageStorage';
 import toast from 'react-hot-toast';
 import { colors } from '@/lib/colors';
+import { normalizeSteamId } from '@/lib/steam/utils';
 
 interface ManageAccessModalProps {
   isOpen: boolean;
@@ -45,7 +46,9 @@ export function ManageAccessModal({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(
-          listingId ? { listingId } : { steamProfileUrl: profileUrl }
+          listingId
+            ? { listingId }
+            : { steamProfileUrl: normalizeSteamId(profileUrl) }
         ),
       });
 
