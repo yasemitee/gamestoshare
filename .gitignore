@@ -45,3 +45,4 @@ next-env.d.ts
 /CLAUDE.md
 # Superpowers (local planning artifacts)
 docs/superpowers/
+.superpowers/
