@@ -16,6 +16,7 @@ import { GameSection } from '@/components/listings/GameSection';
 import { DescriptionTextarea } from '@/components/listings/DescriptionTextarea';
 import { VerificationModal } from '@/components/verification/VerificationModal';
 import { useState, useEffect } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import toast, { Toaster } from 'react-hot-toast';
 import { colors, gradients } from '@/lib/colors';
 import { COUNTRIES } from '@/lib/countries';
@@ -23,6 +24,7 @@ import { useSteamVerification } from '@/hooks/useSteamVerification';
 import { useVerification } from '@/hooks/useVerification';
 import { extractCleanSteamId, normalizeSteamId } from '@/lib/steam/utils';
 import { removeDuplicateGames } from '@/lib/utils/games';
+import { getManageToken } from '@/lib/utils/manageStorage';
 import { motion } from 'motion/react';
 import {
   setupGlobalErrorHandlers,
@@ -63,6 +65,67 @@ export default function CreateListingPage() {
   const [termsError, setTermsError] = useState(false);
   const { isSteamIdValid, isSteamIdInvalid, isVerifying, verifySteamId } =
     useSteamVerification();
+
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const editListingId = searchParams.get('edit');
+
+  useEffect(() => {
+    if (!editListingId) return;
+
+    const cached = getManageToken(editListingId);
+    if (!cached) {
+      router.replace(`/listings/manage`);
+      return;
+    }
+
+    (async () => {
+      const response = await fetch('/api/listings/manage', {
+        headers: { Authorization: `Bearer ${cached.token}` },
+      });
+
+      if (!response.ok) {
+        router.replace('/listings/manage');
+        return;
+      }
+
+      const { listing } = await response.json();
+
+      setSteamId(listing.steamProfileUrl);
+      const result = await verifySteamId(listing.steamProfileUrl);
+
+      setDescription(listing.description || '');
+      setLocation(listing.location);
+      setPlatform(listing.platform);
+      setShowSteamId(listing.showSteamId);
+
+      const existingLookingFor = listing.games
+        .filter((g: any) => g.type === 'LOOKING_FOR')
+        .map((g: any) => ({
+          id: g.game.steamAppId.toString(),
+          name: g.game.name,
+          iconUrl: g.game.iconUrl,
+          appId: g.game.steamAppId,
+        }));
+      const existingOffering = listing.games
+        .filter((g: any) => g.type === 'OFFERING')
+        .map((g: any) => ({
+          id: g.game.steamAppId.toString(),
+          name: g.game.name,
+          iconUrl: g.game.iconUrl,
+          appId: g.game.steamAppId,
+        }));
+
+      setLookingFor(existingLookingFor);
+      setOffering(existingOffering);
+
+      if (result?.username) setUsername(result.username);
+      if (result?.avatarUrl) setAvatarUrl(result.avatarUrl);
+      setSteamLevel(result?.steamLevel || null);
+      setAccountYears(result?.accountYears || null);
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editListingId]);
 
   const cleanSteamId = extractCleanSteamId(steamId);
 
