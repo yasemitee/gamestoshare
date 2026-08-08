@@ -319,6 +319,7 @@ export async function POST(request: NextRequest) {
     // Revalidate homepage cache immediately after creating/updating a listing
     // This ensures users see their new listing right away while keeping cache for other visitors
     revalidatePath('/');
+    revalidatePath(`/listings/${completeListing!.id}`);
 
     return NextResponse.json(completeListing, { status: existingListing ? 200 : 201 });
   } catch (error) {

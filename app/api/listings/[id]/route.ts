@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/db/db';
 import { extractBearerToken, validateManageToken } from '@/lib/utils/manageToken';
 
@@ -76,6 +77,13 @@ export async function DELETE(
     }
 
     await prisma.listing.delete({ where: { id } });
+
+    await prisma.listingManageToken.deleteMany({
+      where: { steamId: listing.steamId },
+    });
+
+    revalidatePath('/');
+    revalidatePath(`/listings/${id}`);
 
     return NextResponse.json({ success: true });
   } catch (error) {

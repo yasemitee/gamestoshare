@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
 import { colors } from '@/lib/colors';
 import { GoBackButton } from '@/components/ui/GoBackButton';
@@ -10,7 +11,7 @@ import { FriendRequestSection } from './FriendRequestSection';
 import { ListingUserHeader } from './ListingUserHeader';
 import { ManageAccessModal } from '@/components/verification/ManageAccessModal';
 import { ManageListingPanel } from './ManageListingPanel';
-import { getManageToken } from '@/lib/utils/manageStorage';
+import { getManageToken, clearManageToken } from '@/lib/utils/manageStorage';
 
 interface Game {
   id: string;
@@ -50,6 +51,7 @@ export const ListingDetailContent: React.FC<ListingDetailContentProps> = ({
     listing: any;
   } | null>(null);
   const [hasCheckedCache, setHasCheckedCache] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const cached = getManageToken(listing.id);
@@ -61,6 +63,8 @@ export const ListingDetailContent: React.FC<ListingDetailContentProps> = ({
         .then((data) => {
           if (data?.listing) {
             setManagedListing({ token: cached.token, listing: data.listing });
+          } else {
+            clearManageToken(listing.id);
           }
         })
         .finally(() => setHasCheckedCache(true));
@@ -160,7 +164,7 @@ export const ListingDetailContent: React.FC<ListingDetailContentProps> = ({
             listing={managedListing.listing}
             token={managedListing.token}
             onDeleted={() => {
-              window.location.href = '/';
+              router.push('/');
             }}
           />
         ) : (

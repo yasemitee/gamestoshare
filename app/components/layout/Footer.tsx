@@ -22,6 +22,13 @@ export function Footer() {
             T&C
           </a>
           <a
+            href="/listings/manage"
+            className="text-navbar hover:opacity-80 transition-opacity"
+            style={{ color: colors.white }}
+          >
+            Manage your listing
+          </a>
+          <a
             href="https://x.com/gamestoshare"
             target="_blank"
             rel="noopener noreferrer"
