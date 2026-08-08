@@ -15,7 +15,7 @@ import { PlatformSelector } from '@/components/listings/PlatformSelector';
 import { GameSection } from '@/components/listings/GameSection';
 import { DescriptionTextarea } from '@/components/listings/DescriptionTextarea';
 import { VerificationModal } from '@/components/verification/VerificationModal';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import toast, { Toaster } from 'react-hot-toast';
 import { colors, gradients } from '@/lib/colors';
@@ -31,7 +31,7 @@ import {
   cleanupGlobalErrorHandlers,
 } from '@/lib/utils/errors';
 
-export default function CreateListingPage() {
+function CreateListingPageInner() {
   // Setup global error handlers for compatibility
   useEffect(() => {
     setupGlobalErrorHandlers();
@@ -522,5 +522,13 @@ export default function CreateListingPage() {
         steamId={cleanSteamId}
       />
     </div>
+  );
+}
+
+export default function CreateListingPage() {
+  return (
+    <Suspense fallback={null}>
+      <CreateListingPageInner />
+    </Suspense>
   );
 }
