@@ -9,6 +9,7 @@ interface Game {
   name: string;
   headerImage: string | null;
   iconUrl: string | null;
+  steamAppId: number;
 }
 
 interface GamesListProps {
@@ -49,6 +50,7 @@ export function GamesList({ title, games }: GamesListProps) {
             <GameImage
               headerImage={game.headerImage}
               iconUrl={game.iconUrl}
+              appId={game.steamAppId}
               name={game.name}
             />
           </motion.div>

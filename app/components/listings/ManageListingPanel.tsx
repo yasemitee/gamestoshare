@@ -1,21 +1,35 @@
 'use client';
 
 import { useState } from 'react';
+import { motion } from 'motion/react';
 import { Button } from '@/components/ui/Button';
 import { colors } from '@/lib/colors';
 import { clearManageToken } from '@/lib/utils/manageStorage';
+import { GamesList } from './GamesList';
+import { ListingUserHeader } from './ListingUserHeader';
 import toast from 'react-hot-toast';
+
+interface Game {
+  id: string;
+  name: string;
+  headerImage: string | null;
+  iconUrl: string | null;
+  steamAppId: number;
+}
 
 interface ManageListingPanelProps {
   listing: {
     id: string;
     username: string | null;
     showSteamId: boolean;
-    description: string | null;
+    avatarUrl: string | null;
     location: string;
+    steamLevel: number | null;
+    accountYears: number | null;
+    description: string | null;
     games: Array<{
       type: 'LOOKING_FOR' | 'OFFERING';
-      game: { name: string };
+      game: Game;
     }>;
   };
   token: string;
@@ -30,12 +44,12 @@ export function ManageListingPanel({
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const offeringNames = listing.games
+  const offeringGames = listing.games
     .filter((g) => g.type === 'OFFERING')
-    .map((g) => g.game.name);
-  const lookingForNames = listing.games
+    .map((g) => g.game);
+  const lookingForGames = listing.games
     .filter((g) => g.type === 'LOOKING_FOR')
-    .map((g) => g.game.name);
+    .map((g) => g.game);
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -63,54 +77,95 @@ export function ManageListingPanel({
   };
 
   return (
-    <div className="text-white">
-      <p style={{ color: colors.gray1 }}>
-        {listing.username || 'Your listing'} — {listing.location}
-      </p>
-      {listing.description && <p className="my-4">{listing.description}</p>}
-      <p style={{ color: colors.gray1 }} className="mb-2">
-        Offering: {offeringNames.join(', ') || 'none'}
-      </p>
-      <p style={{ color: colors.gray1 }} className="mb-8">
-        Looking for: {lookingForNames.join(', ') || 'none'}
-      </p>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+    >
+      {/* User header — same layout as the public listing page */}
+      <ListingUserHeader
+        username={listing.username}
+        showSteamId={listing.showSteamId}
+        avatarUrl={listing.avatarUrl}
+        location={listing.location}
+        steamLevel={listing.steamLevel}
+        accountYears={listing.accountYears}
+      />
 
-      {isConfirmingDelete ? (
-        <div className="flex gap-4 items-center">
-          <span>Delete this listing permanently?</span>
-          <Button
-            variant="secondary"
-            onClick={() => setIsConfirmingDelete(false)}
-            disabled={isDeleting}
+      {/* Divider */}
+      <div
+        style={{ borderTop: `1px solid ${colors.gray2}` }}
+        className="mt-5 mb-6 md:mb-13"
+      />
+
+      {/* Description | Games */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-22">
+        <div>
+          <p
+            className="text-small-title pb-4 md:mb-8"
+            style={{ color: colors.white }}
           >
-            CANCEL
-          </Button>
-          <Button
-            variant="primary"
-            onClick={handleDelete}
-            disabled={isDeleting}
-          >
-            {isDeleting ? 'DELETING...' : 'CONFIRM DELETE'}
-          </Button>
+            DESCRIPTION
+          </p>
+          <p className="text-field-small" style={{ color: colors.gray1 }}>
+            {listing.description || 'No description provided.'}
+          </p>
         </div>
-      ) : (
-        <div className="flex gap-4">
-          <Button
-            variant="secondary"
-            onClick={() => {
-              window.location.href = `/listings/create?edit=${listing.id}`;
-            }}
-          >
-            MODIFICA
-          </Button>
-          <Button
-            variant="primary"
-            onClick={() => setIsConfirmingDelete(true)}
-          >
-            ELIMINA
-          </Button>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-9">
+          <GamesList title="WISHLIST" games={lookingForGames} />
+          <GamesList title="LIBRARY" games={offeringGames} />
         </div>
-      )}
-    </div>
+      </div>
+
+      {/* Actions */}
+      <div
+        style={{ borderTop: `1px solid ${colors.gray2}` }}
+        className="mt-10 md:mt-14 pt-8 flex flex-col sm:flex-row sm:items-center gap-4"
+      >
+        {isConfirmingDelete ? (
+          <>
+            <p
+              className="text-field-small flex-1"
+              style={{ color: colors.white }}
+            >
+              Delete this listing permanently? This can&apos;t be undone.
+            </p>
+            <div className="flex gap-4">
+              <Button
+                variant="secondary"
+                onClick={() => setIsConfirmingDelete(false)}
+                disabled={isDeleting}
+              >
+                CANCEL
+              </Button>
+              <Button
+                variant="primary"
+                onClick={handleDelete}
+                disabled={isDeleting}
+              >
+                {isDeleting ? 'DELETING...' : 'CONFIRM DELETE'}
+              </Button>
+            </div>
+          </>
+        ) : (
+          <div className="flex gap-4">
+            <Button
+              variant="secondary"
+              onClick={() => {
+                window.location.href = `/listings/create?edit=${listing.id}`;
+              }}
+            >
+              EDIT LISTING
+            </Button>
+            <Button
+              variant="primary"
+              onClick={() => setIsConfirmingDelete(true)}
+            >
+              DELETE LISTING
+            </Button>
+          </div>
+        )}
+      </div>
+    </motion.div>
   );
 }

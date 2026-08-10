@@ -1,16 +1,22 @@
 /**
  * Backfill broken game header images.
  *
- * For each game, checks whether its stored header image URL actually resolves.
- * If it 404s (common for recent titles whose assets live under a hashed path),
- * fetches the real header_image from the Steam store API and updates the DB.
+ * NOTE: an earlier version of this script treated any HTTP 200 as proof the
+ * stored URL was fine. It isn't — when a game has no art at the requested
+ * path Steam replies 200 with a ~1.4KB blank placeholder JPEG instead of a
+ * 404, so genuinely broken games (Battlefield 6 among them) were reported
+ * healthy and skipped. Health is now judged by response size, and only
+ * games that fail that check cost a store API call.
  *
  * Dry-run (report only):  npx tsx scripts/fix-header-images.ts
  * Apply changes:          npx tsx scripts/fix-header-images.ts --apply
+ * Every game, not just those on live listings:  ... --all
  */
 
+import 'dotenv/config';
 import { prisma } from '../app/lib/db/db';
 import { getGameDetails } from '../app/lib/steam/api';
+import { servesRealImage } from '../app/lib/steam/images';
 
 const APPLY = process.argv.includes('--apply');
 const HEAD_CONCURRENCY = 12;
@@ -18,15 +24,6 @@ const STORE_DELAY_MS = 800;
 
 const constructed = (appId: number) =>
   `https://cdn.cloudflare.steamstatic.com/steam/apps/${appId}/header.jpg`;
-
-async function head(url: string): Promise<number> {
-  try {
-    const r = await fetch(url, { method: 'HEAD' });
-    return r.status;
-  } catch {
-    return 0;
-  }
-}
 
 async function pool<T>(items: T[], size: number, fn: (item: T) => Promise<void>) {
   let i = 0;
@@ -42,21 +39,27 @@ async function pool<T>(items: T[], size: number, fn: (item: T) => Promise<void>)
 async function main() {
   console.log(`Mode: ${APPLY ? 'APPLY (writing to DB)' : 'DRY-RUN (no writes)'}`);
 
+  // Only games on live listings are worth spending store API calls on.
+  const onlyActive = !process.argv.includes('--all');
   const games = await prisma.game.findMany({
+    where: onlyActive
+      ? { listings: { some: { listing: { isActive: true } } } }
+      : undefined,
     select: { id: true, steamAppId: true, headerImage: true, name: true },
   });
-  console.log(`Loaded ${games.length} games. Checking current header URLs...`);
+  console.log(
+    `Loaded ${games.length} games${onlyActive ? ' (active listings only; pass --all for every game)' : ''}. Checking what each URL actually serves...`
+  );
 
   const broken: typeof games = [];
   let okCount = 0;
   await pool(games, HEAD_CONCURRENCY, async (g) => {
     const url = g.headerImage || constructed(g.steamAppId);
-    const status = await head(url);
-    if (status === 200) okCount++;
+    if (await servesRealImage(url)) okCount++;
     else broken.push(g);
   });
 
-  console.log(`OK: ${okCount} | Broken: ${broken.length}`);
+  console.log(`Already usable: ${okCount} | Serving blank/missing: ${broken.length}`);
   if (broken.length === 0) {
     console.log('Nothing to fix.');
     await prisma.$disconnect();
@@ -66,15 +69,19 @@ async function main() {
   // Phase 1: resolve real URLs over the network (no DB writes here).
   const updates: { id: string; real: string }[] = [];
   let unresolved = 0;
+  let done = 0;
   for (const g of broken) {
     const details = await getGameDetails(g.steamAppId);
     const real: string | undefined = details?.header_image;
-    if (real && (await head(real)) === 200) {
-      console.log(`✓ ${g.steamAppId} ${g.name?.slice(0, 32)} -> ${real.split('?')[0]}`);
+    if (real && (await servesRealImage(real))) {
+      console.log(`✓ ${g.steamAppId} ${g.name?.slice(0, 40)}`);
       updates.push({ id: g.id, real });
     } else {
-      console.log(`✗ ${g.steamAppId} ${g.name?.slice(0, 32)} — no working header`);
+      console.log(`✗ ${g.steamAppId} ${g.name?.slice(0, 40)} — no working header`);
       unresolved++;
+    }
+    if (++done % 25 === 0) {
+      console.log(`  ...${done}/${broken.length} checked (${updates.length} resolved)`);
     }
     await new Promise((r) => setTimeout(r, STORE_DELAY_MS));
   }

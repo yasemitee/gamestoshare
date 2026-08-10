@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { colors } from '@/lib/colors';
 import { FeedGame } from '@/lib/db/types';
+import { useResilientGameImage } from '@/hooks/useResilientGameImage';
 
 const WIDTH = 64;
 const HEIGHT = 30;
@@ -13,46 +14,16 @@ interface GameCapsuleProps {
 }
 
 export const GameCapsule: React.FC<GameCapsuleProps> = ({ game, onDead }) => {
-  const staticSources = [
-    game.headerImage,
-    game.appId
-      ? `https://cdn.cloudflare.steamstatic.com/steam/apps/${game.appId}/header.jpg`
-      : undefined,
-  ].filter(Boolean) as string[];
-  const sources = [...new Set(staticSources)];
+  const { src, handleError, dead } = useResilientGameImage({
+    headerImage: game.headerImage,
+    iconUrl: game.iconUrl,
+    appId: game.appId,
+  });
 
-  const [idx, setIdx] = useState(0);
-  const [resolved, setResolved] = useState<string | null>(null);
-  const [triedApi, setTriedApi] = useState(false);
-  const [dead, setDead] = useState(false);
-
-  const die = () => {
-    setDead(true);
-    onDead?.();
-  };
-
-  const handleError = async () => {
-    if (!resolved && idx < sources.length - 1) {
-      setIdx((i) => i + 1);
-      return;
-    }
-    if (!triedApi && game.appId) {
-      setTriedApi(true);
-      try {
-        const res = await fetch(`/api/steam/header?appId=${game.appId}`);
-        const data = await res.json();
-        if (data?.headerImage) {
-          setResolved(data.headerImage);
-          return;
-        }
-      } catch {
-        // fall through to dead state
-      }
-    }
-    die();
-  };
-
-  const src = resolved ?? sources[idx];
+  useEffect(() => {
+    if (dead) onDead?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dead]);
 
   if (dead || !src) {
     // When a substitution handler is provided, render nothing — the parent
@@ -104,6 +75,9 @@ export const CapsuleStrip: React.FC<{
   const visible = available.slice(0, max);
   const overflow = available.length - visible.length;
 
+  // Games drop out of the strip as their images fail to resolve, so this
+  // count is only final once that settles — report it up rather than let
+  // the caller derive a stale number from `games`.
   useEffect(() => {
     onOverflowChange?.(overflow);
   }, [overflow, onOverflowChange]);

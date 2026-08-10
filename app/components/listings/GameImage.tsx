@@ -1,27 +1,23 @@
 'use client';
 
-import { useState } from 'react';
 import { colors } from '@/lib/colors';
+import { useResilientGameImage } from '@/hooks/useResilientGameImage';
 
 interface GameImageProps {
   headerImage?: string | null;
   iconUrl?: string | null;
+  appId?: number | null;
   name: string;
 }
 
-export function GameImage({ headerImage, iconUrl, name }: GameImageProps) {
-  const [imageError, setImageError] = useState(false);
-  const [currentSrc, setCurrentSrc] = useState(headerImage || iconUrl || '');
+export function GameImage({ headerImage, iconUrl, appId, name }: GameImageProps) {
+  const { src, handleError } = useResilientGameImage({
+    headerImage,
+    iconUrl,
+    appId,
+  });
 
-  const handleError = () => {
-    if (currentSrc === headerImage && iconUrl) {
-      setCurrentSrc(iconUrl);
-    } else {
-      setImageError(true);
-    }
-  };
-
-  if (!currentSrc || imageError) {
+  if (!src) {
     return (
       <div
         className="absolute inset-0 flex items-center justify-center text-xs text-center p-2"
@@ -34,7 +30,7 @@ export function GameImage({ headerImage, iconUrl, name }: GameImageProps) {
 
   return (
     <img
-      src={currentSrc}
+      src={src}
       alt={name}
       className="w-full h-full object-cover"
       onError={handleError}
