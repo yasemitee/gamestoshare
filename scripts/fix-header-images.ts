@@ -115,7 +115,15 @@ async function main() {
   console.log(`Resolved: ${updates.length}`);
   console.log(`${APPLY ? 'Updated' : 'Would update'}: ${APPLY ? fixed : updates.length}`);
   console.log(`Still unresolved: ${unresolved}`);
-  if (!APPLY) console.log('\nRe-run with --apply to write these changes.');
+  if (!APPLY) {
+    console.log('\nRe-run with --apply to write these changes.');
+  } else if (fixed > 0) {
+    console.log(
+      '\nNOTE: the homepage is `revalidate = false`, so it will keep serving\n' +
+        'the previous render until it is revalidated — redeploy (or trigger an\n' +
+        'on-demand revalidation of "/") for these images to appear.'
+    );
+  }
 
   await prisma.$disconnect();
 }

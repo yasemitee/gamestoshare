@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { getGameDetails } from '@/lib/steam/api';
 import { prisma } from '@/lib/db/db';
 import { servesRealImage } from '@/lib/steam/images';
@@ -26,9 +27,15 @@ export async function GET(request: NextRequest) {
   // Persist so this game costs one store API call overall rather than one
   // per viewer, and so the feed stops serving the broken URL.
   if (headerImage) {
-    await prisma.game
+    const repaired = await prisma.game
       .updateMany({ where: { steamAppId: appId }, data: { headerImage } })
-      .catch(() => undefined);
+      .catch(() => null);
+
+    // The homepage is `revalidate = false`, so a repaired row would keep
+    // being served from the old static render without this.
+    if (repaired && repaired.count > 0) {
+      revalidatePath('/');
+    }
   }
 
   return NextResponse.json({ headerImage }, { headers: CACHE_HEADERS });
