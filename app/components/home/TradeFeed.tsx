@@ -7,6 +7,7 @@ import { GameListingData } from '@/lib/db/types';
 
 interface TradeFeedProps {
   data: GameListingData[];
+  totalCount?: number;
   selectedLocation: string;
   isLoading?: boolean;
   onReachEnd?: () => void;
@@ -20,6 +21,7 @@ function countryName(code: string): string {
 
 export const TradeFeed: React.FC<TradeFeedProps> = ({
   data,
+  totalCount,
   selectedLocation,
   isLoading = false,
   onReachEnd,
@@ -48,7 +50,7 @@ export const TradeFeed: React.FC<TradeFeedProps> = ({
         style={{ marginBottom: 6 }}
       >
         <span style={{ ...headerLabelStyle, color: colors.white }}>
-          Showing {countryName(selectedLocation)} · {data.length} swaps
+          Showing {countryName(selectedLocation)} · {totalCount ?? data.length} swaps
         </span>
         <span style={{ ...headerLabelStyle, color: colors.gray1 }}>
           Sorted by newest

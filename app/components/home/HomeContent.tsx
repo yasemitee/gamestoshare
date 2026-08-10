@@ -45,11 +45,13 @@ interface ListingsApiItem {
 interface ListingsApiResponse {
   items: ListingsApiItem[];
   nextCursor: string | null;
+  totalCount: number;
 }
 
 interface HomeContentProps {
   initialListings: GameListingData[];
   initialNextCursor?: string | null;
+  initialTotalCount?: number;
 }
 
 function mapListingToTableData(listing: ListingsApiItem): GameListingData {
@@ -96,10 +98,14 @@ function mapListingsToTableData(listings: ListingsApiItem[]): GameListingData[] 
 export function HomeContent({
   initialListings,
   initialNextCursor = null,
+  initialTotalCount,
 }: HomeContentProps) {
   const [listings, setListings] = useState<GameListingData[]>(initialListings);
   const [nextCursor, setNextCursor] = useState<string | null>(
     initialNextCursor
+  );
+  const [totalCount, setTotalCount] = useState<number>(
+    initialTotalCount ?? initialListings.length
   );
   const [selectedLocation, setSelectedLocation] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -150,12 +156,16 @@ export function HomeContent({
 
         setListings((prev) => (isAppend ? [...prev, ...mapped] : mapped));
         setNextCursor(Array.isArray(data) ? null : data.nextCursor ?? null);
+        setTotalCount(
+          Array.isArray(data) ? data.length : (data.totalCount ?? mapped.length)
+        );
       } catch (error) {
         console.error('Error fetching listings:', error);
         setHasError(true);
         if (!isAppend) {
           setListings([]);
           setNextCursor(null);
+          setTotalCount(0);
         }
       } finally {
         if (isAppend) {
@@ -222,6 +232,7 @@ export function HomeContent({
       />
       <TradeFeed
         data={listings}
+        totalCount={totalCount}
         selectedLocation={selectedLocation}
         isLoading={isLoading}
         onReachEnd={handleReachTableEnd}
