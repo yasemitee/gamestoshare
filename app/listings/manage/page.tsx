@@ -26,38 +26,31 @@ export default function ManageListingPage() {
   if (!MANAGE_ENABLED) {
     return (
       <div className="min-h-screen flex flex-col">
-        <div className="flex-1">
-          <Container>
-            <Navbar />
-            <MainContentContainer>
-              <GoBackButton />
-              <div className="mt-14 text-white">
-                <h1 className="mb-6">Work in progress</h1>
-                <p
-                  className="text-field mb-2"
-                  style={{ color: colors.gray1 }}
-                >
-                  Managing your listing is coming soon.
-                </p>
-                <p
-                  className="text-field mb-8"
-                  style={{ color: colors.gray1 }}
-                >
-                  In the meantime, to remove your post write to the staff on our
-                  Discord server.
-                </p>
-                <AnimatedButton
-                  href="https://discord.gg/mavhKaDRCv"
-                  className="inline-flex items-center gap-1.5 text-button"
-                >
-                  <img src="/Discord.svg" alt="" width={16} height={16} />
-                  <span className="text-button">ASK ON DISCORD</span>
-                </AnimatedButton>
-              </div>
-            </MainContentContainer>
-            <Footer />
-          </Container>
-        </div>
+        <Container className="flex-1">
+          <Navbar />
+          <MainContentContainer>
+            <GoBackButton />
+            <div className="mt-14 text-white">
+              <h1 className="mb-6">Work in progress</h1>
+              <p className="text-field mb-2" style={{ color: colors.gray1 }}>
+                Managing your listing is coming soon.
+              </p>
+              <p className="text-field mb-8" style={{ color: colors.gray1 }}>
+                In the meantime, to remove your post write in the{' '}
+                <span style={{ color: colors.white }}>#delete</span> channel on
+                our Discord server.
+              </p>
+              <AnimatedButton
+                href="https://discord.gg/mavhKaDRCv"
+                className="inline-flex items-center gap-1.5 text-button"
+              >
+                <img src="/Discord.svg" alt="" width={16} height={16} />
+                <span className="text-button">ASK ON DISCORD</span>
+              </AnimatedButton>
+            </div>
+          </MainContentContainer>
+        </Container>
+        <Footer />
       </div>
     );
   }
