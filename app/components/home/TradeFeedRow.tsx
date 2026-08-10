@@ -117,7 +117,7 @@ export const TradeFeedRow: React.FC<TradeFeedRowProps> = ({
           </div>
         </div>
 
-        <div className="flex-1 flex items-center gap-4 md:gap-4 min-w-0">
+        <div className="flex-1 flex items-center justify-end md:justify-start gap-4 md:gap-4 min-w-0">
           <div className="min-w-0">
             <div className="mb-1.5">
               <Label color={colors.purple}>Offers</Label>
