@@ -73,7 +73,7 @@ export const TradeFeedRow: React.FC<TradeFeedRowProps> = ({
           }
         >
         <div className="flex items-center gap-4 md:contents">
-        <div className="flex items-center gap-3 flex-shrink-0 md:w-[210px]">
+        <div className="flex items-center gap-3 min-w-0 max-w-[55%] md:max-w-none md:w-[210px] md:flex-shrink-0">
           <div
             className="flex items-center justify-center flex-shrink-0 overflow-hidden"
             style={{
