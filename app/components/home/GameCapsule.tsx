@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { colors } from '@/lib/colors';
 import { FeedGame } from '@/lib/db/types';
 
@@ -91,10 +91,11 @@ export const GameCapsule: React.FC<GameCapsuleProps> = ({ game, onDead }) => {
   );
 };
 
-export const CapsuleStrip: React.FC<{ games: FeedGame[]; max?: number }> = ({
-  games,
-  max = 3,
-}) => {
+export const CapsuleStrip: React.FC<{
+  games: FeedGame[];
+  max?: number;
+  onOverflowChange?: (overflow: number) => void;
+}> = ({ games, max = 3, onOverflowChange }) => {
   const [failed, setFailed] = useState<Set<number>>(new Set());
 
   const available = games
@@ -102,6 +103,10 @@ export const CapsuleStrip: React.FC<{ games: FeedGame[]; max?: number }> = ({
     .filter(({ i }) => !failed.has(i));
   const visible = available.slice(0, max);
   const overflow = available.length - visible.length;
+
+  useEffect(() => {
+    onOverflowChange?.(overflow);
+  }, [overflow, onOverflowChange]);
 
   const markFailed = (i: number) =>
     setFailed((prev) => {
@@ -125,7 +130,10 @@ export const CapsuleStrip: React.FC<{ games: FeedGame[]; max?: number }> = ({
         />
       ))}
       {overflow > 0 && (
-        <span style={{ color: colors.gray1, fontSize: 11 }} className="ml-1">
+        <span
+          style={{ color: colors.gray1, fontSize: 11 }}
+          className="ml-1 hidden md:inline"
+        >
           +{overflow}
         </span>
       )}

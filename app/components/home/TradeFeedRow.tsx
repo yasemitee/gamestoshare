@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { motion, useReducedMotion } from 'motion/react';
 import { colors } from '@/lib/colors';
@@ -48,6 +48,7 @@ export const TradeFeedRow: React.FC<TradeFeedRowProps> = ({
   const initial = displayName.charAt(0).toUpperCase();
   const truncatedName =
     displayName.length > 10 ? `${displayName.slice(0, 10)}…` : displayName;
+  const [offersOverflow, setOffersOverflow] = useState(0);
 
   return (
     <motion.div
@@ -119,10 +120,22 @@ export const TradeFeedRow: React.FC<TradeFeedRowProps> = ({
 
         <div className="flex-1 flex items-center justify-end md:justify-start gap-4 md:gap-4 min-w-0">
           <div className="min-w-0">
-            <div className="mb-1.5">
+            <div className="mb-1.5 flex items-center gap-1">
               <Label color={colors.purple}>Offers</Label>
+              {offersOverflow > 0 && (
+                <span
+                  className="md:hidden"
+                  style={{ color: colors.gray1, fontSize: 10 }}
+                >
+                  +{offersOverflow}
+                </span>
+              )}
             </div>
-            <CapsuleStrip games={offering} max={3} />
+            <CapsuleStrip
+              games={offering}
+              max={3}
+              onOverflowChange={setOffersOverflow}
+            />
           </div>
           <svg
             width="24"
