@@ -4,8 +4,16 @@ import { getSteamIdFromUrl, getProfileBio } from '@/lib/steam/api';
 import { verifySecurityCode } from '@/lib/steam/utils';
 import { STEAM_VERIFICATION_CODE } from '@/lib/constants';
 import { createManageToken } from '@/lib/utils/manageToken';
+import { MANAGE_ENABLED } from '@/lib/featureFlags';
 
 export async function POST(request: NextRequest) {
+  if (!MANAGE_ENABLED) {
+    return NextResponse.json(
+      { error: 'Managing listings is not available yet' },
+      { status: 503 }
+    );
+  }
+
   try {
     const body = await request.json();
     const { listingId, steamProfileUrl } = body;
