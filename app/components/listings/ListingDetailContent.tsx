@@ -1,17 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
 import { colors } from '@/lib/colors';
 import { GoBackButton } from '@/components/ui/GoBackButton';
-import { Button } from '@/components/ui/Button';
 import { GamesList } from './GamesList';
 import { FriendRequestSection } from './FriendRequestSection';
 import { ListingUserHeader } from './ListingUserHeader';
-import { ManageAccessModal } from '@/components/verification/ManageAccessModal';
-import { ManageListingPanel } from './ManageListingPanel';
-import { getManageToken, clearManageToken } from '@/lib/utils/manageStorage';
 
 interface Game {
   id: string;
@@ -45,34 +39,6 @@ export const ListingDetailContent: React.FC<ListingDetailContentProps> = ({
   offeringGames,
   postingDate,
 }) => {
-  const [isManageModalOpen, setIsManageModalOpen] = useState(false);
-  const [managedListing, setManagedListing] = useState<{
-    token: string;
-    listing: any;
-  } | null>(null);
-  const [hasCheckedCache, setHasCheckedCache] = useState(false);
-  const router = useRouter();
-
-  useEffect(() => {
-    const cached = getManageToken(listing.id);
-    if (cached) {
-      fetch('/api/listings/manage', {
-        headers: { Authorization: `Bearer ${cached.token}` },
-      })
-        .then((res) => (res.ok ? res.json() : null))
-        .then((data) => {
-          if (data?.listing) {
-            setManagedListing({ token: cached.token, listing: data.listing });
-          } else {
-            clearManageToken(listing.id);
-          }
-        })
-        .finally(() => setHasCheckedCache(true));
-    } else {
-      setHasCheckedCache(true);
-    }
-  }, [listing.id]);
-
   return (
     <div className="">
       {/* Go Back Button */}
@@ -158,35 +124,6 @@ export const ListingDetailContent: React.FC<ListingDetailContentProps> = ({
           username={listing.username}
         />
       </motion.div>
-      <div className="mt-16">
-        {managedListing ? (
-          <ManageListingPanel
-            listing={managedListing.listing}
-            token={managedListing.token}
-            onDeleted={() => {
-              router.push('/');
-            }}
-          />
-        ) : (
-          hasCheckedCache && (
-            <Button
-              variant="secondary"
-              onClick={() => setIsManageModalOpen(true)}
-            >
-              È IL TUO ANNUNCIO?
-            </Button>
-          )
-        )}
-      </div>
-
-      <ManageAccessModal
-        isOpen={isManageModalOpen}
-        onClose={() => setIsManageModalOpen(false)}
-        listingId={listing.id}
-        onVerified={({ token, listing: fullListing }) => {
-          setManagedListing({ token, listing: fullListing });
-        }}
-      />
     </div>
   );
 };

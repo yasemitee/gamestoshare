@@ -35,7 +35,7 @@ body {
 
 h1 {
   font-family: var(--font-quando), serif;
-  font-size: 48px;
+  font-size: clamp(30px, 7vw, 48px);
   line-height: auto;
 }
 

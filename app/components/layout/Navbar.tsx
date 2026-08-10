@@ -85,19 +85,13 @@ export const Navbar: React.FC = () => {
             whileHover={{ y: -2 }}
             whileTap={{ y: 0 }}
             transition={{ duration: 0.2 }}
-            className="text-navbar flex items-center gap-2 cursor-pointer outline-none group"
+            className="text-navbar cursor-pointer transition-colors hover:!text-white"
+            style={{
+              color: isActive('/listings/manage') ? colors.white : colors.gray1,
+            }}
+            onClick={() => (window.location.href = '/listings/manage')}
           >
-            <span
-              className="transition-colors group-hover:!text-white"
-              style={{ color: colors.gray1 }}
-            >
-              Platform
-            </span>
-            <img
-              src="/Dropdown.svg"
-              alt=""
-              className="w-3 h-3 pt-1 transition-[filter] brightness-[0.6] group-hover:!brightness-[10]"
-            />
+            Manage your listing
           </motion.button>
           <motion.button
             whileHover={{ y: -2 }}
@@ -220,17 +214,20 @@ export const Navbar: React.FC = () => {
                 Search
               </button>
 
-              {/* Platform */}
+              {/* Manage your listing */}
               <button
-                className="text-title flex items-center gap-2"
-                style={{ color: colors.gray1 }}
+                className="text-title"
+                style={{
+                  color: isActive('/listings/manage')
+                    ? colors.white
+                    : colors.gray1,
+                }}
+                onClick={() => {
+                  window.location.href = '/listings/manage';
+                  setIsMobileMenuOpen(false);
+                }}
               >
-                <span>Platform</span>
-                <img
-                  src="/Dropdown.svg"
-                  alt=""
-                  className="w-3 h-3 brightness-[0.6]"
-                />
+                Manage your listing
               </button>
 
               {/* Info */}

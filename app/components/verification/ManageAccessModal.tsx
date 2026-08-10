@@ -111,6 +111,7 @@ export function ManageAccessModal({
           onCancel={listingId ? handleClose : () => setStep('profile-url')}
           onConfirm={handleConfirm}
           showSkip={false}
+          isLoading={isSubmitting}
         />
       )}
     </BaseVerificationModal>

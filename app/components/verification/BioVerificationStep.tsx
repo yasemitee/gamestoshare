@@ -11,6 +11,7 @@ interface BioVerificationStepProps {
   onSkip?: () => void;
   showSkip?: boolean;
   hideBioPreview?: boolean;
+  isLoading?: boolean;
 }
 
 export function BioVerificationStep({
@@ -20,6 +21,7 @@ export function BioVerificationStep({
   onSkip,
   showSkip = false,
   hideBioPreview = false,
+  isLoading = false,
 }: BioVerificationStepProps) {
   const verificationCode = 'GTS';
 
@@ -161,17 +163,46 @@ export function BioVerificationStep({
       {/* Buttons Area - Fixed at bottom */}
       <div className="flex gap-16 px-9">
         {onCancel && (
-          <Button onClick={onCancel} variant="secondary" className="flex-1">
+          <Button
+            onClick={onCancel}
+            variant="secondary"
+            className="flex-1"
+            disabled={isLoading}
+          >
             {showSkip ? 'BACK' : 'CANCEL'}
           </Button>
         )}
         {showSkip && onSkip ? (
-          <Button onClick={onSkip} variant="primary" className="flex-1">
+          <Button
+            onClick={onSkip}
+            variant="primary"
+            className="flex-1"
+            disabled={isLoading}
+          >
             SKIP
           </Button>
         ) : (
-          <Button onClick={onConfirm} variant="primary" className="flex-1">
-            CONFIRM
+          <Button
+            onClick={onConfirm}
+            variant="primary"
+            className="flex-1"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <span className="flex items-center justify-center gap-2">
+                <span
+                  className="w-4 h-4 rounded-full border-2 animate-spin"
+                  style={{
+                    borderColor: colors.black,
+                    borderTopColor: 'transparent',
+                    opacity: 0.5,
+                  }}
+                />
+                VERIFYING...
+              </span>
+            ) : (
+              'CONFIRM'
+            )}
           </Button>
         )}
       </div>
