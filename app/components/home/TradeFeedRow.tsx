@@ -72,7 +72,8 @@ export const TradeFeedRow: React.FC<TradeFeedRowProps> = ({
               : 'transparent')
           }
         >
-        <div className="flex items-center gap-3 md:w-[210px] md:flex-shrink-0">
+        <div className="flex items-center gap-4 md:contents">
+        <div className="flex items-center gap-3 flex-shrink-0 md:w-[210px]">
           <div
             className="flex items-center justify-center flex-shrink-0 overflow-hidden"
             style={{
@@ -141,6 +142,7 @@ export const TradeFeedRow: React.FC<TradeFeedRowProps> = ({
             </div>
             <CapsuleStrip games={lookingFor} max={3} />
           </div>
+        </div>
         </div>
 
         <div className="md:w-24 md:flex-shrink-0 md:text-right flex md:block items-center justify-between gap-3">
