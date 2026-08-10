@@ -46,7 +46,7 @@ export const TradeFeed: React.FC<TradeFeedProps> = ({
   return (
     <div style={{ marginTop: 56 }}>
       <div
-        className="flex justify-between items-center pl-2 pr-5"
+        className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 pl-2 pr-5"
         style={{ marginBottom: 6 }}
       >
         <span style={{ ...headerLabelStyle, color: colors.white }}>

@@ -91,17 +91,22 @@ export const GameCapsule: React.FC<GameCapsuleProps> = ({ game, onDead }) => {
   );
 };
 
-export const CapsuleStrip: React.FC<{ games: FeedGame[]; max?: number }> = ({
-  games,
-  max = 3,
-}) => {
+export const CapsuleStrip: React.FC<{
+  games: FeedGame[];
+  max?: number;
+  label: string;
+  labelColor?: string;
+}> = ({ games, max = 3, label, labelColor = colors.gray1 }) => {
   const [failed, setFailed] = useState<Set<number>>(new Set());
 
+  // Offers is now the only strip, so it spans the full row width on mobile too.
+  const MOBILE_MAX = 4;
   const available = games
     .map((game, i) => ({ game, i }))
     .filter(({ i }) => !failed.has(i));
   const visible = available.slice(0, max);
-  const overflow = available.length - visible.length;
+  const desktopOverflow = Math.max(0, available.length - max);
+  const mobileOverflow = Math.max(0, available.length - MOBILE_MAX);
 
   const markFailed = (i: number) =>
     setFailed((prev) => {
@@ -110,24 +115,45 @@ export const CapsuleStrip: React.FC<{ games: FeedGame[]; max?: number }> = ({
       return next;
     });
 
-  if (visible.length === 0) {
-    if (games.length === 0) return null;
-    return <GameCapsule game={games[0]} />;
-  }
+  const overflowStyle = { color: colors.gray1, fontSize: 10 } as const;
 
   return (
-    <div className="flex items-center gap-1">
-      {visible.map(({ game, i }) => (
-        <GameCapsule
-          key={game.appId ?? i}
-          game={game}
-          onDead={() => markFailed(i)}
-        />
-      ))}
-      {overflow > 0 && (
-        <span style={{ color: colors.gray1, fontSize: 11 }} className="ml-1">
-          +{overflow}
+    <div className="min-w-0">
+      <div className="mb-1.5 flex items-center gap-1.5">
+        <span
+          style={{
+            fontSize: 10,
+            letterSpacing: '.12em',
+            textTransform: 'uppercase',
+            color: labelColor,
+          }}
+        >
+          {label}
         </span>
+        {mobileOverflow > 0 && (
+          <span className="lg:hidden" style={overflowStyle}>
+            +{mobileOverflow}
+          </span>
+        )}
+        {desktopOverflow > 0 && (
+          <span className="hidden lg:inline" style={overflowStyle}>
+            +{desktopOverflow}
+          </span>
+        )}
+      </div>
+      {visible.length === 0 ? (
+        games.length === 0 ? null : <GameCapsule game={games[0]} />
+      ) : (
+        <div className="flex items-center gap-1">
+          {visible.map(({ game, i }, pos) => (
+            <div
+              key={game.appId ?? i}
+              className={pos >= MOBILE_MAX ? 'hidden lg:block' : ''}
+            >
+              <GameCapsule game={game} onDead={() => markFailed(i)} />
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );

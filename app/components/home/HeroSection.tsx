@@ -43,7 +43,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
   return (
     <motion.div
-      className="text-center mt-32 mb-16"
+      className="text-center mt-20 md:mt-32 mb-16"
       variants={container}
       initial="hidden"
       animate="show"

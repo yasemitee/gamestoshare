@@ -33,7 +33,6 @@ export const TradeFeedRow: React.FC<TradeFeedRowProps> = ({
   user,
   showSteamId,
   location,
-  lookingFor,
   offering,
   postingDate,
   avatarUrl,
@@ -57,7 +56,7 @@ export const TradeFeedRow: React.FC<TradeFeedRowProps> = ({
     >
       <Link href={`/listings/${id}`} className="block">
         <div
-          className="group flex flex-col md:flex-row md:items-center gap-4 md:gap-5 cursor-pointer transition-colors"
+          className="group flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-5 cursor-pointer transition-colors"
           style={{
             padding: '18px 8px',
             borderTop: first ? 'none' : '1px solid rgba(255,255,255,.07)',
@@ -72,7 +71,7 @@ export const TradeFeedRow: React.FC<TradeFeedRowProps> = ({
               : 'transparent')
           }
         >
-        <div className="flex items-center gap-3 md:w-[210px] md:flex-shrink-0">
+        <div className="flex items-center gap-3 lg:w-[210px] lg:flex-shrink-0">
           <div
             className="flex items-center justify-center flex-shrink-0 overflow-hidden"
             style={{
@@ -113,38 +112,12 @@ export const TradeFeedRow: React.FC<TradeFeedRowProps> = ({
           </div>
         </div>
 
-        <div className="flex-1 flex items-center gap-4 md:gap-4 min-w-0">
-          <div className="min-w-0">
-            <div className="mb-1.5">
-              <Label color={colors.purple}>Offers</Label>
-            </div>
-            <CapsuleStrip games={offering} max={3} />
-          </div>
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke={colors.gray2}
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="self-end flex-shrink-0"
-            style={{ marginBottom: 6 }}
-          >
-            <line x1="3" y1="12" x2="20" y2="12" />
-            <polyline points="14 7 20 12 14 17" />
-          </svg>
-          <div className="min-w-0">
-            <div className="mb-1.5">
-              <Label>Wants</Label>
-            </div>
-            <CapsuleStrip games={lookingFor} max={3} />
-          </div>
+        <div className="flex-1 min-w-0">
+          <CapsuleStrip games={offering} max={5} label="Offers" labelColor={colors.purple} />
         </div>
 
-        <div className="md:w-24 md:flex-shrink-0 md:text-right flex md:block items-center justify-between gap-3">
-          <div className="md:mb-2">
+        <div className="lg:w-24 lg:flex-shrink-0 lg:text-right flex lg:block items-center justify-between gap-3">
+          <div className="lg:mb-2">
             <Label>{postingDate}</Label>
           </div>
           <span
