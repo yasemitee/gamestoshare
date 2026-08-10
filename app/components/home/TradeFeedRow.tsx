@@ -33,6 +33,7 @@ export const TradeFeedRow: React.FC<TradeFeedRowProps> = ({
   user,
   showSteamId,
   location,
+  lookingFor,
   offering,
   postingDate,
   avatarUrl,
@@ -112,8 +113,13 @@ export const TradeFeedRow: React.FC<TradeFeedRowProps> = ({
           </div>
         </div>
 
-        <div className="flex-1 min-w-0">
-          <CapsuleStrip games={offering} max={5} label="Offers" labelColor={colors.purple} />
+        <div className="flex-1 flex flex-row lg:items-center gap-3 lg:gap-8 min-w-0">
+          <div className="flex-1 lg:flex-initial min-w-0">
+            <CapsuleStrip games={offering} max={3} label="Offers" labelColor={colors.purple} />
+          </div>
+          <div className="hidden lg:block lg:flex-initial min-w-0">
+            <CapsuleStrip games={lookingFor} max={3} label="Wants" />
+          </div>
         </div>
 
         <div className="lg:w-24 lg:flex-shrink-0 lg:text-right flex lg:block items-center justify-between gap-3">

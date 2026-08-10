@@ -99,7 +99,7 @@ export const CapsuleStrip: React.FC<{
 }> = ({ games, max = 3, label, labelColor = colors.gray1 }) => {
   const [failed, setFailed] = useState<Set<number>>(new Set());
 
-  // Offers is now the only strip, so it spans the full row width on mobile too.
+  // Wants is hidden on mobile, so Offers spans the full row width there.
   const MOBILE_MAX = 4;
   const available = games
     .map((game, i) => ({ game, i }))
