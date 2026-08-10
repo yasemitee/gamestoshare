@@ -46,6 +46,8 @@ export const TradeFeedRow: React.FC<TradeFeedRowProps> = ({
   const reduce = useReducedMotion();
   const displayName = showSteamId && user ? user : 'Anonymous';
   const initial = displayName.charAt(0).toUpperCase();
+  const truncatedName =
+    displayName.length > 10 ? `${displayName.slice(0, 10)}…` : displayName;
 
   return (
     <motion.div
@@ -96,8 +98,9 @@ export const TradeFeedRow: React.FC<TradeFeedRowProps> = ({
               <span
                 style={{ color: colors.white, fontSize: 14 }}
                 className="truncate"
+                title={displayName}
               >
-                {displayName}
+                {truncatedName}
               </span>
               <img
                 src={`https://flagcdn.com/${location.toLowerCase()}.svg`}
