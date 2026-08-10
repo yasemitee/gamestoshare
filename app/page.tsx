@@ -64,20 +64,23 @@ export const revalidate = false;
 export const fetchCache = 'default-cache';
 
 export default async function Home() {
-  const listings = await prisma.listing.findMany({
-    where: {
-      isActive: true,
-    },
-    include: {
-      games: {
-        include: {
-          game: true,
+  const [listings, totalCount] = await Promise.all([
+    prisma.listing.findMany({
+      where: {
+        isActive: true,
+      },
+      include: {
+        games: {
+          include: {
+            game: true,
+          },
         },
       },
-    },
-    orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
-    take: MAX_LISTINGS_PER_PAGE + 1,
-  });
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+      take: MAX_LISTINGS_PER_PAGE + 1,
+    }),
+    prisma.listing.count({ where: { isActive: true } }),
+  ]);
 
   const hasMore = listings.length > MAX_LISTINGS_PER_PAGE;
   const pageItems = hasMore
@@ -131,6 +134,7 @@ export default async function Home() {
         <HomeContent
           initialListings={tableData}
           initialNextCursor={nextCursor}
+          initialTotalCount={totalCount}
         />
       </MainContentContainer>
     </Container>
