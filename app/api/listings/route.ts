@@ -70,24 +70,27 @@ export async function GET(request: NextRequest) {
       where.OR = searchConditions;
     }
 
-    const listings = await prisma.listing.findMany({
-      where,
-      include: {
-        games: {
-          include: {
-            game: true,
+    const [listings, totalCount] = await Promise.all([
+      prisma.listing.findMany({
+        where,
+        include: {
+          games: {
+            include: {
+              game: true,
+            },
           },
         },
-      },
-      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
-      ...(usePagination && cursor
-        ? {
-          cursor: { id: cursor },
-          skip: 1,
-        }
-        : {}),
-      ...(usePagination ? { take: pageSize + 1 } : {}),
-    });
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+        ...(usePagination && cursor
+          ? {
+            cursor: { id: cursor },
+            skip: 1,
+          }
+          : {}),
+        ...(usePagination ? { take: pageSize + 1 } : {}),
+      }),
+      prisma.listing.count({ where }),
+    ]);
 
     let nextCursor: string | null = null;
     let pageItems = listings;
@@ -120,6 +123,7 @@ export async function GET(request: NextRequest) {
         ? {
           items: sanitizedListings,
           nextCursor,
+          totalCount,
         }
         : sanitizedListings,
       {
