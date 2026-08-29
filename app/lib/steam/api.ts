@@ -275,11 +275,17 @@ export async function getSteamWishlist(steamId: string): Promise<SteamWishlistGa
   }
 }
 
-export async function getGameDetails(appId: number) {
+/**
+ * `fresh` bypasses the shared 24h fetch cache. Steam answers an unknown or
+ * delisted app with a 200 carrying `success: false`, which the Data Cache is
+ * happy to keep for a day — so a caller retrying after a transient miss would
+ * keep replaying that miss until the entry expired.
+ */
+export async function getGameDetails(appId: number, { fresh = false } = {}) {
   try {
     const response = await fetch(
       `https://store.steampowered.com/api/appdetails?appids=${appId}&l=english`,
-      { next: { revalidate: 86400 } }
+      fresh ? { cache: 'no-store' } : { next: { revalidate: 86400 } }
     );
 
     const data = await response.json();
