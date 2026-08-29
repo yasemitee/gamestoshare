@@ -221,7 +221,12 @@ export async function POST(request: NextRequest) {
             update: {
               name: gameData.name,
               iconUrl: gameData.iconUrl,
-              headerImage: gameData.headerImage || `https://cdn.cloudflare.steamstatic.com/steam/apps/${gameData.appId}/header.jpg`,
+              // Only overwrite when the client actually sent one. The client
+              // never does today, so falling back to the constructed URL here
+              // clobbered whatever /api/steam/header had repaired — and that
+              // URL 404s for exactly the games that needed repairing, so every
+              // new listing re-broke them.
+              ...(gameData.headerImage && { headerImage: gameData.headerImage }),
               releaseYear: gameData.releaseYear,
               priceInCents: gameData.priceInCents,
             },
