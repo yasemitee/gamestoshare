@@ -14,6 +14,9 @@ interface GameCapsuleProps {
 }
 
 export const GameCapsule: React.FC<GameCapsuleProps> = ({ game, onDead }) => {
+  // Hidden until it actually paints, so a source that is failing over never
+  // shows the browser's broken-image glyph and alt text.
+  const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
   const { src, handleError, dead } = useResilientGameImage({
     headerImage: game.headerImage,
     iconUrl: game.iconUrl,
@@ -51,22 +54,35 @@ export const GameCapsule: React.FC<GameCapsuleProps> = ({ game, onDead }) => {
   }
 
   return (
-    <img
-      src={src}
-      alt={game.name}
-      title={game.name}
-      onError={handleError}
-      className="flex-shrink-0 object-cover"
+    <div
+      className="flex-shrink-0 overflow-hidden"
       style={{ width: WIDTH, height: HEIGHT, backgroundColor: colors.gray2 }}
-    />
+      title={game.name}
+    >
+      <img
+        key={src}
+        ref={(el) => {
+          // Covers images that finished loading before hydration.
+          if (el?.complete && el.naturalWidth > 0) setLoadedSrc(src);
+        }}
+        src={src}
+        alt={game.name}
+        onLoad={() => setLoadedSrc(src)}
+        onError={handleError}
+        className="w-full h-full object-cover transition-opacity duration-200"
+        style={{ opacity: loadedSrc === src ? 1 : 0 }}
+      />
+    </div>
   );
 };
 
 export const CapsuleStrip: React.FC<{
   games: FeedGame[];
   max?: number;
+  /** Fewer capsules below `md`, where the strip shares a row with the poster. */
+  mobileMax?: number;
   onOverflowChange?: (overflow: number) => void;
-}> = ({ games, max = 3, onOverflowChange }) => {
+}> = ({ games, max = 3, mobileMax = max, onOverflowChange }) => {
   const [failed, setFailed] = useState<Set<number>>(new Set());
 
   const available = games
@@ -74,13 +90,15 @@ export const CapsuleStrip: React.FC<{
     .filter(({ i }) => !failed.has(i));
   const visible = available.slice(0, max);
   const overflow = available.length - visible.length;
+  const mobileOverflow = available.length - Math.min(visible.length, mobileMax);
 
   // Games drop out of the strip as their images fail to resolve, so this
   // count is only final once that settles — report it up rather than let
   // the caller derive a stale number from `games`.
+  // Callers show this count on mobile only, so report the mobile figure.
   useEffect(() => {
-    onOverflowChange?.(overflow);
-  }, [overflow, onOverflowChange]);
+    onOverflowChange?.(mobileOverflow);
+  }, [mobileOverflow, onOverflowChange]);
 
   const markFailed = (i: number) =>
     setFailed((prev) => {
@@ -96,12 +114,13 @@ export const CapsuleStrip: React.FC<{
 
   return (
     <div className="flex items-center gap-1">
-      {visible.map(({ game, i }) => (
-        <GameCapsule
+      {visible.map(({ game, i }, slot) => (
+        <div
           key={game.appId ?? i}
-          game={game}
-          onDead={() => markFailed(i)}
-        />
+          className={slot >= mobileMax ? 'hidden md:flex' : 'contents'}
+        >
+          <GameCapsule game={game} onDead={() => markFailed(i)} />
+        </div>
       ))}
       {overflow > 0 && (
         <span

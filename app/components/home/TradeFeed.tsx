@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
+import Link from 'next/link';
+import { AnimatePresence } from 'motion/react';
 import { TradeFeedRow } from './TradeFeedRow';
 import { colors } from '@/lib/colors';
 import { COUNTRIES } from '@/lib/countries';
@@ -18,6 +19,54 @@ function countryName(code: string): string {
   if (!code) return 'All countries';
   return COUNTRIES.find((c) => c.code === code)?.name ?? code;
 }
+
+const shimmer = 'motion-safe:animate-pulse';
+const skeletonTone = { backgroundColor: 'rgba(255,255,255,.06)' };
+
+// Mirrors TradeFeedRow's geometry so the feed doesn't jump when data lands.
+const SkeletonRow: React.FC<{ first?: boolean }> = ({ first }) => (
+  <div
+    aria-hidden="true"
+    className="flex flex-col md:flex-row md:items-center gap-4 md:gap-5"
+    style={{
+      padding: '18px 8px',
+      borderTop: first ? 'none' : '1px solid rgba(255,255,255,.07)',
+    }}
+  >
+    <div className="flex items-center gap-4 md:contents">
+      <div className="flex items-center gap-3 md:w-[210px] md:flex-shrink-0">
+        <div
+          className={`w-10 h-10 rounded-full flex-shrink-0 ${shimmer}`}
+          style={skeletonTone}
+        />
+        <div className="space-y-2">
+          <div className={`h-3 w-24 ${shimmer}`} style={skeletonTone} />
+          <div className={`h-2 w-16 ${shimmer}`} style={skeletonTone} />
+        </div>
+      </div>
+      <div className="flex-1 flex justify-end md:justify-start gap-1 md:gap-10">
+        {[0, 1].map((group) => (
+          <div
+            key={group}
+            className={`gap-1 ${group === 1 ? 'hidden md:flex' : 'flex'}`}
+          >
+            {[0, 1, 2].map((i) => (
+              <div
+                key={i}
+                className={`w-16 h-[30px] ${i === 2 ? 'hidden md:block' : ''} ${shimmer}`}
+                style={skeletonTone}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+    <div className="md:w-24 md:flex-shrink-0 flex md:flex-col md:items-end justify-between gap-2">
+      <div className={`h-2 w-16 ${shimmer}`} style={skeletonTone} />
+      <div className={`h-2 w-8 ${shimmer}`} style={skeletonTone} />
+    </div>
+  </div>
+);
 
 export const TradeFeed: React.FC<TradeFeedProps> = ({
   data,
@@ -50,29 +99,47 @@ export const TradeFeed: React.FC<TradeFeedProps> = ({
         style={{ marginBottom: 6 }}
       >
         <span style={{ ...headerLabelStyle, color: colors.white }}>
-          Showing {countryName(selectedLocation)} · {totalCount ?? data.length} swaps
+          {countryName(selectedLocation)}
+          {!isLoading && (
+            <>
+              {' · '}
+              {totalCount ?? data.length}{' '}
+              {(totalCount ?? data.length) === 1 ? 'listing' : 'listings'}
+            </>
+          )}
         </span>
         <span style={{ ...headerLabelStyle, color: colors.gray1 }}>
           Sorted by newest
         </span>
       </div>
 
-      {data.length === 0 ? (
-        <div
-          className="text-center py-12 text-field"
-          style={{ color: colors.gray1 }}
-        >
-          {isLoading ? (
-            <div className="flex items-center justify-center gap-3">
-              <div
-                className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin"
-                style={{ color: colors.purple }}
-              />
-              <span>Loading swaps...</span>
-            </div>
-          ) : (
-            'No swaps found'
-          )}
+      {/* Old rows would sit under the new country's header, so swap them out. */}
+      {isLoading ? (
+        <div role="status" aria-label="Loading listings">
+          {[0, 1, 2, 3].map((i) => (
+            <SkeletonRow key={i} first={i === 0} />
+          ))}
+        </div>
+      ) : data.length === 0 ? (
+        <div className="text-center py-14">
+          <p className="text-field mb-5" style={{ color: colors.gray1 }}>
+            {selectedLocation
+              ? `No listings in ${countryName(selectedLocation)} yet.`
+              : 'No listings yet.'}
+          </p>
+          <Link
+            href="/listings/create"
+            className="uppercase transition-colors hover:!text-[#C3C2F5]"
+            style={{
+              fontSize: 11,
+              letterSpacing: '.08em',
+              color: colors.white,
+              borderBottom: `1px solid ${colors.purple}`,
+              paddingBottom: 2,
+            }}
+          >
+            Create a post
+          </Link>
         </div>
       ) : (
         <div className="relative">
@@ -100,30 +167,6 @@ export const TradeFeed: React.FC<TradeFeedProps> = ({
             </AnimatePresence>
           </div>
 
-          <AnimatePresence>
-            {isLoading && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="absolute inset-0 flex items-center justify-center bg-[#0B0B0C]/45 pointer-events-none"
-              >
-                <div
-                  className="flex items-center gap-3 px-4 py-2"
-                  style={{ backgroundColor: colors.blue1 }}
-                >
-                  <div
-                    className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin"
-                    style={{ color: colors.purple }}
-                  />
-                  <span className="text-field" style={{ color: colors.white }}>
-                    Loading swaps...
-                  </span>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
       )}
     </div>

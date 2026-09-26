@@ -275,19 +275,24 @@ export function HomeContent({
         </div>
       )}
       <div className="mt-32">
-        <GradientTitle className="text-center mb-4">FAQ</GradientTitle>
-        <div
-          className="mb-12 text-small-title upper text-center"
-          style={{ color: colors.gray1 }}
+        {/* h2 for the outline; keeps the page-title look (DESIGN.md). */}
+        <GradientTitle
+          as="h2"
+          className="text-center mb-4"
+          style={{
+            fontFamily: 'var(--font-quando), serif',
+            fontSize: 'clamp(30px, 7vw, 48px)',
+          }}
         >
-          <p>
-            This information refers to Steam’s own features. GTS only helps
-            users connect
-          </p>
-          <p className="text-small-title upper text-center mt-1">
-            it does not provide Family Sharing
-          </p>
-        </div>
+          FAQ
+        </GradientTitle>
+        <p
+          className="mb-12 text-field text-center mx-auto max-w-[60ch]"
+          style={{ color: colors.gray1, lineHeight: '24px' }}
+        >
+          These answers describe Steam’s own features. GTS only helps you find
+          people; Family Sharing itself is run by Steam.
+        </p>
         <div className="mx-auto">
           <FAQItem
             question="HOW DO I ENABLE FAMILY SHARING?"
@@ -307,7 +312,7 @@ export function HomeContent({
           />
           <FAQItem
             question="CAN I GET BANNED FROM FAMILY SHARING?"
-            answer="Offline and solo games are 100% safe, but you can get a VAC ban if your copy is used to cheat in a multiplayer game protected by Valve Anti-Cheat (VAC). Only the cheater and the owner of the copy will be affected by the ban. "
+            answer="Offline and solo games are 100% safe, but you can get a VAC ban if your copy is used to cheat in a multiplayer game protected by Valve Anti-Cheat (VAC). Only the cheater and the owner of the copy will be affected by the ban."
           />
         </div>
       </div>
@@ -318,10 +323,10 @@ export function HomeContent({
           Still unsure?
         </h2>
         <p
-          className="text-small-title mb-8"
+          className="text-field mb-8"
           style={{ color: colors.gray1, lineHeight: '24px' }}
         >
-          JOIN OUR COMMUNITY ON DISCORD AND GET TO KNOW US
+          Ask questions and meet other players on our Discord.
         </p>
         <AnimatedButton
           href="https://discord.gg/mavhKaDRCv"

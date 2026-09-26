@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { colors } from '@/lib/colors';
 import { motion, AnimatePresence } from 'motion/react';
+import { EASE, MOTION } from '@/lib/constants';
 
 interface FAQItemProps {
   question: string;
@@ -14,13 +15,14 @@ export function FAQItem({ question, answer }: FAQItemProps) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: MOTION.rise }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-50px' }}
-      transition={{ duration: 0.4 }}
+      transition={{ duration: MOTION.duration, ease: MOTION.ease }}
     >
       <button
         onClick={() => setIsOpen(!isOpen)}
+        aria-expanded={isOpen}
         className="w-full py-6 flex items-center gap-2 text-small-title text-left border-b cursor-pointer"
         style={{
           color: colors.white,
@@ -43,7 +45,7 @@ export function FAQItem({ question, answer }: FAQItemProps) {
             animate={{
               rotate: isOpen ? 180 : 0,
             }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            transition={{ duration: 0.2, ease: EASE.out }}
           />
           <span>{question}</span>
         </span>
@@ -56,8 +58,8 @@ export function FAQItem({ question, answer }: FAQItemProps) {
           opacity: isOpen ? 1 : 0,
         }}
         transition={{
-          height: { duration: 0.4, ease: [0.4, 0.0, 0.2, 1] },
-          opacity: { duration: 0.3, ease: 'easeInOut' },
+          height: { duration: 0.3, ease: EASE.inOut },
+          opacity: { duration: 0.2, ease: 'easeOut' },
         }}
         className="overflow-hidden"
       >

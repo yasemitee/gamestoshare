@@ -61,9 +61,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         className="mb-11"
         style={{ color: colors.gray1, lineHeight: '24px' }}
       >
-        Connecting people through games has never been easier.
+        Find Steam players whose library matches your wishlist,{' '}
         <br className="hidden md:block" />
-        Choose a platform, search a game and send a friend request.
+        then share games through Family Sharing. No account needed.
       </motion.h4>
 
       <motion.div variants={item}>
@@ -78,19 +78,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
       <motion.div variants={item}>
         <RegionChips value={selectedLocation} onChange={onLocationChange} />
       </motion.div>
-
-      <motion.p
-        variants={item}
-        className="upper"
-        style={{
-          color: colors.gray1,
-          fontSize: 11,
-          letterSpacing: '.08em',
-          marginTop: 22,
-        }}
-      >
-        No registering — No sensitive info shared
-      </motion.p>
     </motion.div>
   );
 };

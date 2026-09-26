@@ -112,7 +112,7 @@ export const TradeFeedRow: React.FC<TradeFeedRowProps> = ({
             </div>
             <div className="mt-0.5">
               <Label>
-                Lvl {level ?? '—'} · {years != null ? Math.floor(years) : '—'} yrs
+                Lvl {level ?? '-'} · {years != null ? Math.floor(years) : '-'} yrs
               </Label>
             </div>
           </div>
@@ -134,6 +134,7 @@ export const TradeFeedRow: React.FC<TradeFeedRowProps> = ({
             <CapsuleStrip
               games={offering}
               max={3}
+              mobileMax={2}
               onOverflowChange={setOffersOverflow}
             />
           </div>
