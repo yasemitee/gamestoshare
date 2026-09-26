@@ -113,14 +113,14 @@ export default function InfoPage() {
                   GamesToShare (GTS) is a platform where Steam users can share
                   their libraries and wishlists to connect with others. Anyone
                   with a Steam account can use it without logging in. The
-                  platform is free to use and is ads-free.
+                  platform is free to use and ad-free.
                 </ContentParagraph>
               </ContentSection>
 
               {/* Who is it for */}
               <ContentSection id="who-is-it-for" title="Who is it for?">
                 <ContentParagraph className="mb-0">
-                  GTS was designed specifically for steam users, altough we are
+                  GTS was designed specifically for Steam users, although we are
                   working on implementing new platforms. The ultimate goal is
                   for users to connect through friend requests and discover
                   other players with similar interests.
@@ -157,38 +157,14 @@ export default function InfoPage() {
                   className="mt-16"
                 >
                   <ContentParagraph>
-                    Before you can send a request, the platform will check if
-                    you're a good match for the post.
+                    On a post, accept the terms and press “Add on Steam”. GTS
+                    opens the poster’s Steam profile, in the Steam client if you
+                    have it installed, where you can send them a friend request.
                   </ContentParagraph>
                   <ContentParagraph>
-                    Your account must own at least one game that appears in the
-                    "Wishlist" section of the post you're viewing.
+                    Check their Wishlist first: if you own some of the games
+                    they’re looking for, say so in your request.
                   </ContentParagraph>
-                  <ContentParagraph>
-                    Enter your Steam ID and wait for confirmation. If there's a
-                    match, you'll be able to send a friend request or open the
-                    user's Steam profile directly.
-                  </ContentParagraph>
-                  <div className="md:flex gap-6">
-                    <Image
-                      img={{
-                        src: '/SendingRequest1.png',
-                        alt: 'Sending Request',
-                      }}
-                    />
-                    <Image
-                      img={{
-                        src: '/SendingRequest2.png',
-                        alt: 'Sending Request',
-                      }}
-                    />
-                    <Image
-                      img={{
-                        src: '/SendingRequest3.png',
-                        alt: 'Sending Request',
-                      }}
-                    />
-                  </div>
                 </ContentSection>
               </section>
               <section id="how-to-use">
@@ -223,13 +199,8 @@ export default function InfoPage() {
                     </span>
                   </CodeBlock>
                   <ContentParagraph className="mb-8">
-                    You can choose whether to show your Steam username in the
-                    post. If you leave the checkbox unticked, your name will
-                    appear as "Anonymous". Note that if you choose to display
-                    your Steam username, you are implicitly consenting to other
-                    people to bypass our matching logic, so you are allowing
-                    anyone to send you a friend request (that may be your actual
-                    goal).
+                    Your Steam username is shown on your post, and anyone who
+                    sees it can send you a friend request.
                   </ContentParagraph>
 
                   {/* Location */}
@@ -263,9 +234,8 @@ export default function InfoPage() {
                     Add the games you'd like to receive. If your Steam wishlist
                     is public, GTS will import it automatically. You can add
                     more titles using the search bar or remove any by hovering
-                    on them and clicking the X. Other users will be able to
-                    match with you if they own at least one game in your
-                    Wishlist.
+                    on them and clicking the X. Other users will see which games
+                    you’re looking for.
                   </ContentParagraph>
 
                   {/* Library */}
