@@ -12,23 +12,25 @@ interface DescriptionTextareaProps {
 export function DescriptionTextarea({
   value,
   onChange,
-  placeholder = 'Write a description...',
+  placeholder = 'What are you looking for in a Family Sharing partner? Languages, play times, anything else.',
   maxLength = 500,
 }: DescriptionTextareaProps) {
   return (
     <div className="flex flex-col">
       <label
+        htmlFor="listing-description"
         className="text-field mb-4 md:mb-11"
         style={{ color: colors.white }}
       >
         Description
       </label>
       <textarea
+        id="listing-description"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         maxLength={maxLength}
-        className="w-full text-field-small resize-none border-b md:min-h-[220px]"
+        className="w-full text-field-small resize-none border-b min-h-[88px] md:min-h-[220px]"
         style={{
           color: colors.gray1,
           outline: 'none',

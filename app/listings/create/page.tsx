@@ -1,5 +1,6 @@
 'use client';
 import { Container } from '@/components/layout/Container';
+import { MOTION } from '@/lib/constants';
 import { MainContentContainer } from '@/components/layout/MainContentContainer';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
@@ -10,9 +11,9 @@ import { TermsCheckbox } from '@/components/ui/TermsCheckbox';
 import { LocationSelector } from '@/components/ui/LocationSelector';
 import { GameIconsList } from '@/components/listings/GameIconsList';
 import { SteamIdInput } from '@/components/listings/SteamIdInput';
-import { ShowSteamIdCheckbox } from '@/components/listings/ShowSteamIdCheckbox';
 import { PlatformSelector } from '@/components/listings/PlatformSelector';
 import { GameSection } from '@/components/listings/GameSection';
+import { FieldError } from '@/components/ui/FieldError';
 import { DescriptionTextarea } from '@/components/listings/DescriptionTextarea';
 import { VerificationModal } from '@/components/verification/VerificationModal';
 import { useState, useEffect, Suspense } from 'react';
@@ -30,6 +31,8 @@ import {
   setupGlobalErrorHandlers,
   cleanupGlobalErrorHandlers,
 } from '@/lib/utils/errors';
+
+type GameEntry = { id: string; name: string; iconUrl?: string; appId?: number };
 
 function CreateListingPageInner() {
   // Setup global error handlers for compatibility
@@ -49,26 +52,33 @@ function CreateListingPageInner() {
   const [accountYears, setAccountYears] = useState<number | null>(null);
   const [location, setLocation] = useState('');
   const [platform, setPlatform] = useState('STEAM');
-  const [lookingFor, setLookingFor] = useState<
-    Array<{ id: string; name: string; iconUrl?: string; appId?: number }>
-  >([]);
-  const [offering, setOffering] = useState<
-    Array<{ id: string; name: string; iconUrl?: string; appId?: number }>
-  >([]);
+  const [lookingFor, setLookingFor] = useState<GameEntry[]>([]);
+  const [offering, setOffering] = useState<GameEntry[]>([]);
+  // Where the current game lists came from, for the hint above each grid.
+  const [gamesSource, setGamesSource] = useState<string | undefined>();
+  // New posts always show the Steam name. Listings created while the
+  // anonymous option existed keep their setting when edited.
   const [showSteamId, setShowSteamId] = useState(true);
   const [description, setDescription] = useState('');
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
-  const [hasError, setHasError] = useState(false);
-  const [locationError, setLocationError] = useState(false);
-  const [termsError, setTermsError] = useState(false);
+  // Errors appear after the first submit attempt (or, for the Steam ID, once
+  // a lookup fails) and clear as soon as the field is fixed.
+  const [attempted, setAttempted] = useState(false);
   const { isSteamIdValid, isSteamIdInvalid, isVerifying, verifySteamId } =
     useSteamVerification();
 
   const searchParams = useSearchParams();
   const router = useRouter();
   const editListingId = searchParams.get('edit');
+  // Set once an edit session is confirmed by a manage token. Saving with the
+  // original Steam profile skips bio verification, since the token already
+  // proves ownership.
+  const [editSession, setEditSession] = useState<{
+    token: string;
+    steamProfileUrl: string;
+  } | null>(null);
 
   useEffect(() => {
     if (!editListingId) return;
@@ -91,6 +101,10 @@ function CreateListingPageInner() {
 
       const { listing } = await response.json();
 
+      setEditSession({
+        token: cached.token,
+        steamProfileUrl: listing.steamProfileUrl,
+      });
       setSteamId(listing.steamProfileUrl);
       const result = await verifySteamId(listing.steamProfileUrl);
 
@@ -118,6 +132,7 @@ function CreateListingPageInner() {
 
       setLookingFor(existingLookingFor);
       setOffering(existingOffering);
+      setGamesSource('From your listing');
 
       if (result?.username) setUsername(result.username);
       if (result?.avatarUrl) setAvatarUrl(result.avatarUrl);
@@ -145,9 +160,10 @@ function CreateListingPageInner() {
     if (!game) return;
     const isDuplicate = lookingFor.some((g) => g.appId === game.appId);
     if (!isDuplicate) {
+      // Newest first, so the added game lands where the user is looking.
       setLookingFor((prev) => [
-        ...prev,
         { id: game.appId.toString(), ...game },
+        ...prev,
       ]);
     }
   };
@@ -158,7 +174,7 @@ function CreateListingPageInner() {
     if (!game) return;
     const isDuplicate = offering.some((g) => g.appId === game.appId);
     if (!isDuplicate) {
-      setOffering((prev) => [...prev, { id: game.appId.toString(), ...game }]);
+      setOffering((prev) => [{ id: game.appId.toString(), ...game }, ...prev]);
     }
   };
   const handleSteamIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -202,6 +218,7 @@ function CreateListingPageInner() {
 
         setLookingFor([]);
         setOffering([]);
+        setGamesSource('Imported from Steam');
 
         if (result.wishlist && result.wishlist.length > 0) {
           setLookingFor(removeDuplicateGames(result.wishlist));
@@ -224,12 +241,67 @@ function CreateListingPageInner() {
       setOffering([]);
     }
   };
-  const handleRemoveLookingFor = (id: string) => {
-    setLookingFor((prev) => prev.filter((game) => game.id !== id));
+  const removeGame = (
+    list: GameEntry[],
+    setList: React.Dispatch<React.SetStateAction<GameEntry[]>>,
+    id: string,
+  ) => {
+    const index = list.findIndex((game) => game.id === id);
+    if (index === -1) return;
+    const removed = list[index];
+    setList((prev) => prev.filter((game) => game.id !== id));
+
+    // One toast id: a new removal replaces the previous Undo.
+    toast(
+      (t) => (
+        <span className="flex items-center gap-4">
+          <span>
+            Removed{' '}
+            <span style={{ color: colors.white }}>{removed.name}</span>
+          </span>
+          <button
+            type="button"
+            onClick={() => {
+              setList((prev) =>
+                prev.some((game) => game.id === removed.id)
+                  ? prev
+                  : [
+                      ...prev.slice(0, index),
+                      removed,
+                      ...prev.slice(index),
+                    ],
+              );
+              toast.dismiss(t.id);
+            }}
+            className="uppercase cursor-pointer transition-colors hover:!text-white"
+            style={{
+              color: colors.purple,
+              fontSize: 11,
+              letterSpacing: '.08em',
+              borderBottom: `1px solid ${colors.purple}`,
+              paddingBottom: 2,
+            }}
+          >
+            Undo
+          </button>
+        </span>
+      ),
+      {
+        id: 'game-removed',
+        duration: 5000,
+        style: {
+          background: colors.gray3,
+          color: colors.gray1,
+          borderRadius: '0',
+          fontSize: '12px',
+        },
+      },
+    );
   };
-  const handleRemoveOffering = (id: string) => {
-    setOffering((prev) => prev.filter((game) => game.id !== id));
-  };
+  const handleRemoveLookingFor = (id: string) =>
+    removeGame(lookingFor, setLookingFor, id);
+  const handleRemoveOffering = (id: string) =>
+    removeGame(offering, setOffering, id);
   const handleVerificationConfirm = async () => {
     const verified = await confirmVerification();
     if (verified) {
@@ -246,7 +318,7 @@ function CreateListingPageInner() {
         {
           duration: 4000,
           style: {
-            background: colors.blue1,
+            background: colors.gray3,
             borderRadius: '0',
             fontSize: '12px',
             textAlign: 'left',
@@ -263,11 +335,13 @@ function CreateListingPageInner() {
     try {
       const cleanSteamId = extractCleanSteamId(steamId);
       const fullProfileUrl = normalizeSteamId(steamId);
+      const isEditing = editSession?.steamProfileUrl === steamId;
 
       const response = await fetch('/api/listings', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(isEditing && { Authorization: `Bearer ${editSession.token}` }),
         },
         body: JSON.stringify({
           steamId: cleanSteamId,
@@ -302,15 +376,17 @@ function CreateListingPageInner() {
       if (!response.ok) {
         const errorData = await response.json();
         console.error('API Error:', errorData);
-        throw new Error(errorData.error || 'Failed to create listing');
+        throw new Error(
+          errorData.code === 'LISTING_EXISTS'
+            ? 'You already have a listing. Edit it from "Manage your listing".'
+            : errorData.error || 'Failed to create listing'
+        );
       }
 
-      const listing = await response.json();
-
-      toast.success('Listing created successfully!', {
+      toast.success(isEditing ? 'Listing updated!' : 'Listing created successfully!', {
         duration: 4000,
         style: {
-          background: colors.blue1,
+          background: colors.gray3,
           color: colors.white,
           borderRadius: '0',
           fontSize: '12px',
@@ -333,7 +409,7 @@ function CreateListingPageInner() {
         {
           duration: 4000,
           style: {
-            background: colors.blue1,
+            background: colors.gray3,
             borderRadius: '0',
             fontSize: '12px',
             textTransform: 'none',
@@ -347,38 +423,54 @@ function CreateListingPageInner() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setAttempted(true);
 
-    setHasError(false);
-    setLocationError(false);
-    setTermsError(false);
-
-    let hasValidationError = false;
-
-    if (!isSteamIdValid) {
-      setHasError(true);
-      hasValidationError = true;
+    if (
+      !isSteamIdValid ||
+      !location ||
+      !termsAccepted ||
+      lookingFor.length === 0 ||
+      offering.length === 0
+    ) {
+      // Bring the first message into view; it may be far above the button.
+      requestAnimationFrame(() =>
+        document
+          .querySelector('[data-field-error]')
+          ?.scrollIntoView({ block: 'center', behavior: 'smooth' }),
+      );
+      return;
     }
 
-    if (!location) {
-      setLocationError(true);
-      hasValidationError = true;
-    }
-
-    if (!termsAccepted) {
-      setTermsError(true);
-      hasValidationError = true;
-    }
-
-    if (lookingFor.length === 0 || offering.length === 0) {
-      hasValidationError = true;
-    }
-
-    if (hasValidationError) {
+    if (editSession?.steamProfileUrl === steamId) {
+      await createListing();
       return;
     }
 
     openVerification();
   };
+
+  const steamIdError = isSteamIdInvalid
+    ? 'We couldn’t find that Steam account. Check the ID or link.'
+    : attempted && !isSteamIdValid && !isVerifying
+      ? steamId.trim()
+        ? 'Press Enter to look up this Steam account.'
+        : 'Enter your Steam ID or profile link.'
+      : undefined;
+  const locationError =
+    attempted && !location
+      ? 'Choose your country. Steam Family members must share a store region.'
+      : undefined;
+  const wishlistError =
+    attempted && lookingFor.length === 0
+      ? 'Add at least one game you want.'
+      : undefined;
+  const libraryError =
+    attempted && offering.length === 0
+      ? 'Add at least one game you own.'
+      : undefined;
+  const termsError =
+    attempted && !termsAccepted ? 'Accept the terms to post.' : undefined;
+  const isEditingOwnListing = editSession?.steamProfileUrl === steamId;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -389,9 +481,9 @@ function CreateListingPageInner() {
           <MainContentContainer>
             <GoBackButton />
             <motion.form
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: MOTION.rise }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
+              transition={{ duration: MOTION.duration, ease: MOTION.ease, delay: 0 }}
               onSubmit={handleSubmit}
               className="mt-14 text-white"
             >
@@ -399,9 +491,9 @@ function CreateListingPageInner() {
               <div className="flex flex-col md:flex-row gap-8 mb-12">
                 {/* Left Column */}
                 <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.4, delay: 0.1 }}
+                  initial={{ opacity: 0, y: MOTION.rise }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: MOTION.duration, ease: MOTION.ease, delay: 0.05 }}
                   className="flex-1 flex flex-col"
                 >
                   {/* Steam ID */}
@@ -413,12 +505,7 @@ function CreateListingPageInner() {
                     isVerifying={isVerifying}
                     isValid={isSteamIdValid}
                     isInvalid={isSteamIdInvalid}
-                    hasError={hasError}
-                  />
-                  {/* Show steam ID */}
-                  <ShowSteamIdCheckbox
-                    checked={showSteamId}
-                    onChange={setShowSteamId}
+                    error={steamIdError}
                   />
                   {/* Location & Platform */}
                   <div className="flex gap-8 md:gap-16 mt-6">
@@ -427,7 +514,7 @@ function CreateListingPageInner() {
                       onChange={setLocation}
                       showLabel={true}
                       width="100px"
-                      hasError={locationError}
+                      hasError={!!locationError}
                     />
                     <PlatformSelector
                       value={platform}
@@ -435,13 +522,16 @@ function CreateListingPageInner() {
                       disabled
                     />
                   </div>
+                  {locationError && (
+                    <FieldError message={locationError} />
+                  )}
                 </motion.div>
 
                 {/* Right Column - Description */}
                 <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.4, delay: 0.2 }}
+                  initial={{ opacity: 0, y: MOTION.rise }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: MOTION.duration, ease: MOTION.ease, delay: 0.1 }}
                   className="flex-1 md:mt-0 mt-6"
                 >
                   <DescriptionTextarea
@@ -452,9 +542,9 @@ function CreateListingPageInner() {
               </div>
               {/* Wishlist & Library */}
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: MOTION.rise }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.3 }}
+                transition={{ duration: MOTION.duration, ease: MOTION.ease, delay: 0.15 }}
                 className="flex flex-col md:flex-row gap-8 mb-12"
               >
                 <GameSection
@@ -463,6 +553,9 @@ function CreateListingPageInner() {
                   onGameSelect={handleAddGameToLookingFor}
                   onRemove={handleRemoveLookingFor}
                   maxGames={10}
+                  addPlaceholder="Add a game you want"
+                  source={gamesSource}
+                  error={wishlistError}
                 />
                 <GameSection
                   label="Library"
@@ -470,6 +563,9 @@ function CreateListingPageInner() {
                   onGameSelect={handleAddGameToOffering}
                   onRemove={handleRemoveOffering}
                   maxGames={10}
+                  addPlaceholder="Add a game you own"
+                  source={gamesSource}
+                  error={libraryError}
                 />
               </motion.div>
               {/* Terms and conditions */}
@@ -477,35 +573,33 @@ function CreateListingPageInner() {
                 <TermsCheckbox
                   checked={termsAccepted}
                   onChange={setTermsAccepted}
-                  hasError={termsError}
+                  hasError={!!termsError}
                 />
+                {termsError && (
+                  <div className="flex justify-center -mt-5 mb-8">
+                    <FieldError message={termsError} />
+                  </div>
+                )}
                 {/* Submit button */}
                 <div className="flex justify-center">
-                  <motion.button
+                  <button
                     type="submit"
-                    disabled={!termsAccepted || isSubmitting}
-                    whileHover={{
-                      boxShadow:
-                        '0 0 20px rgba(195, 194, 245, 0.6), 0 0 40px rgba(195, 194, 245, 0.3)',
-                      filter: 'brightness(1.1)',
-                    }}
-                    whileTap={{ scale: 0.98 }}
-                    transition={{ duration: 0.2 }}
-                    className="text-button px-6 py-2.5 cursor-pointer"
+                    disabled={isSubmitting}
+                    className="glow-hover press text-button px-6 py-2.5 cursor-pointer disabled:cursor-not-allowed"
                     style={{
-                      background:
-                        !termsAccepted || isSubmitting
-                          ? colors.gray2
-                          : gradients.main,
-                      color:
-                        !termsAccepted || isSubmitting
-                          ? colors.gray1
-                          : colors.black,
-                      opacity: !termsAccepted || isSubmitting ? 0.5 : 1,
+                      background: isSubmitting ? colors.gray2 : gradients.main,
+                      color: isSubmitting ? colors.gray1 : colors.black,
+                      opacity: isSubmitting ? 0.5 : 1,
                     }}
                   >
-                    {isSubmitting ? 'POSTING...' : 'POST'}
-                  </motion.button>
+                    {isSubmitting
+                      ? isEditingOwnListing
+                        ? 'SAVING…'
+                        : 'POSTING…'
+                      : isEditingOwnListing
+                        ? 'SAVE CHANGES'
+                        : 'POST'}
+                  </button>
                 </div>
               </div>
             </motion.form>

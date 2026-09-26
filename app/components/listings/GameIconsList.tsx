@@ -1,7 +1,7 @@
-import { colors, gradients } from '@/lib/colors';
+import { colors } from '@/lib/colors';
 import { ANIMATION_DURATION, ANIMATION_DELAY } from '@/lib/constants';
-import React from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import React, { useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 
 interface Game {
   id: string;
@@ -14,93 +14,167 @@ interface GameIconsListProps {
   games: Game[];
   onRemove?: (id: string) => void;
   maxGames?: number;
+  /** Where the list came from, shown on the count line (e.g. "Imported from Steam"). */
+  source?: string;
+  /** Tile to scroll to and flash; `nonce` re-triggers it for the same game. */
+  highlight?: { id: string; nonce: number } | null;
+  emptyText?: string;
 }
+
+const microLabel: React.CSSProperties = {
+  fontSize: 10,
+  letterSpacing: '.12em',
+  textTransform: 'uppercase',
+};
 
 export const GameIconsList: React.FC<GameIconsListProps> = ({
   games,
   onRemove,
-  maxGames = 10,
+  source,
+  highlight,
+  emptyText = 'No games yet. Search above to add one.',
 }) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const reduce = useReducedMotion();
+
+  useEffect(() => {
+    if (!highlight) return;
+    const el = scrollRef.current?.querySelector<HTMLElement>(
+      `[data-game-id="${CSS.escape(highlight.id)}"]`
+    );
+    el?.scrollIntoView({
+      block: 'nearest',
+      behavior: reduce ? 'auto' : 'smooth',
+    });
+  }, [highlight, reduce]);
+
   return (
-    <div className="">
-      <div className="text-small-title mb-2" style={{ color: colors.gray1 }}>
-        {games.length} GAMES
+    <div>
+      <div
+        className="flex flex-wrap items-center gap-x-2 gap-y-1"
+        style={{ ...microLabel, color: colors.gray1 }}
+      >
+        <span style={{ color: colors.white }}>{games.length} games</span>
+        {source && games.length > 0 && (
+          <>
+            <span aria-hidden="true">·</span>
+            <span>{source}</span>
+          </>
+        )}
+        {onRemove && games.length > 0 && (
+          <>
+            <span aria-hidden="true">·</span>
+            <span>
+              <span className="[@media(hover:hover)]:hidden">
+                Tap <span style={{ color: colors.white }}>×</span> to remove
+              </span>
+              <span className="hidden [@media(hover:hover)]:inline">
+                Hover a game to remove it
+              </span>
+            </span>
+          </>
+        )}
       </div>
       <div
-        className={`mt-7 ${
+        ref={scrollRef}
+        className={`mt-4 ${
           games.length > 0 ? 'md:min-h-[140px]' : ''
-        } max-h-[280px] bg-transparent overflow-y-auto overflow-x-hidden`}
+        } max-h-[296px] overflow-y-auto overflow-x-hidden custom-scrollbar -mx-2 px-2 py-2`}
       >
         {games.length === 0 ? (
           <div
-            className="text-field w-full h-full flex items-center justify-center"
+            className="text-field w-full h-full flex items-center justify-center py-6"
             style={{ color: colors.gray1 }}
           >
-            No games selected
+            {emptyText}
           </div>
         ) : (
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(72px,72px))] gap-3 justify-start">
-            <AnimatePresence mode="popLayout">
-              {games.map((game, index) => (
-                <motion.div
-                  key={game.id}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{
-                    opacity: 1,
-                    scale: 1,
-                    transition: {
-                      duration: ANIMATION_DURATION.QUICK,
-                      delay: index * ANIMATION_DELAY.MINIMAL,
-                    },
-                  }}
-                  exit={{
-                    opacity: 0,
-                    scale: 0.5,
-                    transition: { duration: ANIMATION_DURATION.FAST },
-                  }}
-                  layout
-                  className="relative group flex-shrink-0"
-                >
-                  {/* Game Icon */}
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="w-18 h-18 flex items-center justify-center cursor-pointer bg-cover bg-center relative overflow-hidden"
-                    style={{
-                      backgroundImage: game.iconUrl
-                        ? `url(${game.iconUrl})`
-                        : 'none',
+          <ul className="grid grid-cols-[repeat(auto-fill,minmax(72px,72px))] gap-3 justify-start">
+            <AnimatePresence mode="popLayout" initial={false}>
+              {games.map((game, index) => {
+                const isHighlighted = highlight?.id === game.id;
+                return (
+                  <motion.li
+                    key={game.id}
+                    data-game-id={game.id}
+                    initial={{ opacity: 0, scale: 0.92 }}
+                    animate={{
+                      opacity: 1,
+                      scale: 1,
+                      transition: {
+                        duration: ANIMATION_DURATION.QUICK,
+                        delay: Math.min(index, 20) * ANIMATION_DELAY.MINIMAL,
+                      },
                     }}
+                    exit={{
+                      opacity: 0,
+                      scale: 0.92,
+                      transition: { duration: ANIMATION_DURATION.FAST },
+                    }}
+                    layout={!reduce}
+                    className="relative group w-18 h-18"
                     title={game.name}
-                    onClick={() => onRemove && onRemove(game.id)}
                   >
-                    {/* Fallback text if no icon */}
-                    {!game.iconUrl && (
-                      <span className="text-white text-base font-bold">
-                        {game.name.substring(0, 2).toUpperCase()}
-                      </span>
+                    <div
+                      className="w-full h-full flex items-center justify-center bg-cover bg-center"
+                      style={{
+                        backgroundColor: colors.gray2,
+                        backgroundImage: game.iconUrl
+                          ? `url(${game.iconUrl})`
+                          : 'none',
+                      }}
+                    >
+                      {!game.iconUrl && (
+                        <span className="text-white text-base font-bold">
+                          {game.name.substring(0, 2).toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+
+                    {isHighlighted && (
+                      <span
+                        key={highlight.nonce}
+                        aria-hidden="true"
+                        className="game-flash pointer-events-none absolute inset-0"
+                      />
                     )}
 
-                    {/* Red gradient overlay and X icon on hover */}
                     {onRemove && (
-                      <div
-                        className="absolute inset-0 opacity-0 group-hover:opacity-90 transition-opacity flex items-center justify-center"
-                        style={{
-                          background: gradients.red,
-                        }}
-                      >
-                        <img
-                          src="/XIcon.svg"
-                          alt="Remove"
-                          className="w-8 h-8 relative z-10"
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => onRemove(game.id)}
+                          aria-label={`Remove ${game.name}`}
+                          className="peer absolute z-10 -top-2 -right-2 w-7 h-7 flex items-center justify-center cursor-pointer transition-opacity duration-150 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 focus-visible:opacity-100"
+                        >
+                          <span
+                            className="w-5 h-5 flex items-center justify-center"
+                            style={{
+                              backgroundColor: colors.red,
+                              border: '1px solid rgba(255,255,255,.2)',
+                            }}
+                          >
+                            <img
+                              src="/XIcon.svg"
+                              alt=""
+                              width={8}
+                              height={8}
+                            />
+                          </span>
+                        </button>
+                        {/* Ember wash over the art while the × is hovered */}
+                        <span
+                          aria-hidden="true"
+                          className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-150 peer-hover:opacity-70 peer-focus-visible:opacity-70"
+                          style={{ backgroundColor: colors.red }}
                         />
-                      </div>
+                      </>
                     )}
-                  </motion.div>
-                </motion.div>
-              ))}
+                  </motion.li>
+                );
+              })}
             </AnimatePresence>
-          </div>
+          </ul>
         )}
       </div>
     </div>

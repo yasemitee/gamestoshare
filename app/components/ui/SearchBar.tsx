@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { colors, gradients } from '@/lib/colors';
 import { LocationSelector } from './LocationSelector';
 import { motion, AnimatePresence } from 'motion/react';
+import { EASE } from '@/lib/constants';
 
 interface Game {
   appId: number;
@@ -20,6 +21,10 @@ interface SearchBarProps {
   selectedLocation?: string;
   clearOnSelect?: boolean;
   className?: string;
+  /** 'add' turns the bar into an add-to-list control: a plus icon and an
+   *  ADD / ADDED marker on each result. */
+  mode?: 'search' | 'add';
+  addedAppIds?: ReadonlySet<number>;
 }
 
 export const SearchBar: React.FC<SearchBarProps> = ({
@@ -31,6 +36,8 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   selectedLocation = '',
   clearOnSelect = false,
   className = '',
+  mode = 'search',
+  addedAppIds,
 }) => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Game[]>([]);
@@ -108,18 +115,32 @@ export const SearchBar: React.FC<SearchBarProps> = ({
               ? '0 0 20px rgba(195, 194, 245, 0.4), 0 0 40px rgba(195, 194, 245, 0.2)'
               : '0 0 0px rgba(195, 194, 245, 0)',
           }}
-          whileHover={{
-            boxShadow:
-              '0 0 15px rgba(195, 194, 245, 0.3), 0 0 30px rgba(195, 194, 245, 0.15)',
-          }}
-          transition={{ duration: 0.3 }}
-          className="relative flex-1 flex items-center"
+          transition={{ duration: 0.2, ease: 'easeOut' }}
+          className="relative flex-1 flex items-center glow-hover-subtle"
         >
-          <img
-            src="/Lens.svg"
-            alt=""
-            className="absolute left-4 pointer-events-none w-5 h-5"
-          />
+          {mode === 'add' ? (
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
+              fill="none"
+              aria-hidden="true"
+              className="absolute left-4 pointer-events-none"
+            >
+              <path
+                d="M10 3.5V16.5M3.5 10H16.5"
+                stroke={colors.purple}
+                strokeWidth="2"
+                strokeLinecap="square"
+              />
+            </svg>
+          ) : (
+            <img
+              src="/Lens.svg"
+              alt=""
+              className="absolute left-4 pointer-events-none w-5 h-5"
+            />
+          )}
           <input
             type="text"
             placeholder={placeholder}
@@ -136,10 +157,10 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             }}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
-            className="text-field w-full pl-12 pr-4 py-4 focus:outline-none focus:ring-2 focus:ring-offset-0 transition-all"
+            className="text-field w-full pl-12 pr-4 py-4 focus:outline-none focus:ring-2 focus:ring-offset-0 transition-shadow duration-200"
             style={
               {
-                backgroundColor: colors.blue1,
+                backgroundColor: colors.gray3,
                 color: colors.white,
                 '--tw-ring-color': colors.purple,
               } as React.CSSProperties
@@ -162,27 +183,28 @@ export const SearchBar: React.FC<SearchBarProps> = ({
       <AnimatePresence>
         {showResults && results.length > 0 && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3, ease: [0.4, 0.0, 0.2, 1] }}
+            initial={{ opacity: 0, y: -4, scale: 0.98 }}
+            animate={{
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              transition: { duration: 0.18, ease: EASE.out },
+            }}
+            exit={{ opacity: 0, transition: { duration: 0.12 } }}
             className="absolute top-full left-0 right-0 mt-2 max-h-80 overflow-y-auto"
             style={{
-              backgroundColor: colors.blue1,
+              transformOrigin: 'top center',
+              backgroundColor: colors.gray3,
               border: `1px solid ${colors.gray2}`,
               zIndex: 50,
             }}
           >
             {results.map((game, index) => (
-              <motion.button
+              <button
+                type="button"
                 key={game.appId}
-                whileHover={{
-                  boxShadow:
-                    '0 0 12px rgba(195, 194, 245, 0.3), 0 0 24px rgba(195, 194, 245, 0.15)',
-                }}
-                transition={{ duration: 0.2 }}
                 onClick={() => handleGameClick(game)}
-                className="w-full flex items-center gap-2.5 p-2.5 text-left"
+                className="w-full flex items-center gap-2.5 p-2.5 text-left cursor-pointer glow-hover-subtle"
                 style={{
                   backgroundColor: 'transparent',
                 }}
@@ -193,10 +215,28 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                   className="w-7 h-7 object-cover flex-shrink-0"
                   style={{ backgroundColor: colors.gray2 }}
                 />
-                <span className="text-field" style={{ color: colors.white }}>
+                <span
+                  className="text-field flex-1 min-w-0 truncate"
+                  style={{ color: colors.white }}
+                >
                   {game.name}
                 </span>
-              </motion.button>
+                {mode === 'add' && (
+                  <span
+                    className="flex-shrink-0 pr-1"
+                    style={{
+                      fontSize: 10,
+                      letterSpacing: '.12em',
+                      textTransform: 'uppercase',
+                      color: addedAppIds?.has(game.appId)
+                        ? colors.gray1
+                        : colors.purple,
+                    }}
+                  >
+                    {addedAppIds?.has(game.appId) ? 'Added' : '+ Add'}
+                  </span>
+                )}
+              </button>
             ))}
           </motion.div>
         )}

@@ -1,4 +1,5 @@
 import { colors } from '@/lib/colors';
+import { FieldError } from '@/components/ui/FieldError';
 
 interface SteamIdInputProps {
   value: string;
@@ -8,7 +9,7 @@ interface SteamIdInputProps {
   isVerifying: boolean;
   isValid: boolean;
   isInvalid: boolean;
-  hasError?: boolean;
+  error?: string;
 }
 
 export function SteamIdInput({
@@ -19,22 +20,29 @@ export function SteamIdInput({
   isVerifying,
   isValid,
   isInvalid,
-  hasError = false,
+  error,
 }: SteamIdInputProps) {
+  const hasError = !!error;
   return (
     <div className="mb-6">
-      <label className="mb-4 md:mb-8 block text-field">Steam ID</label>
+      <label htmlFor="steam-id" className="mb-4 md:mb-8 block text-field">
+        Steam ID
+      </label>
       <div className="flex items-center gap-3">
         <input
+          id="steam-id"
           type="text"
+          aria-invalid={hasError}
+          aria-describedby="steam-id-hint"
+          autoComplete="off"
+          spellCheck={false}
           value={value}
           onChange={onChange}
           onBlur={onBlur}
           onKeyDown={onKeyDown}
-          placeholder="Your Steam ID"
+          placeholder="Your Steam ID or profile link"
           className="flex-1 py-2 focus:outline-none border-b text-field bg-transparent"
           style={{
-            caretColor: colors.gray2,
             borderColor: hasError ? colors.error : colors.white,
           }}
         />
@@ -66,6 +74,18 @@ export function SteamIdInput({
           ) : null}
         </div>
       </div>
+      {error ? (
+        <FieldError id="steam-id-hint" message={error} />
+      ) : (
+        <p
+          id="steam-id-hint"
+          className="text-field-small mt-2"
+          style={{ color: colors.gray1 }}
+        >
+          17-digit ID, custom URL name or full profile link. Your game list and
+          wishlist must be public to import.
+        </p>
+      )}
     </div>
   );
 }
