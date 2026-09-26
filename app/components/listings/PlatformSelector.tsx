@@ -18,7 +18,7 @@ export function PlatformSelector({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className="p-4 text-small-title appearance-none pr-10"
-        style={{ background: colors.blue1, color: colors.gray2 }}
+        style={{ background: colors.gray3, color: colors.gray2 }}
         disabled={disabled}
       >
         <option value="STEAM">STEAM</option>

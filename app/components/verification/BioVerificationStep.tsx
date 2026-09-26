@@ -3,38 +3,49 @@
 import { colors } from '@/lib/colors';
 import { Button } from '@/components/ui/Button';
 import { motion } from 'motion/react';
+import { EASE } from '@/lib/constants';
+import { useState } from 'react';
+import { STEAM_VERIFICATION_CODE } from '@/lib/constants';
 
 interface BioVerificationStepProps {
   steamId?: string;
   onCancel?: () => void;
   onConfirm: () => void;
-  onSkip?: () => void;
-  showSkip?: boolean;
   hideBioPreview?: boolean;
   isLoading?: boolean;
+  code?: string;
+  hint?: string;
 }
 
 export function BioVerificationStep({
   steamId,
   onCancel,
   onConfirm,
-  onSkip,
-  showSkip = false,
   hideBioPreview = false,
   isLoading = false,
+  code = STEAM_VERIFICATION_CODE,
+  hint = 'When detected, you can post and send requests.',
 }: BioVerificationStepProps) {
-  const verificationCode = 'GTS';
+  const verificationCode = code;
+  const isLongCode = verificationCode.length > 4;
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(verificationCode);
+  const [copied, setCopied] = useState(false);
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(verificationCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1600);
+    } catch {
+      // Clipboard can be blocked; the code is still selectable on screen.
+    }
   };
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
-      transition={{ duration: 0.3 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2, ease: EASE.out }}
       className="flex flex-col h-full"
       style={{ minHeight: '455px' }}
     >
@@ -56,23 +67,48 @@ export function BioVerificationStep({
         {/* Verification Code */}
         <div className="flex items-center justify-center mb-6">
           <div
-            className="flex items-center px-4 md:px-6 py-2 gap-4 md:gap-8"
+            className={`flex items-center px-4 md:px-6 py-2 ${
+              isLongCode ? 'gap-2 md:gap-3' : 'gap-4 md:gap-8'
+            }`}
             style={{ backgroundColor: 'rgba(0, 0, 0, 0.25)' }}
           >
+            {/* One string for assistive tech; the spaced glyphs are visual only. */}
+            <span className="sr-only">{verificationCode}</span>
             {verificationCode.split('').map((char, index) => (
-              <h2
+              <span
                 key={index}
-                className="text-2xl md:text-4xl"
+                aria-hidden="true"
+                className={
+                  isLongCode ? 'text-xl md:text-3xl' : 'text-2xl md:text-4xl'
+                }
                 style={{ color: colors.white }}
               >
                 {char}
-              </h2>
+              </span>
             ))}
             <button
+              type="button"
               onClick={handleCopy}
-              className="hover:opacity-70 transition-opacity hover:cursor-pointer"
+              aria-label={copied ? 'Code copied' : 'Copy code'}
+              className={`hover:opacity-70 transition-opacity hover:cursor-pointer ${
+                isLongCode ? 'ml-2' : ''
+              }`}
             >
-              <img src="/CopyIcon.svg" alt="Copy" width="20" height="20" />
+              {copied ? (
+                <span
+                  aria-live="polite"
+                  style={{
+                    color: colors.purple,
+                    fontSize: 10,
+                    letterSpacing: '.12em',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  Copied
+                </span>
+              ) : (
+                <img src="/CopyIcon.svg" alt="" width="20" height="20" />
+              )}
             </button>
           </div>
         </div>
@@ -113,15 +149,15 @@ export function BioVerificationStep({
         {/* BIO Section - only show if not hidden */}
         {!hideBioPreview && (
           <div className="mb-8 relative">
-            <button
+            <span
               className="absolute top-0 right-0 text-field-small px-3 py-1 z-10 border"
               style={{
                 backgroundColor: colors.gray3,
                 color: colors.gray1,
               }}
             >
-              Reference
-            </button>
+              Example
+            </span>
             <div
               className="w-full"
               style={{
@@ -150,12 +186,11 @@ export function BioVerificationStep({
             HOW IT WORKS
           </p>
           <p className="text-field-small" style={{ color: colors.gray1 }}>
-            When detected, you can post and send requests.
+            {hint}
           </p>
           <p className="text-field-small" style={{ color: colors.gray1 }}>
-            Please{' '}
-            <span style={{ color: colors.white }}>always remove it after</span>{' '}
-            to avoid any inconveniences.
+            <span style={{ color: colors.white }}>Remove it from your bio</span>{' '}
+            once you&apos;re verified.
           </p>
         </div>
       </div>
@@ -169,42 +204,31 @@ export function BioVerificationStep({
             className="flex-1"
             disabled={isLoading}
           >
-            {showSkip ? 'BACK' : 'CANCEL'}
+            CANCEL
           </Button>
         )}
-        {showSkip && onSkip ? (
-          <Button
-            onClick={onSkip}
-            variant="primary"
-            className="flex-1"
-            disabled={isLoading}
-          >
-            SKIP
-          </Button>
-        ) : (
-          <Button
-            onClick={onConfirm}
-            variant="primary"
-            className="flex-1"
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <span className="flex items-center justify-center gap-2">
-                <span
-                  className="w-4 h-4 rounded-full border-2 animate-spin"
-                  style={{
-                    borderColor: colors.black,
-                    borderTopColor: 'transparent',
-                    opacity: 0.5,
-                  }}
-                />
-                VERIFYING...
-              </span>
-            ) : (
-              'CONFIRM'
-            )}
-          </Button>
-        )}
+        <Button
+          onClick={onConfirm}
+          variant="primary"
+          className="flex-1"
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <span className="flex items-center justify-center gap-2">
+              <span
+                className="w-4 h-4 rounded-full border-2 animate-spin"
+                style={{
+                  borderColor: colors.black,
+                  borderTopColor: 'transparent',
+                  opacity: 0.5,
+                }}
+              />
+              VERIFYING...
+            </span>
+          ) : (
+            'CONFIRM'
+          )}
+        </Button>
       </div>
     </motion.div>
   );

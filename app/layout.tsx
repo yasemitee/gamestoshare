@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { MotionProvider } from '@/components/layout/MotionProvider';
 import { Lexend_Exa, Quando } from 'next/font/google';
 import './globals.css';
 import { colors, gradients } from './lib/colors';
@@ -32,7 +33,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="it" className={`${lexendExa.variable} ${quando.variable}`}>
+    <html lang="en" className={`${lexendExa.variable} ${quando.variable}`}>
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any"></link>
         {/*Simple Analytics*/}
@@ -48,9 +49,9 @@ export default function RootLayout({
       </head>
       <body
         className={lexendExa.className}
-        style={{ backgroundColor: '#2C3137' }}
+        style={{ backgroundColor: colors.gray3 }}
       >
-        {children}
+        <MotionProvider>{children}</MotionProvider>
       </body>
     </html>
   );

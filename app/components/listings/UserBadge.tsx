@@ -7,7 +7,7 @@ interface UserBadgeProps {
   showCircle?: boolean;
 }
 
-export function UserBadge({ icon, label, value, showCircle }: UserBadgeProps) {
+export function UserBadge({ label, value, showCircle }: UserBadgeProps) {
   if (showCircle && value !== undefined) {
     // Level badge style
     return (
@@ -37,11 +37,12 @@ export function UserBadge({ icon, label, value, showCircle }: UserBadgeProps) {
     );
   }
 
-  // Icon badge style (Donor, Popular, Veteran)
+  // Label badge style (Donor, Popular, Veteran). Emoji icons render as
+  // unrelated glyphs on some platforms, so the lavender label carries it.
   return (
     <div className="flex items-center gap-2">
-      <span style={{ color: colors.purple }}>
-        {icon} {label}
+      <span className="uppercase" style={{ color: colors.purple }}>
+        {label}
       </span>
     </div>
   );

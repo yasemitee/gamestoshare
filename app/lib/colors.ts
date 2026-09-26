@@ -6,15 +6,16 @@ export const colors = {
   purple: '#C3C2F5',
   red: '#4D2222',
   black: '#0B0B0C',
-  blue1: '#2C3137',
   error: '#DD4F4F',
+  // Lighter tint of error for small text, so messages clear 4.5:1 on slate.
+  errorText: '#F07A7A',
 } as const;
 
 export const gradients = {
   main: 'linear-gradient(180deg, #D9D9D9 0%, #C3C2F5 100%)',
   navbar: 'linear-gradient(180deg, #1C1F23 0%, #0F1012 100%)',
   stroke: 'linear-gradient(180deg, #FFFFFF 0%, #F6E0F5 100%)',
-  bg: 'linear-gradient(180deg, #0F1012 0%, #1C1F23 100%)',
+  bg: 'linear-gradient(180deg, #0B0B0C 0%, #2C3137 100%)',
   red: 'linear-gradient(180deg, #4D2222 0%, #4D2222 100%)',
   pink: 'linear-gradient(180deg, #F0C5FF 0%, #CB71FF 100%)',
 } as const;

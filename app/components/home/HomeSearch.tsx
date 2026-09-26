@@ -240,7 +240,7 @@ export const HomeSearch: React.FC<HomeSearchProps> = ({
         >
           <div
             className="absolute left-0 right-0 mt-2 max-h-80 overflow-y-auto custom-scrollbar"
-            style={{ background: colors.blue1, border: `1px solid ${colors.gray2}` }}
+            style={{ background: colors.gray3, border: `1px solid ${colors.gray2}` }}
           >
             {results.map((game) => (
               <button

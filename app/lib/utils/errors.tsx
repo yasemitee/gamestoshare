@@ -12,7 +12,7 @@ interface ToastOptions {
 }
 
 const DEFAULT_TOAST_STYLE = {
-  background: colors.blue1,
+  background: colors.gray3,
   borderRadius: '0',
   fontSize: '12px',
   textTransform: 'none' as const,

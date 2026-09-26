@@ -3,7 +3,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { colors, gradients } from '@/lib/colors';
 import { COUNTRIES } from '@/lib/countries';
-import { motion } from 'motion/react';
 
 interface LocationSelectorProps {
   value: string;
@@ -53,20 +52,14 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
   return (
     <div className="relative" ref={dropdownRef}>
       {showLabel && <label className="block mb-6 text-field">Location</label>}
-      <motion.button
+      <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        whileHover={{
-          boxShadow: gradient
-            ? '0 0 15px rgba(195, 194, 245, 0.4), 0 0 30px rgba(195, 194, 245, 0.2)'
-            : '0 0 15px rgba(195, 194, 245, 0.3), 0 0 30px rgba(195, 194, 245, 0.15)',
-        }}
-        transition={{ duration: 0.3 }}
-        className={`${
+        className={`glow-hover-subtle press ${
           compact ? 'text-field' : 'text-small-title'
         } appearance-none cursor-pointer p-4 pr-10 text-left flex items-center gap-2`}
         style={{
-          background: gradient ? gradients.main : colors.blue1,
+          background: gradient ? gradients.main : colors.gray3,
           color: gradient ? colors.black : colors.white,
           width: width || (compact ? '100px' : '120px'),
           boxShadow: hasError ? `inset 0 0 0 1px ${colors.error}` : 'none',
@@ -99,7 +92,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
         ) : (
           <span>--</span>
         )}
-      </motion.button>
+      </button>
       <div
         className={`absolute pointer-events-none ${
           compact
@@ -122,7 +115,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
         <div
           className="absolute z-50 mt-1 w-full max-h-60 overflow-y-auto custom-scrollbar"
           style={{
-            background: gradient ? gradients.main : colors.blue1,
+            background: gradient ? gradients.main : colors.gray3,
             color: gradient ? colors.black : colors.white,
           }}
         >
