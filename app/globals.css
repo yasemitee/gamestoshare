@@ -9,10 +9,15 @@
     --color-purple: #C3C2F5;
     --color-red: #4D2222;
     --color-black: #0B0B0C;
-    
+    --color-error: #DD4F4F;
+    --color-error-text: #F07A7A;
+
     --gradient-main: linear-gradient(180deg, #D9D9D9 0%, #C3C2F5 100%);
+    --gradient-navbar: linear-gradient(180deg, #1C1F23 0%, #0F1012 100%);
     --gradient-stroke: linear-gradient(180deg, #FFFFFF 0%, #F6E0F5 100%);
     --gradient-bg: linear-gradient(180deg, #0B0B0C 0%, #2C3137 100%);
+    --gradient-red: linear-gradient(180deg, #4D2222 0%, #4D2222 100%);
+    --gradient-pink: linear-gradient(180deg, #F0C5FF 0%, #CB71FF 100%);
   }
 }
 
@@ -85,6 +90,11 @@ h4 {
   line-height: auto;
 }
 
+.text-title {
+  font-size: 20px;
+  line-height: 24px;
+}
+
 /* Scrollbar */
 .custom-scrollbar {
   scrollbar-width: thin;
@@ -128,11 +138,142 @@ h4 {
   background: rgba(195, 194, 245, 0.5);
 }
 
+input::placeholder,
 textarea::placeholder {
   color: var(--color-gray1);
   opacity: 1;
 }
+
+/* Browser surfaces carry the lavender signal too */
+::selection {
+  background: rgba(195, 194, 245, 0.3);
+  color: var(--color-white);
+}
+
+input,
+textarea {
+  caret-color: var(--color-purple);
+}
+
+:where(a, button, [role='button'], input[type='checkbox'], summary):focus-visible {
+  outline: 2px solid var(--color-purple);
+  outline-offset: 2px;
+}
+/* The browser's blue clear button clashes with the palette; Esc still clears. */
+input[type='search']::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* ------------------------------------------------------------------ */
+/* Motion: shared curves and interaction utilities                     */
+/* ------------------------------------------------------------------ */
+:root {
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+/* Press feedback for anything clickable. */
+.press {
+  transition: transform 160ms var(--ease-out);
+}
+.press:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+/* Lavender glow on hover (DESIGN.md glow vocabulary). Hover only exists on
+   real pointers; on touch it would stick after a tap. */
+.glow-hover,
+.glow-hover-subtle {
+  transition:
+    box-shadow 200ms ease,
+    filter 200ms ease,
+    transform 160ms var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .glow-hover:hover:not(:disabled) {
+    box-shadow:
+      0 0 20px rgba(195, 194, 245, 0.6),
+      0 0 40px rgba(195, 194, 245, 0.3);
+    filter: brightness(1.1);
+  }
+  .glow-hover-subtle:hover {
+    box-shadow:
+      0 0 12px rgba(195, 194, 245, 0.3),
+      0 0 24px rgba(195, 194, 245, 0.15);
+  }
+  /* Nav links lift 2px on hover (DESIGN.md). */
+  .lift-hover {
+    transition: transform 200ms var(--ease-out), color 200ms ease;
+  }
+  .lift-hover:hover {
+    transform: translateY(-2px);
+  }
+}
+
+/* Game art inside scrolling columns: an outer glow would be clipped by the
+   column, so hover draws an inset ring and lifts brightness instead. */
+.tile-hover {
+  transition: filter 200ms ease, box-shadow 200ms ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .tile-hover:hover {
+    filter: brightness(1.08);
+    box-shadow: inset 0 0 0 1px var(--color-purple);
+  }
+}
+
+/* Spinners read as faster loading when they turn faster. */
+.animate-spin {
+  animation-duration: 0.75s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .press:active:not(:disabled),
+  .lift-hover:hover {
+    transform: none;
+  }
+}
+
+/* Desktop game columns: fade the last rows so the box reads as scrollable
+   rather than cut off. Mobile scrolls sideways, so no fade there. */
+@media (min-width: 768px) {
+  .games-scroll-fade {
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 48px), transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 48px), transparent 100%);
+  }
+}
+
 /* Animations */
+
+/* A game just added (or re-picked) in the create form: lavender ring + glow
+   that settles back to nothing. */
+.game-flash {
+  animation: gameFlash 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes gameFlash {
+  0%,
+  35% {
+    box-shadow:
+      inset 0 0 0 2px var(--color-purple),
+      0 0 16px rgba(195, 194, 245, 0.4),
+      0 0 36px rgba(195, 194, 245, 0.2);
+  }
+  100% {
+    box-shadow:
+      inset 0 0 0 2px rgba(195, 194, 245, 0),
+      0 0 0 rgba(195, 194, 245, 0),
+      0 0 0 rgba(195, 194, 245, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Hold the ring, then drop it — no fade. */
+  .game-flash {
+    animation-timing-function: steps(1, end);
+  }
+}
 @keyframes fadeIn {
   from {
     opacity: 0;

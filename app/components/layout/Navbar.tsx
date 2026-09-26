@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { colors, gradients } from '@/lib/colors';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'motion/react';
+import { EASE } from '@/lib/constants';
 
 export const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -48,10 +49,7 @@ export const Navbar: React.FC = () => {
           ? 'linear-gradient(180deg, #1C1F23 0%, #0F1012 100%)'
           : 'linear-gradient(180deg, rgba(28, 31, 35, 0) 0%, rgba(15, 16, 18, 0) 100%)',
       }}
-      transition={{
-        duration: 0.5,
-        ease: [0.4, 0.0, 0.2, 1],
-      }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
       className={`fixed top-0 left-0 right-0 z-[60] py-4 ${
         isScrolled ? 'backdrop-blur-sm' : ''
       }`}
@@ -71,38 +69,29 @@ export const Navbar: React.FC = () => {
         </div>
 
         <div className="hidden md:flex items-center gap-16 md:gap-8 lg:gap-16">
-          <motion.button
-            whileHover={{ y: -2 }}
-            whileTap={{ y: 0 }}
-            transition={{ duration: 0.2 }}
-            className="text-navbar flex items-center gap-2 cursor-pointer transition-colors hover:!text-white"
+          <button
+            className="lift-hover text-navbar flex items-center gap-2 cursor-pointer transition-colors hover:!text-white"
             style={{ color: isActive('/') ? colors.white : colors.gray1 }}
             onClick={() => (window.location.href = '/')}
           >
             Search
-          </motion.button>
-          <motion.button
-            whileHover={{ y: -2 }}
-            whileTap={{ y: 0 }}
-            transition={{ duration: 0.2 }}
-            className="text-navbar cursor-pointer transition-colors hover:!text-white"
+          </button>
+          <button
+            className="lift-hover text-navbar cursor-pointer transition-colors hover:!text-white"
             style={{
               color: isActive('/listings/manage') ? colors.white : colors.gray1,
             }}
             onClick={() => (window.location.href = '/listings/manage')}
           >
             Manage your listing
-          </motion.button>
-          <motion.button
-            whileHover={{ y: -2 }}
-            whileTap={{ y: 0 }}
-            transition={{ duration: 0.2 }}
-            className="text-navbar cursor-pointer transition-colors hover:!text-white"
+          </button>
+          <button
+            className="lift-hover text-navbar cursor-pointer transition-colors hover:!text-white"
             style={{ color: isActive('/info') ? colors.white : colors.gray1 }}
             onClick={() => (window.location.href = '/info')}
           >
             Info
-          </motion.button>
+          </button>
         </div>
 
         <button
@@ -143,7 +132,7 @@ export const Navbar: React.FC = () => {
         >
           <div className="relative w-6 h-6 flex items-center justify-center">
             <span
-              className="absolute h-0.5 w-full transition-all duration-300 ease-out"
+              className="absolute h-0.5 w-full transition-[transform,opacity,top,bottom] duration-200 ease-[var(--ease-out)]"
               style={{
                 backgroundColor: colors.white,
                 top: isMobileMenuOpen ? '50%' : '4px',
@@ -153,7 +142,7 @@ export const Navbar: React.FC = () => {
               }}
             />
             <span
-              className="absolute h-0.5 w-full transition-all duration-300 ease-out"
+              className="absolute h-0.5 w-full transition-[transform,opacity,top,bottom] duration-200 ease-[var(--ease-out)]"
               style={{
                 backgroundColor: colors.white,
                 top: '50%',
@@ -162,7 +151,7 @@ export const Navbar: React.FC = () => {
               }}
             />
             <span
-              className="absolute h-0.5 w-full transition-all duration-300 ease-out"
+              className="absolute h-0.5 w-full transition-[transform,opacity,top,bottom] duration-200 ease-[var(--ease-out)]"
               style={{
                 backgroundColor: colors.white,
                 bottom: isMobileMenuOpen ? '50%' : '4px',
@@ -180,9 +169,8 @@ export const Navbar: React.FC = () => {
         {isMobileMenuOpen && (
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            animate={{ opacity: 1, transition: { duration: 0.2 } }}
+            exit={{ opacity: 0, transition: { duration: 0.15 } }}
             className="fixed top-0 left-0 w-full md:hidden z-40"
             style={{
               backgroundColor: 'rgba(11, 11, 12, 0.95)',
@@ -195,10 +183,13 @@ export const Navbar: React.FC = () => {
           >
             {/* Menu content - centered */}
             <motion.div
-              initial={{ y: -20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -20, opacity: 0 }}
-              transition={{ duration: 0.3, delay: 0.1 }}
+              initial={{ y: -8, opacity: 0 }}
+              animate={{
+                y: 0,
+                opacity: 1,
+                transition: { duration: 0.25, delay: 0.05, ease: EASE.out },
+              }}
+              exit={{ opacity: 0, transition: { duration: 0.12 } }}
               className="flex flex-col items-center justify-center h-full space-y-10"
               onClick={(e) => e.stopPropagation()}
             >

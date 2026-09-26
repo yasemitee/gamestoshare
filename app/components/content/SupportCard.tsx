@@ -1,9 +1,8 @@
 'use client';
 
-import { colors, gradients, shadowbox } from '@/lib/colors';
+import { colors, gradients } from '@/lib/colors';
 import { Button } from '@/components/ui/Button';
 import { ContentParagraph } from '@/components/content/ContentParagraph';
-import { motion } from 'motion/react';
 
 interface SupportCardProps {
   title: string;
@@ -39,13 +38,8 @@ export function SupportCard({
       ))}
       {buttonHref ? (
         <a href={buttonHref} target="_blank" rel="noopener noreferrer">
-          <motion.div
-            whileHover={{
-              boxShadow: shadowbox.medium,
-            }}
-            whileTap={{ scale: 0.98 }}
-            transition={{ duration: 0.2 }}
-            className="inline-block"
+          <div
+            className="inline-block glow-hover"
           >
             <Button
               className="inline-flex items-center gap-1.5 text-button"
@@ -61,16 +55,11 @@ export function SupportCard({
               />
               <span className="text-button">{buttonText}</span>
             </Button>
-          </motion.div>
+          </div>
         </a>
       ) : (
-        <motion.div
-          whileHover={{
-            boxShadow: shadowbox.medium,
-          }}
-          whileTap={{ scale: 0.98 }}
-          transition={{ duration: 0.2 }}
-          className="inline-block"
+        <div
+          className="inline-block glow-hover"
         >
           <Button
             className="inline-flex items-center gap-1.5 text-button"
@@ -79,7 +68,7 @@ export function SupportCard({
             <img src={buttonIcon} alt={buttonIconAlt} width={16} height={16} />
             <span className="text-button">{buttonText}</span>
           </Button>
-        </motion.div>
+        </div>
       )}
     </div>
   );

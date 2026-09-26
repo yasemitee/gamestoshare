@@ -24,11 +24,19 @@ export const ANIMATION_DELAY = {
   VERY_LONG: 0.5,
 } as const;
 
-export const ANIMATION_EASING = [0.4, 0.0, 0.2, 1] as const;
+// Mirrors --ease-out / --ease-in-out in globals.css. The built-in curves are
+// too soft: ease-out for anything entering or responding to input,
+// ease-in-out for things that move or resize on screen.
+export const EASE = {
+  out: [0.23, 1, 0.32, 1] as const,
+  inOut: [0.77, 0, 0.175, 1] as const,
+};
+
+export const ANIMATION_EASING = EASE.out;
 
 export const MOTION = {
   duration: 0.35,
-  ease: [0.22, 1, 0.36, 1] as const,
+  ease: EASE.out,
   rise: 8,
   stagger: 0.05,
 } as const;

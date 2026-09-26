@@ -2,6 +2,7 @@
 
 import { motion } from 'motion/react';
 import { ReactNode } from 'react';
+import { MOTION } from '@/lib/constants';
 
 interface AnimatedContentWrapperProps {
   children: ReactNode;
@@ -12,9 +13,9 @@ export const AnimatedContentWrapper: React.FC<AnimatedContentWrapperProps> = ({
 }) => {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: MOTION.rise }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: [0.4, 0.0, 0.2, 1] }}
+      transition={{ duration: MOTION.duration, ease: MOTION.ease, delay: 0 }}
     >
       {children}
     </motion.div>

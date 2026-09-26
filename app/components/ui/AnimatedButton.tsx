@@ -1,6 +1,4 @@
-import { motion } from 'motion/react';
 import { Button } from './Button';
-import { shadowbox } from '@/lib/colors';
 
 interface AnimatedButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -9,49 +7,34 @@ interface AnimatedButtonProps
   href?: string;
 }
 
+/** Button with the lavender hover glow. Hover is CSS-only, gated to real
+ *  pointers; press feedback comes from Button itself. */
 export function AnimatedButton({
   children,
   variant = 'primary',
   href,
   ...props
 }: AnimatedButtonProps) {
-  const buttonElement = (
-    <Button variant={variant} {...props}>
-      {children}
-    </Button>
-  );
-
   if (href) {
     return (
-      <motion.a
+      <a
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        whileHover={{
-          boxShadow: shadowbox.medium,
-          filter: 'brightness(1.1)',
-        }}
-        whileTap={{ scale: 0.98 }}
-        transition={{ duration: 0.2 }}
-        style={{ display: 'inline-block' }}
+        className="inline-block glow-hover"
       >
-        {buttonElement}
-      </motion.a>
+        <Button variant={variant} tabIndex={-1} {...props}>
+          {children}
+        </Button>
+      </a>
     );
   }
 
   return (
-    <motion.div
-      whileHover={{
-        boxShadow:
-          '0 0 20px rgba(195, 194, 245, 0.6), 0 0 40px rgba(195, 194, 245, 0.3)',
-        filter: 'brightness(1.1)',
-      }}
-      whileTap={{ scale: 0.98 }}
-      transition={{ duration: 0.2 }}
-      style={{ display: 'inline-block' }}
-    >
-      {buttonElement}
-    </motion.div>
+    <span className="inline-block glow-hover">
+      <Button variant={variant} {...props}>
+        {children}
+      </Button>
+    </span>
   );
 }
