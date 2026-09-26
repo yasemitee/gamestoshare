@@ -13,6 +13,7 @@ import { ManageAccessModal } from '@/components/verification/ManageAccessModal';
 import { ManageListingPanel } from '@/components/listings/ManageListingPanel';
 import { Toaster } from 'react-hot-toast';
 import { colors } from '@/lib/colors';
+import { GradientTitle } from '@/components/ui/GradientTitle';
 import { MANAGE_ENABLED } from '@/lib/featureFlags';
 
 export default function ManageListingPage() {
@@ -64,7 +65,7 @@ export default function ManageListingPage() {
           <MainContentContainer>
             <GoBackButton />
             <div className="mt-14 text-white">
-              <h1 className="mb-8">Manage your listing</h1>
+              <GradientTitle className="mb-8">Manage your listing</GradientTitle>
               {verified ? (
                 <ManageListingPanel
                   listing={verified.listing}
@@ -75,22 +76,24 @@ export default function ManageListingPage() {
                 />
               ) : (
                 <div>
-                  <p className="mb-6">
-                    Verify your Steam profile to manage your listing.
-                  </p>
-                  <Button
-                    variant="secondary"
-                    onClick={() => setIsModalOpen(true)}
+                  <p
+                    className="text-field mb-8 max-w-[60ch]"
+                    style={{ color: colors.gray1, lineHeight: '24px' }}
                   >
-                    Verify your Steam profile
+                    To edit or delete your listing, prove the Steam account is
+                    yours: we give you a one-time code to add to your Steam
+                    bio.
+                  </p>
+                  <Button onClick={() => setIsModalOpen(true)}>
+                    START VERIFICATION
                   </Button>
                 </div>
               )}
             </div>
           </MainContentContainer>
-          <Footer />
         </Container>
       </div>
+      <Footer />
 
       <ManageAccessModal
         isOpen={isModalOpen && !verified}

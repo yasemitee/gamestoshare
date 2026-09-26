@@ -2,16 +2,18 @@
 
 import toast, { Toaster } from 'react-hot-toast';
 import { colors } from '@/lib/colors';
-import { motion } from 'motion/react';
 
 interface ActionButtonsProps {
   showReport?: boolean;
   showShare?: boolean;
+  /** Path or URL to share; defaults to the current page. */
+  shareUrl?: string;
 }
 
 export function ActionButtons({
   showReport = true,
   showShare = true,
+  shareUrl,
 }: ActionButtonsProps) {
   const handleReport = () => {
     // TODO: Implement report functionality
@@ -19,21 +21,23 @@ export function ActionButtons({
   };
 
   const handleShare = async () => {
+    const url = new URL(shareUrl ?? window.location.href, window.location.origin)
+      .href;
     if (navigator.share) {
       try {
         await navigator.share({
           title: 'GamesToShare Listing',
-          url: window.location.href,
+          url,
         });
       } catch (error) {
         console.log('Share cancelled');
       }
     } else {
-      navigator.clipboard.writeText(window.location.href);
+      navigator.clipboard.writeText(url);
       toast.success('Link copied to clipboard!', {
         duration: 3000,
         style: {
-          background: colors.blue1,
+          background: colors.gray3,
           color: colors.white,
           borderRadius: '0',
           fontSize: '12px',
@@ -51,7 +55,7 @@ export function ActionButtons({
         {showReport && (
           <button
             onClick={handleReport}
-            className="p-3.5 transition-all hover:bg-opacity-80 hover:cursor-pointer"
+            className="press p-3.5 transition-opacity hover:opacity-80 hover:cursor-pointer"
             style={{ backgroundColor: colors.red }}
             title="Report"
           >
@@ -61,20 +65,16 @@ export function ActionButtons({
 
         {/* Share Button */}
         {showShare && (
-          <motion.button
+          <button
+            type="button"
             onClick={handleShare}
-            whileHover={{
-              boxShadow:
-                '0 0 20px rgba(195, 194, 245, 0.6), 0 0 40px rgba(195, 194, 245, 0.3)',
-            }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ duration: 0.2 }}
-            className="p-3.5 hover:cursor-pointer"
-            style={{ backgroundColor: colors.blue1 }}
+            aria-label="Share this listing"
+            className="glow-hover press p-3.5 hover:cursor-pointer"
+            style={{ backgroundColor: colors.gray3 }}
             title="Share"
           >
             <img src="/Share.svg" alt="Share" width="20" height="20" />
-          </motion.button>
+          </button>
         )}
       </div>
     </>

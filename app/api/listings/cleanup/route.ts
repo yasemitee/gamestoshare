@@ -3,8 +3,12 @@ import { prisma } from '@/lib/db/db';
 
 // Cleanup route disabled — listings no longer expire after 30 days.
 export async function POST(request: NextRequest) {
+  const now = new Date();
   await prisma.listingManageToken.deleteMany({
-    where: { expiresAt: { lt: new Date() } },
+    where: { expiresAt: { lt: now } },
+  });
+  await prisma.listingManageChallenge.deleteMany({
+    where: { expiresAt: { lt: now } },
   });
 
   return NextResponse.json({

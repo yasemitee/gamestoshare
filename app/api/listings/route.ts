@@ -4,6 +4,11 @@ import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/db/db';
 import { getSteamIdFromUrl } from '@/lib/steam/api';
 import { MAX_LISTINGS_PER_PAGE } from '@/lib/constants';
+import { MANAGE_ENABLED } from '@/lib/featureFlags';
+import { extractBearerToken, validateManageToken } from '@/lib/utils/manageToken';
+
+const isPlaceholderGameName = (name: unknown) =>
+  typeof name !== 'string' || /^Game \d+$/.test(name.trim());
 
 export async function GET(request: NextRequest) {
   try {
@@ -190,6 +195,24 @@ export async function POST(request: NextRequest) {
       include: { games: true },
     });
 
+    // Overwriting an existing listing needs a manage token for that Steam
+    // account. Only enforced while the manage flow is live, since that's the
+    // only place tokens can be obtained.
+    if (existingListing && MANAGE_ENABLED) {
+      const token = extractBearerToken(request.headers.get('authorization'));
+      const validated = await validateManageToken(token);
+
+      if (!validated || validated.steamId !== normalizedSteamId) {
+        return NextResponse.json(
+          {
+            error: 'A listing already exists for this Steam account',
+            code: 'LISTING_EXISTS',
+          },
+          { status: 409 }
+        );
+      }
+    }
+
     if (existingListing) {
       await prisma.listingGame.deleteMany({
         where: { listingId: existingListing.id },
@@ -219,7 +242,12 @@ export async function POST(request: NextRequest) {
               },
             },
             update: {
-              name: gameData.name,
+              // Game rows are shared by every listing. When the importer
+              // couldn't reach the store it sends a "Game <appId>" stand-in;
+              // writing that would rename the game for everyone.
+              ...(!isPlaceholderGameName(gameData.name) && {
+                name: gameData.name,
+              }),
               iconUrl: gameData.iconUrl,
               // Only overwrite when the client actually sent one. The client
               // never does today, so falling back to the constructed URL here

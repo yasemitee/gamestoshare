@@ -12,54 +12,105 @@ import { normalizeSteamId } from '@/lib/steam/utils';
 interface ManageAccessModalProps {
   isOpen: boolean;
   onClose: () => void;
-  listingId?: string;
   onVerified: (result: { token: string; steamId: string; listing: any }) => void;
 }
 
-type Step = 'profile-url' | 'bio';
+interface Challenge {
+  challengeId: string;
+  code: string;
+  steamId: string;
+}
+
+const toastStyle = { background: colors.gray3, color: colors.white };
 
 export function ManageAccessModal({
   isOpen,
   onClose,
-  listingId,
   onVerified,
 }: ManageAccessModalProps) {
-  const [step, setStep] = useState<Step>(listingId ? 'bio' : 'profile-url');
   const [profileUrl, setProfileUrl] = useState('');
+  const [challenge, setChallenge] = useState<Challenge | null>(null);
+  const [isRequestingCode, setIsRequestingCode] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleClose = () => {
-    setStep(listingId ? 'bio' : 'profile-url');
     setProfileUrl('');
+    setChallenge(null);
     onClose();
   };
 
-  const handleProfileUrlNext = (value: string) => {
+  const requestChallenge = async (value: string): Promise<boolean> => {
+    setIsRequestingCode(true);
+    try {
+      const response = await fetch('/api/listings/manage/challenge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ steamProfileUrl: normalizeSteamId(value) }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        toast.error(
+          response.status === 404
+            ? 'No listing found for this Steam account.'
+            : 'Something went wrong. Please try again.',
+          { style: toastStyle }
+        );
+        return false;
+      }
+
+      setChallenge({
+        challengeId: data.challengeId,
+        code: data.code,
+        steamId: data.steamId,
+      });
+      return true;
+    } catch (error) {
+      console.error('Manage challenge error:', error);
+      toast.error('Something went wrong. Please try again.', {
+        style: toastStyle,
+      });
+      return false;
+    } finally {
+      setIsRequestingCode(false);
+    }
+  };
+
+  const handleProfileUrlNext = async (value: string) => {
     setProfileUrl(value);
-    setStep('bio');
+    await requestChallenge(value);
   };
 
   const handleConfirm = async () => {
+    if (!challenge) return;
+
     setIsSubmitting(true);
     try {
       const verifyResponse = await fetch('/api/listings/manage/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(
-          listingId
-            ? { listingId }
-            : { steamProfileUrl: normalizeSteamId(profileUrl) }
-        ),
+        body: JSON.stringify({ challengeId: challenge.challengeId }),
       });
 
       const verifyData = await verifyResponse.json();
+
+      if (verifyResponse.status === 410) {
+        // The code timed out: hand out a fresh one so the user can retry.
+        if (await requestChallenge(profileUrl)) {
+          toast.error(
+            'Your code expired. Put the new code in your Steam bio and try again.',
+            { style: toastStyle }
+          );
+        }
+        return;
+      }
 
       if (!verifyResponse.ok || !verifyData.verified) {
         toast.error(
           verifyData.error === 'No listing found for this Steam account'
             ? 'No listing found for this Steam account.'
-            : 'Verification failed. Make sure "GTS" is in your Steam bio and try again.',
-          { style: { background: colors.blue1, color: colors.white } }
+            : `Verification failed. Make sure "${challenge.code}" is in your Steam bio and try again.`,
+          { style: toastStyle }
         );
         return;
       }
@@ -70,9 +121,7 @@ export function ManageAccessModal({
       const listingData = await listingResponse.json();
 
       if (!listingResponse.ok) {
-        toast.error('Could not load your listing.', {
-          style: { background: colors.blue1, color: colors.white },
-        });
+        toast.error('Could not load your listing.', { style: toastStyle });
         return;
       }
 
@@ -91,7 +140,7 @@ export function ManageAccessModal({
     } catch (error) {
       console.error('Manage verification error:', error);
       toast.error('Something went wrong. Please try again.', {
-        style: { background: colors.blue1, color: colors.white },
+        style: toastStyle,
       });
     } finally {
       setIsSubmitting(false);
@@ -100,18 +149,22 @@ export function ManageAccessModal({
 
   return (
     <BaseVerificationModal isOpen={isOpen} onClose={handleClose}>
-      {step === 'profile-url' ? (
+      {challenge ? (
+        <BioVerificationStep
+          steamId={challenge.steamId}
+          code={challenge.code}
+          hint="This code works once and expires in 15 minutes."
+          hideBioPreview
+          onCancel={() => setChallenge(null)}
+          onConfirm={handleConfirm}
+          isLoading={isSubmitting || isRequestingCode}
+        />
+      ) : (
         <SteamIdInputStep
           onBack={handleClose}
           onNext={handleProfileUrlNext}
-          isLoading={false}
-        />
-      ) : (
-        <BioVerificationStep
-          onCancel={listingId ? handleClose : () => setStep('profile-url')}
-          onConfirm={handleConfirm}
-          showSkip={false}
-          isLoading={isSubmitting}
+          isLoading={isRequestingCode}
+          currentSteamId={profileUrl}
         />
       )}
     </BaseVerificationModal>

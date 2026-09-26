@@ -58,6 +58,20 @@ model ListingManageToken {
   @@map("listing_manage_tokens")
 }
 
+// One-time code the owner pastes into their Steam bio to prove ownership.
+// Single use and short-lived, so a code left in the bio is harmless.
+model ListingManageChallenge {
+  id        String   @id @default(cuid())
+  steamId   String
+  code      String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([steamId])
+  @@index([expiresAt])
+  @@map("listing_manage_challenges")
+}
+
 model Game {
   id           String   @id @default(cuid())
   steamAppId   Int      @unique

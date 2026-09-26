@@ -1,9 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { motion } from 'motion/react';
 import { Button } from '@/components/ui/Button';
-import { colors } from '@/lib/colors';
+import { colors, gradients } from '@/lib/colors';
+import { MOTION } from '@/lib/constants';
 import { clearManageToken } from '@/lib/utils/manageStorage';
 import { GamesList } from './GamesList';
 import { ListingUserHeader } from './ListingUserHeader';
@@ -60,15 +62,15 @@ export function ManageListingPanel({
       });
 
       if (!response.ok) {
-        toast.error('Failed to delete listing.', {
-          style: { background: colors.blue1, color: colors.white },
+        toast.error('Couldn’t delete your listing. Please try again.', {
+          style: { background: colors.gray3, color: colors.white },
         });
         return;
       }
 
       clearManageToken(listing.id);
       toast.success('Listing deleted.', {
-        style: { background: colors.blue1, color: colors.white },
+        style: { background: colors.gray3, color: colors.white },
       });
       onDeleted();
     } finally {
@@ -78,11 +80,11 @@ export function ManageListingPanel({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: MOTION.rise }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
+      transition={{ duration: MOTION.duration, ease: MOTION.ease, delay: 0 }}
     >
-      {/* User header — same layout as the public listing page */}
+      {/* User header: same layout as the public listing page */}
       <ListingUserHeader
         username={listing.username}
         showSteamId={listing.showSteamId}
@@ -90,6 +92,7 @@ export function ManageListingPanel({
         location={listing.location}
         steamLevel={listing.steamLevel}
         accountYears={listing.accountYears}
+        shareUrl={`/listings/${listing.id}`}
       />
 
       {/* Divider */}
@@ -130,7 +133,7 @@ export function ManageListingPanel({
             >
               Delete this listing permanently? This can&apos;t be undone.
             </p>
-            <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <Button
                 variant="secondary"
                 onClick={() => setIsConfirmingDelete(false)}
@@ -138,34 +141,68 @@ export function ManageListingPanel({
               >
                 CANCEL
               </Button>
-              <Button
-                variant="primary"
-                onClick={handleDelete}
-                disabled={isDeleting}
-              >
-                {isDeleting ? 'DELETING...' : 'CONFIRM DELETE'}
-              </Button>
+              <DeleteButton onClick={handleDelete} disabled={isDeleting}>
+                {isDeleting ? 'DELETING…' : 'DELETE FOREVER'}
+              </DeleteButton>
             </div>
           </>
         ) : (
-          <div className="flex gap-4">
-            <Button
-              variant="secondary"
-              onClick={() => {
-                window.location.href = `/listings/create?edit=${listing.id}`;
+          <>
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+              <Link
+                href={`/listings/create?edit=${listing.id}`}
+                className="text-button px-6 py-2.5 text-center transition-opacity hover:opacity-90"
+                style={{ background: gradients.main, color: colors.black }}
+              >
+                EDIT LISTING
+              </Link>
+              <DeleteButton onClick={() => setIsConfirmingDelete(true)}>
+                DELETE LISTING
+              </DeleteButton>
+            </div>
+            <Link
+              href={`/listings/${listing.id}`}
+              className="sm:ml-auto self-start sm:self-auto uppercase transition-colors hover:!text-[#C3C2F5]"
+              style={{
+                fontSize: 11,
+                letterSpacing: '.08em',
+                color: colors.white,
+                borderBottom: `1px solid ${colors.purple}`,
+                paddingBottom: 2,
               }}
             >
-              EDIT LISTING
-            </Button>
-            <Button
-              variant="primary"
-              onClick={() => setIsConfirmingDelete(true)}
-            >
-              DELETE LISTING
-            </Button>
-          </div>
+              View public listing
+            </Link>
+          </>
         )}
       </div>
     </motion.div>
+  );
+}
+
+// Ember Maroon fill: DESIGN.md reserves it for destructive controls.
+function DeleteButton({
+  children,
+  onClick,
+  disabled,
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className="text-button px-6 py-2.5 transition-opacity hover:opacity-85 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+      style={{
+        backgroundColor: colors.red,
+        color: colors.white,
+        border: '1px solid rgba(221, 79, 79, 0.35)',
+      }}
+    >
+      {children}
+    </button>
   );
 }

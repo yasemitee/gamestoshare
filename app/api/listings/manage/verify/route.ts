@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/db';
-import { getSteamIdFromUrl, getProfileBio } from '@/lib/steam/api';
+import { getProfileBio } from '@/lib/steam/api';
 import { verifySecurityCode } from '@/lib/steam/utils';
-import { STEAM_VERIFICATION_CODE } from '@/lib/constants';
-import { createManageToken } from '@/lib/utils/manageToken';
+import {
+  consumeManageChallenge,
+  createManageToken,
+  findActiveManageChallenge,
+} from '@/lib/utils/manageToken';
 import { MANAGE_ENABLED } from '@/lib/featureFlags';
 
 export async function POST(request: NextRequest) {
@@ -15,41 +18,50 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
-    const { listingId, steamProfileUrl } = body;
+    const { challengeId } = await request.json();
 
-    if (!listingId && !steamProfileUrl) {
+    if (!challengeId) {
       return NextResponse.json(
-        { error: 'listingId or steamProfileUrl is required' },
+        { error: 'challengeId is required' },
         { status: 400 }
       );
     }
 
-    const listing = listingId
-      ? await prisma.listing.findUnique({ where: { id: listingId } })
-      : await (async () => {
-          const resolvedSteamId = await getSteamIdFromUrl(steamProfileUrl);
-          if (!resolvedSteamId) return null;
-          return prisma.listing.findUnique({
-            where: { steamId: resolvedSteamId },
-          });
-        })();
+    const challenge = await findActiveManageChallenge(challengeId);
 
-    if (!listing) {
+    if (!challenge) {
       return NextResponse.json(
-        { error: 'No listing found for this Steam account' },
-        { status: 404 }
+        { verified: false, error: 'Verification code expired' },
+        { status: 410 }
       );
     }
 
-    const bio = await getProfileBio(listing.steamId);
-    const isVerified = verifySecurityCode(bio, STEAM_VERIFICATION_CODE);
+    const bio = await getProfileBio(challenge.steamId);
+    const isVerified = verifySecurityCode(bio, challenge.code);
 
     if (!isVerified) {
       return NextResponse.json({
         verified: false,
         error: 'Verification code not found in bio',
       });
+    }
+
+    if (!(await consumeManageChallenge(challenge.id))) {
+      return NextResponse.json(
+        { verified: false, error: 'Verification code expired' },
+        { status: 410 }
+      );
+    }
+
+    const listing = await prisma.listing.findUnique({
+      where: { steamId: challenge.steamId },
+    });
+
+    if (!listing) {
+      return NextResponse.json(
+        { error: 'No listing found for this Steam account' },
+        { status: 404 }
+      );
     }
 
     const { token, expiresAt } = await createManageToken(listing.steamId);
