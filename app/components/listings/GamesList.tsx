@@ -2,7 +2,6 @@
 
 import { colors } from '@/lib/colors';
 import { GameImage } from './GameImage';
-import { motion } from 'motion/react';
 
 interface Game {
   id: string;
@@ -15,47 +14,74 @@ interface Game {
 interface GamesListProps {
   title: string;
   games: Game[];
+  /** Opens the full gallery; the link only shows when this is provided. */
+  onViewAll?: () => void;
 }
 
-export function GamesList({ title, games }: GamesListProps) {
+export function GamesList({ title, games, onViewAll }: GamesListProps) {
+  const scrolls = games.length > 3;
+
   return (
-    <div>
+    <div className="min-w-0">
       <div className="pb-5">
         <p
           className="text-small-title flex justify-between items-center"
           style={{ color: colors.white }}
         >
           {title}
-          <span style={{ color: colors.gray1 }}>{games.length} GAMES</span>
+          <span className="flex items-center gap-3">
+            <span style={{ color: colors.gray1 }}>
+              {games.length} {games.length === 1 ? 'GAME' : 'GAMES'}
+            </span>
+            {onViewAll && games.length > 0 && (
+              <button
+                type="button"
+                onClick={onViewAll}
+                aria-label={`View all ${title.toLowerCase()} games`}
+                className="uppercase cursor-pointer transition-colors hover:!text-[#C3C2F5]"
+                style={{
+                  color: colors.white,
+                  borderBottom: `1px solid ${colors.purple}`,
+                  paddingBottom: 2,
+                }}
+              >
+                View all
+              </button>
+            )}
+          </span>
         </p>
       </div>
-      <div className="flex md:flex-col gap-2 overflow-x-auto md:overflow-x-hidden overflow-y-visible md:overflow-y-auto max-h-none md:max-h-[400px] custom-scrollbar">
-        {games.map((game) => (
-          <motion.div
-            key={game.id}
-            whileHover={{
-              boxShadow:
-                '0 0 20px rgba(195, 194, 245, 0.6), 0 0 40px rgba(195, 194, 245, 0.3)',
-              scale: 1.05,
-              zIndex: 10,
-            }}
-            transition={{ duration: 0.2 }}
-            className="flex-shrink-0 relative overflow-hidden w-[200px] md:w-auto"
-            style={{
-              backgroundColor: colors.gray2,
-              aspectRatio: '21/9',
-            }}
-            title={game.name}
-          >
-            <GameImage
-              headerImage={game.headerImage}
-              iconUrl={game.iconUrl}
-              appId={game.steamAppId}
-              name={game.name}
-            />
-          </motion.div>
-        ))}
-      </div>
+
+      {games.length === 0 ? (
+        <p className="text-field-small py-6" style={{ color: colors.gray1 }}>
+          No games listed.
+        </p>
+      ) : (
+        <div
+          className={`flex md:flex-col gap-2 overflow-x-auto md:overflow-x-hidden overflow-y-visible md:overflow-y-auto max-h-none md:max-h-[400px] custom-scrollbar md:pb-6 ${
+            scrolls ? 'games-scroll-fade' : ''
+          }`}
+        >
+          {games.map((game) => (
+            <div
+              key={game.id}
+              className="tile-hover flex-shrink-0 relative overflow-hidden w-[200px] md:w-auto"
+              style={{
+                backgroundColor: colors.gray2,
+                aspectRatio: '21/9',
+              }}
+              title={game.name}
+            >
+              <GameImage
+                headerImage={game.headerImage}
+                iconUrl={game.iconUrl}
+                appId={game.steamAppId}
+                name={game.name}
+              />
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

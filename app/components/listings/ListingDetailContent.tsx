@@ -1,11 +1,14 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'motion/react';
 import { colors } from '@/lib/colors';
+import { MOTION } from '@/lib/constants';
 import { GoBackButton } from '@/components/ui/GoBackButton';
 import { GamesList } from './GamesList';
 import { FriendRequestSection } from './FriendRequestSection';
 import { ListingUserHeader } from './ListingUserHeader';
+import { GamesModal, type GamesTab } from './GamesModal';
 
 interface Game {
   id: string;
@@ -39,13 +42,17 @@ export const ListingDetailContent: React.FC<ListingDetailContentProps> = ({
   offeringGames,
   postingDate,
 }) => {
+  const [galleryTab, setGalleryTab] = useState<GamesTab | null>(null);
+  const ownerName =
+    listing.showSteamId && listing.username ? listing.username : 'Anonymous';
+
   return (
     <div className="">
       {/* Go Back Button */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: MOTION.rise }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
+        transition={{ duration: MOTION.duration, ease: MOTION.ease, delay: 0 }}
         className="mb-14"
       >
         <GoBackButton />
@@ -54,9 +61,9 @@ export const ListingDetailContent: React.FC<ListingDetailContentProps> = ({
       <div className="flex flex-col">
         {/* Top Section - Avatar and User Info */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: MOTION.rise }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.1 }}
+          transition={{ duration: MOTION.duration, ease: MOTION.ease, delay: 0.05 }}
         >
           <ListingUserHeader
             username={listing.username}
@@ -69,9 +76,9 @@ export const ListingDetailContent: React.FC<ListingDetailContentProps> = ({
         </motion.div>
         {/* Divider */}
         <motion.div
-          initial={{ opacity: 0, scaleX: 0 }}
-          animate={{ opacity: 1, scaleX: 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: MOTION.duration, delay: 0.1 }}
           style={{
             borderTop: `1px solid ${colors.gray2}`,
           }}
@@ -81,9 +88,9 @@ export const ListingDetailContent: React.FC<ListingDetailContentProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-22">
           {/* Left: Description */}
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.4, delay: 0.3 }}
+            initial={{ opacity: 0, y: MOTION.rise }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: MOTION.duration, ease: MOTION.ease, delay: 0.1 }}
           >
             <div className="flex items-center gap-4 pb-4 md:mb-8">
               <p className="text-small-title" style={{ color: colors.white }}>
@@ -102,21 +109,29 @@ export const ListingDetailContent: React.FC<ListingDetailContentProps> = ({
           </motion.div>
           {/* Right: Games Section */}
           <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.4, delay: 0.4 }}
+            initial={{ opacity: 0, y: MOTION.rise }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: MOTION.duration, ease: MOTION.ease, delay: 0.15 }}
             className="grid grid-cols-1 md:grid-cols-2 gap-9"
           >
-            <GamesList title="WISHLIST" games={lookingForGames} />
-            <GamesList title="LIBRARY" games={offeringGames} />
+            <GamesList
+              title="WISHLIST"
+              games={lookingForGames}
+              onViewAll={() => setGalleryTab('wishlist')}
+            />
+            <GamesList
+              title="LIBRARY"
+              games={offeringGames}
+              onViewAll={() => setGalleryTab('library')}
+            />
           </motion.div>
         </div>
       </div>
       {/* Friend Request Section */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: MOTION.rise }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.5 }}
+        transition={{ duration: MOTION.duration, ease: MOTION.ease, delay: 0.2 }}
         className="mt-14 md:mt-32"
       >
         <FriendRequestSection
@@ -124,6 +139,15 @@ export const ListingDetailContent: React.FC<ListingDetailContentProps> = ({
           username={listing.username}
         />
       </motion.div>
+      <GamesModal
+        open={galleryTab !== null}
+        tab={galleryTab ?? 'wishlist'}
+        onTabChange={setGalleryTab}
+        onClose={() => setGalleryTab(null)}
+        ownerName={ownerName}
+        wishlist={lookingForGames}
+        library={offeringGames}
+      />
     </div>
   );
 };
