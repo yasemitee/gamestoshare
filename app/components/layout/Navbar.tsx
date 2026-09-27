@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
-import { colors, gradients } from '@/lib/colors';
+import { colors } from '@/lib/colors';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'motion/react';
 import { EASE } from '@/lib/constants';
@@ -94,35 +94,15 @@ export const Navbar: React.FC = () => {
           </button>
         </div>
 
-        <button
-          onClick={() => (window.location.href = '/listings/create')}
-          className="hidden md:block uppercase cursor-pointer transition-colors"
-          style={{
-            fontSize: '12px',
-            letterSpacing: '.06em',
-            border: `1.5px solid ${colors.gray2}`,
-            padding: '8px 17px',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = colors.purple;
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = colors.gray2;
-          }}
-        >
-          <span
-            style={{
-              background: gradients.main,
-              WebkitBackgroundClip: 'text',
-              backgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              color: 'transparent',
-              fontWeight: 600,
-            }}
+        {/* Same primary button as the mobile menu. */}
+        <div className="hidden md:block">
+          <Button
+            variant="primary"
+            onClick={() => (window.location.href = '/listings/create')}
           >
-            Create a post
-          </span>
-        </button>
+            CREATE A POST
+          </Button>
+        </div>
 
         {/* Mobile menu button */}
         <button

@@ -239,28 +239,16 @@ export function HomeContent({
       )}
       {nextCursor && showLoadMoreLink && (
         <div className="mt-8 flex justify-center">
+          {/* Styled like the /info quick-navigation links. */}
           <button
             onClick={handleLoadMore}
             disabled={isLoadingMore || isLoading}
-            className="group uppercase flex items-center gap-2 cursor-pointer text-white transition-colors hover:!text-[#C3C2F5] disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{ fontSize: 12, letterSpacing: '.08em' }}
+            className="text-small-title flex items-center gap-2 cursor-pointer transition-opacity hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{ color: colors.purple }}
           >
-            <span
-              style={{
-                borderBottom: `1px solid ${colors.purple}`,
-                paddingBottom: 3,
-              }}
-            >
-              {isLoadingMore ? 'Loading…' : 'Load more'}
-            </span>
-            {isLoadingMore ? (
+            {isLoadingMore ? 'Loading…' : 'Load more'}
+            {isLoadingMore && (
               <div className="w-3 h-3 border border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <img
-                src="/Dropdown.svg"
-                alt=""
-                className="w-3 h-3 brightness-[0.6] group-hover:brightness-[10]"
-              />
             )}
           </button>
         </div>

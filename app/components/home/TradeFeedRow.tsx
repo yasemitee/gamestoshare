@@ -173,16 +173,10 @@ export const TradeFeedRow: React.FC<TradeFeedRowProps> = ({
           <div className="md:mb-2">
             <Label>{postingDate}</Label>
           </div>
+          {/* Styled like the /info quick-navigation links. */}
           <span
-            className="transition-colors group-hover:!text-[#C3C2F5]"
-            style={{
-              fontSize: 11,
-              letterSpacing: '.08em',
-              textTransform: 'uppercase',
-              color: colors.white,
-              borderBottom: `1px solid ${colors.purple}`,
-              paddingBottom: 2,
-            }}
+            className="text-small-title transition-opacity group-hover:opacity-80"
+            style={{ color: colors.purple }}
           >
             View
           </span>
