@@ -56,7 +56,9 @@ export async function GET(request: NextRequest) {
     after(async () => {
       try {
         const game = await prisma.game.findUnique({
-          where: { steamAppId: appId },
+          where: {
+            steamAppId_platform: { steamAppId: appId, platform: 'STEAM' },
+          },
           select: { id: true },
         });
         if (!game) return;

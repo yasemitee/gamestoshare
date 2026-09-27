@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
-import { Prisma } from '@prisma/client';
+import { Platform, Prisma } from '@prisma/client';
 import { prisma } from '@/lib/db/db';
 import { getSteamIdFromUrl } from '@/lib/steam/api';
 import { MAX_LISTINGS_PER_PAGE } from '@/lib/constants';
+import { getFeedGames } from '@/lib/db/feed';
+import { saveGames, type IncomingGame } from '@/lib/db/games';
 import { MANAGE_ENABLED } from '@/lib/featureFlags';
 import { extractBearerToken, validateManageToken } from '@/lib/utils/manageToken';
-
-const isPlaceholderGameName = (name: unknown) =>
-  typeof name !== 'string' || /^Game \d+$/.test(name.trim());
 
 export async function GET(request: NextRequest) {
   try {
@@ -78,13 +77,6 @@ export async function GET(request: NextRequest) {
     const [listings, totalCount] = await Promise.all([
       prisma.listing.findMany({
         where,
-        include: {
-          games: {
-            include: {
-              game: true,
-            },
-          },
-        },
         orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
         ...(usePagination && cursor
           ? {
@@ -108,18 +100,21 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    const feedGames = await getFeedGames(pageItems.map((l) => l.id));
+
     // Filter sensitive data for anonymous users
     const sanitizedListings = pageItems.map((listing) => {
+      const withGames = { ...listing, ...feedGames.get(listing.id) };
       if (!listing.showSteamId) {
         // Remove sensitive data for anonymous listings (but keep avatarUrl)
         return {
-          ...listing,
+          ...withGames,
           steamId: null,
           steamProfileUrl: null,
           username: null,
         };
       }
-      return listing;
+      return withGames;
     });
 
     // Add cache headers to reduce API calls
@@ -149,7 +144,6 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    console.log('Received listing data:', JSON.stringify(body, null, 2));
 
     const {
       steamId,
@@ -165,8 +159,6 @@ export async function POST(request: NextRequest) {
       lookingFor = [],
       offering = [],
     } = body;
-
-    console.log('Parsed data:', { steamId, username, avatarUrl, location, lookingForCount: lookingFor.length, offeringCount: offering.length });
 
     if (!steamId || !steamProfileUrl || !location) {
       return NextResponse.json(
@@ -184,11 +176,6 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-
-    console.log('Normalized Steam ID:', normalizedSteamId);
-
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 30);
 
     const existingListing = await prisma.listing.findUnique({
       where: { steamId: normalizedSteamId },
@@ -213,148 +200,85 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    if (existingListing) {
-      await prisma.listingGame.deleteMany({
-        where: { listingId: existingListing.id },
-      });
-    }
+    const allGames: IncomingGame[] = [...lookingFor, ...offering];
 
-    const allGames = [...lookingFor, ...offering];
-
-    // Validate all games have appId
-    const invalidGames = allGames.filter((g: any) => !g.appId);
+    // Validate before touching anything, so a bad payload can't leave the
+    // existing listing half-rewritten.
+    const invalidGames = allGames.filter((g) => !g.appId);
     if (invalidGames.length > 0) {
-      console.error('Games without appId:', invalidGames);
       return NextResponse.json(
         { error: 'Some games are missing appId', details: invalidGames },
         { status: 400 }
       );
     }
 
-    const gameRecords = await Promise.all(
-      allGames.map(async (gameData: any) => {
-        try {
-          return await prisma.game.upsert({
-            where: {
-              steamAppId_platform: {
-                steamAppId: gameData.appId,
-                platform: platform || 'STEAM',
-              },
-            },
-            update: {
-              // Game rows are shared by every listing. When the importer
-              // couldn't reach the store it sends a "Game <appId>" stand-in;
-              // writing that would rename the game for everyone.
-              ...(!isPlaceholderGameName(gameData.name) && {
-                name: gameData.name,
-              }),
-              iconUrl: gameData.iconUrl,
-              // Only overwrite when the client actually sent one. The client
-              // never does today, so falling back to the constructed URL here
-              // clobbered whatever /api/steam/header had repaired — and that
-              // URL 404s for exactly the games that needed repairing, so every
-              // new listing re-broke them.
-              ...(gameData.headerImage && { headerImage: gameData.headerImage }),
-              releaseYear: gameData.releaseYear,
-              priceInCents: gameData.priceInCents,
-            },
-            create: {
-              steamAppId: gameData.appId,
-              name: gameData.name,
-              platform: platform || 'STEAM',
-              iconUrl: gameData.iconUrl,
-              headerImage: gameData.headerImage || `https://cdn.cloudflare.steamstatic.com/steam/apps/${gameData.appId}/header.jpg`,
-              releaseYear: gameData.releaseYear,
-              priceInCents: gameData.priceInCents,
-            },
-          });
-        } catch (error) {
-          console.error('Error upserting game:', gameData, error);
-          throw error;
-        }
-      })
-    );
+    const gamePlatform: Platform = platform || 'STEAM';
+    const gameIdByAppId = await saveGames(allGames, gamePlatform);
 
-    const listing = await prisma.listing.upsert({
-      where: { steamId: normalizedSteamId },
-      update: {
-        username: username || null,
-        avatarUrl: avatarUrl || null,
-        steamLevel: steamLevel || null,
-        accountYears: accountYears || null,
-        platform: platform || 'STEAM',
-        steamProfileUrl,
-        description: description || null,
-        location,
-        showSteamId: showSteamId || false,
-        expiresAt,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      create: {
-        steamId: normalizedSteamId,
-        username: username || null,
-        avatarUrl: avatarUrl || null,
-        steamLevel: steamLevel || null,
-        accountYears: accountYears || null,
-        platform: platform || 'STEAM',
-        steamProfileUrl,
-        description: description || null,
-        location,
-        showSteamId: showSteamId || false,
-        expiresAt,
-      },
+    // Deduplicate by name (case-insensitive) before linking, so different
+    // editions/regions of the same game don't show up twice.
+    const uniqueByName = (games: IncomingGame[]) =>
+      Array.from(
+        new Map(games.map((g) => [g.name.toLowerCase().trim(), g])).values()
+      );
+    const links = (games: IncomingGame[], type: 'LOOKING_FOR' | 'OFFERING') =>
+      uniqueByName(games).map((g) => ({
+        gameId: gameIdByAppId.get(g.appId)!,
+        type,
+      }));
+    const gameLinks = [
+      ...links(lookingFor, 'LOOKING_FOR'),
+      ...links(offering, 'OFFERING'),
+    ];
+
+    const listingData = {
+      username: username || null,
+      avatarUrl: avatarUrl || null,
+      steamLevel: steamLevel || null,
+      accountYears: accountYears || null,
+      platform: gamePlatform,
+      steamProfileUrl,
+      description: description || null,
+      location,
+      showSteamId: showSteamId || false,
+    };
+
+    // One transaction: a failure part-way leaves the old listing intact
+    // instead of a listing with no games.
+    const listing = await prisma.$transaction(async (tx) => {
+      if (existingListing) {
+        await tx.listingGame.deleteMany({
+          where: { listingId: existingListing.id },
+        });
+      }
+
+      const saved = await tx.listing.upsert({
+        where: { steamId: normalizedSteamId },
+        // createdAt stays the original post date, so editing a listing
+        // doesn't move it to the top of the feed. updatedAt is automatic.
+        update: listingData,
+        create: { steamId: normalizedSteamId, ...listingData },
+      });
+
+      await tx.listingGame.createMany({
+        data: gameLinks.map((link) => ({ ...link, listingId: saved.id })),
+        skipDuplicates: true,
+      });
+
+      return saved;
     });
 
-    // Deduplica i giochi per nome (case-insensitive) prima di creare le relazioni
-    // Questo evita duplicati con stesso nome ma appId diversi (diverse edizioni/regioni)
-    const uniqueLookingFor = Array.from(
-      new Map(lookingFor.map((g: any) => [g.name.toLowerCase().trim(), g])).values()
-    );
-    const uniqueOffering = Array.from(
-      new Map(offering.map((g: any) => [g.name.toLowerCase().trim(), g])).values()
-    );
-
-    // Crea le nuove relazioni con i giochi
-    await prisma.listingGame.createMany({
-      data: [
-        ...uniqueLookingFor.map((gameData: any) => {
-          const game = gameRecords.find(g => g.steamAppId === gameData.appId);
-          return {
-            listingId: listing.id,
-            gameId: game!.id,
-            type: 'LOOKING_FOR' as const,
-          };
-        }),
-        ...uniqueOffering.map((gameData: any) => {
-          const game = gameRecords.find(g => g.steamAppId === gameData.appId);
-          return {
-            listingId: listing.id,
-            gameId: game!.id,
-            type: 'OFFERING' as const,
-          };
-        }),
-      ],
-    });
-
-    // Recupera il listing completo con i giochi
-    const completeListing = await prisma.listing.findUnique({
-      where: { id: listing.id },
-      include: {
-        games: {
-          include: {
-            game: true,
-          },
-        },
-      },
-    });
-
-    // Revalidate homepage cache immediately after creating/updating a listing
-    // This ensures users see their new listing right away while keeping cache for other visitors
+    // Revalidate so the author sees their listing right away while other
+    // visitors keep the cached page.
     revalidatePath('/');
-    revalidatePath(`/listings/${completeListing!.id}`);
+    revalidatePath(`/listings/${listing.id}`);
 
-    return NextResponse.json(completeListing, { status: existingListing ? 200 : 201 });
+    // The client only needs to know it worked; echoing back every game
+    // (up to 1,000+) was wasted payload.
+    return NextResponse.json(
+      { id: listing.id },
+      { status: existingListing ? 200 : 201 }
+    );
   } catch (error) {
     console.error('Error creating/updating listing:', error);
     console.error('Error details:', error instanceof Error ? error.message : 'Unknown error');

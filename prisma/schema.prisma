@@ -29,19 +29,13 @@ model Listing {
   location        String
   showSteamId     Boolean  @default(false)
   isActive        Boolean  @default(true)
-  views           Int      @default(0)
-  expiresAt       DateTime
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
   // Relazioni
   games ListingGame[]
 
-  @@index([steamId])
   @@index([location])
-  @@index([platform])
-  @@index([isActive])
-  @@index([expiresAt])
   @@index([createdAt])
   @@map("listings")
 }
@@ -74,7 +68,7 @@ model ListingManageChallenge {
 
 model Game {
   id           String   @id @default(cuid())
-  steamAppId   Int      @unique
+  steamAppId   Int
   name         String
   platform     Platform
   iconUrl      String?

@@ -49,5 +49,4 @@ export const CACHE_DURATION = {
 } as const;
 
 // Listing settings
-export const LISTING_EXPIRATION_DAYS = 30;
 export const MAX_LISTINGS_PER_PAGE = 30;
