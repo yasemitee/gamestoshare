@@ -49,6 +49,9 @@ export interface GameListingData {
   platform: string;
   lookingFor: FeedGame[];
   offering: FeedGame[];
+  /** Full counts; the arrays above only hold the first few per side. */
+  lookingForTotal: number;
+  offeringTotal: number;
   postingDate: string;
   avatarUrl?: string | null;
   level?: number | null;

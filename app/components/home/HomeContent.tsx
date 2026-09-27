@@ -19,13 +19,10 @@ interface Game {
 }
 
 interface ListingsApiGame {
-  type: 'LOOKING_FOR' | 'OFFERING';
-  game: {
-    name?: string | null;
-    iconUrl?: string | null;
-    steamAppId?: number | null;
-    headerImage?: string | null;
-  };
+  steamAppId: number;
+  name: string;
+  iconUrl: string | null;
+  headerImage: string | null;
 }
 
 interface ListingsApiItem {
@@ -39,7 +36,10 @@ interface ListingsApiItem {
   avatarUrl?: string | null;
   steamLevel?: number | null;
   accountYears?: number | null;
-  games?: ListingsApiGame[];
+  lookingFor?: ListingsApiGame[];
+  offering?: ListingsApiGame[];
+  lookingForTotal?: number;
+  offeringTotal?: number;
 }
 
 interface ListingsApiResponse {
@@ -54,27 +54,15 @@ interface HomeContentProps {
   initialTotalCount?: number;
 }
 
+const toFeedGame = (g: ListingsApiGame) => ({
+  iconUrl: g.iconUrl || '',
+  name: g.name,
+  appId: g.steamAppId,
+  headerImage: g.headerImage ?? undefined,
+});
+
+// Mirrors the mapping in app/page.tsx; keep the two in sync.
 function mapListingToTableData(listing: ListingsApiItem): GameListingData {
-  const allGames = listing.games || [];
-
-  const lookingForGames = allGames
-    .filter((lg) => lg.type === 'LOOKING_FOR')
-    .map((lg) => ({
-      iconUrl: lg.game?.iconUrl || '',
-      name: lg.game?.name || '',
-      appId: lg.game?.steamAppId ?? undefined,
-      headerImage: lg.game?.headerImage ?? undefined,
-    }));
-
-  const offeringGames = allGames
-    .filter((lg) => lg.type === 'OFFERING')
-    .map((lg) => ({
-      iconUrl: lg.game?.iconUrl || '',
-      name: lg.game?.name || '',
-      appId: lg.game?.steamAppId ?? undefined,
-      headerImage: lg.game?.headerImage ?? undefined,
-    }));
-
   return {
     id: listing.id,
     user: listing.showSteamId ? listing.username || listing.steamId : null,
@@ -82,8 +70,10 @@ function mapListingToTableData(listing: ListingsApiItem): GameListingData {
     showSteamId: listing.showSteamId,
     location: listing.location,
     platform: listing.platform,
-    lookingFor: lookingForGames,
-    offering: offeringGames,
+    lookingFor: (listing.lookingFor ?? []).map(toFeedGame),
+    offering: (listing.offering ?? []).map(toFeedGame),
+    lookingForTotal: listing.lookingForTotal ?? 0,
+    offeringTotal: listing.offeringTotal ?? 0,
     postingDate: formatTimeAgo(listing.createdAt),
     avatarUrl: listing.avatarUrl ?? null,
     level: listing.steamLevel ?? null,

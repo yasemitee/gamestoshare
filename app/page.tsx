@@ -5,6 +5,7 @@ import { HomeContent } from '@/components/home/HomeContent';
 import { GameListingData } from '@/lib/db/types';
 import { prisma } from '@/lib/db/db';
 import { MAX_LISTINGS_PER_PAGE } from '@/lib/constants';
+import { getFeedGames, type FeedGameRow } from '@/lib/db/feed';
 import { formatTimeAgo } from '@/lib/utils/time';
 
 export const metadata = {
@@ -69,13 +70,6 @@ export default async function Home() {
       where: {
         isActive: true,
       },
-      include: {
-        games: {
-          include: {
-            game: true,
-          },
-        },
-      },
       orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
       take: MAX_LISTINGS_PER_PAGE + 1,
     }),
@@ -90,36 +84,29 @@ export default async function Home() {
     ? (pageItems[pageItems.length - 1]?.id ?? null)
     : null;
 
+  const feedGames = await getFeedGames(pageItems.map((l) => l.id));
+
   const tableData: GameListingData[] = pageItems.map((listing) => {
-    const allGames = listing.games || [];
-
-    const lookingForGames = allGames
-      .filter((lg) => lg.type === 'LOOKING_FOR')
-      .map((lg) => ({
-        iconUrl: lg.game?.iconUrl || '',
-        name: lg.game?.name || '',
-        appId: lg.game?.steamAppId ?? undefined,
-        headerImage: lg.game?.headerImage ?? undefined,
-      }));
-
-    const offeringGames = allGames
-      .filter((lg) => lg.type === 'OFFERING')
-      .map((lg) => ({
-        iconUrl: lg.game?.iconUrl || '',
-        name: lg.game?.name || '',
-        appId: lg.game?.steamAppId ?? undefined,
-        headerImage: lg.game?.headerImage ?? undefined,
-      }));
+    const games = feedGames.get(listing.id);
+    const toFeedGame = (g: FeedGameRow) => ({
+      iconUrl: g.iconUrl || '',
+      name: g.name,
+      appId: g.steamAppId,
+      headerImage: g.headerImage ?? undefined,
+    });
 
     return {
       id: listing.id,
       user: listing.showSteamId ? listing.username || listing.steamId : null,
-      steamId: listing.steamId,
+      // Anonymous listings must not ship their Steam ID in the page HTML.
+      steamId: listing.showSteamId ? listing.steamId : '',
       showSteamId: listing.showSteamId,
       location: listing.location,
       platform: listing.platform,
-      lookingFor: lookingForGames,
-      offering: offeringGames,
+      lookingFor: (games?.lookingFor ?? []).map(toFeedGame),
+      offering: (games?.offering ?? []).map(toFeedGame),
+      lookingForTotal: games?.lookingForTotal ?? 0,
+      offeringTotal: games?.offeringTotal ?? 0,
       postingDate: formatTimeAgo(listing.createdAt),
       avatarUrl: listing.avatarUrl ?? null,
       level: listing.steamLevel ?? null,

@@ -78,19 +78,26 @@ export const GameCapsule: React.FC<GameCapsuleProps> = ({ game, onDead }) => {
 
 export const CapsuleStrip: React.FC<{
   games: FeedGame[];
+  /** Full count when `games` is only the first few of a longer list. */
+  total?: number;
   max?: number;
   /** Fewer capsules below `md`, where the strip shares a row with the poster. */
   mobileMax?: number;
   onOverflowChange?: (overflow: number) => void;
-}> = ({ games, max = 3, mobileMax = max, onOverflowChange }) => {
+}> = ({ games, total, max = 3, mobileMax = max, onOverflowChange }) => {
   const [failed, setFailed] = useState<Set<number>>(new Set());
 
   const available = games
     .map((game, i) => ({ game, i }))
     .filter(({ i }) => !failed.has(i));
   const visible = available.slice(0, max);
-  const overflow = available.length - visible.length;
-  const mobileOverflow = available.length - Math.min(visible.length, mobileMax);
+  // Games whose art failed drop out of the count as well as the strip.
+  const remaining = Math.max((total ?? games.length) - failed.size, 0);
+  const overflow = Math.max(remaining - visible.length, 0);
+  const mobileOverflow = Math.max(
+    remaining - Math.min(visible.length, mobileMax),
+    0
+  );
 
   // Games drop out of the strip as their images fail to resolve, so this
   // count is only final once that settles — report it up rather than let

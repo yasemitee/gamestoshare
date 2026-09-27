@@ -35,6 +35,8 @@ export const TradeFeedRow: React.FC<TradeFeedRowProps> = ({
   location,
   lookingFor,
   offering,
+  lookingForTotal,
+  offeringTotal,
   postingDate,
   avatarUrl,
   level,
@@ -133,6 +135,7 @@ export const TradeFeedRow: React.FC<TradeFeedRowProps> = ({
             </div>
             <CapsuleStrip
               games={offering}
+              total={offeringTotal}
               max={3}
               mobileMax={2}
               onOverflowChange={setOffersOverflow}
@@ -157,7 +160,11 @@ export const TradeFeedRow: React.FC<TradeFeedRowProps> = ({
             <div className="mb-1.5">
               <Label>Wants</Label>
             </div>
-            <CapsuleStrip games={lookingFor} max={3} />
+            <CapsuleStrip
+              games={lookingFor}
+              total={lookingForTotal}
+              max={3}
+            />
           </div>
         </div>
         </div>
