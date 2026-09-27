@@ -46,3 +46,6 @@ next-env.d.ts
 # Superpowers (local planning artifacts)
 docs/superpowers/
 .superpowers/
+DESIGN.md
+PRODUCT.md
+.impeccable

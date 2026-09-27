@@ -27,6 +27,7 @@ export function BioVerificationStep({
   hint = 'When detected, you can post and send requests.',
 }: BioVerificationStepProps) {
   const verificationCode = code;
+  // Manage codes (GTS-XXXXXX) render smaller so the copy icon stays inside the modal.
   const isLongCode = verificationCode.length > 4;
 
   const [copied, setCopied] = useState(false);
@@ -68,7 +69,7 @@ export function BioVerificationStep({
         <div className="flex items-center justify-center mb-6">
           <div
             className={`flex items-center px-4 md:px-6 py-2 ${
-              isLongCode ? 'gap-2 md:gap-3' : 'gap-4 md:gap-8'
+              isLongCode ? 'gap-1.5 md:gap-2' : 'gap-4 md:gap-8'
             }`}
             style={{ backgroundColor: 'rgba(0, 0, 0, 0.25)' }}
           >
@@ -79,7 +80,7 @@ export function BioVerificationStep({
                 key={index}
                 aria-hidden="true"
                 className={
-                  isLongCode ? 'text-xl md:text-3xl' : 'text-2xl md:text-4xl'
+                  isLongCode ? 'text-lg md:text-2xl' : 'text-2xl md:text-4xl'
                 }
                 style={{ color: colors.white }}
               >

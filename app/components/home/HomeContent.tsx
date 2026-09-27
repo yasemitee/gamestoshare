@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { HeroSection } from '@/components/home/HeroSection';
 import { TradeFeed } from '@/components/home/TradeFeed';
+import { PostedThanksToast } from '@/components/home/PostedThanksToast';
 import { FAQItem } from '@/components/home/FAQItem';
 import { AnimatedButton } from '@/components/ui/AnimatedButton';
 import { Footer } from '@/components/layout/Footer';
@@ -327,6 +328,7 @@ export function HomeContent({
         </AnimatedButton>
       </div>
       <Footer />
+      <PostedThanksToast />
     </>
   );
 }

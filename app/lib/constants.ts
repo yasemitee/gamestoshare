@@ -5,6 +5,9 @@
 // Steam verification
 export const STEAM_VERIFICATION_CODE = 'GTS';
 
+// Donations
+export const DONATE_URL = 'https://buymeacoffee.com/gamestoshare';
+
 // Animation timings (in seconds)
 export const ANIMATION_DURATION = {
   FAST: 0.1,

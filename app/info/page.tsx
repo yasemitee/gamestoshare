@@ -19,7 +19,7 @@ import { QuickNavigation } from '@/components/ui/QuickNavigation';
 import { CodeBlock } from '@/components/ui/CodeBlock';
 import { SupportCard } from '@/components/content/SupportCard';
 import { AnimatedContentWrapper } from '@/components/content/AnimatedContentWrapper';
-import { Content } from 'next/font/google';
+import { DONATE_URL } from '@/lib/constants';
 
 export const metadata = {
   title: 'Guide: How to use GTS - GamesToShare',
@@ -329,7 +329,7 @@ export default function InfoPage() {
                   buttonIcon="/Heart.svg"
                   buttonIconAlt="Heart"
                   buttonGradient={gradients.pink}
-                  buttonHref="https://buymeacoffee.com/gamestoshare"
+                  buttonHref={DONATE_URL}
                 />
               </section>
             </div>

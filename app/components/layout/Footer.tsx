@@ -1,4 +1,5 @@
-import { colors } from '@/lib/colors';
+import { colors, gradients } from '@/lib/colors';
+import { DONATE_URL } from '@/lib/constants';
 
 export function Footer() {
   return (
@@ -13,7 +14,35 @@ export function Footer() {
         >
           Copyright © Gamestoshare.com All Rights Reserved
         </p>
-        <div className="flex items-center gap-8 sm:gap-16">
+        <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 sm:gap-x-16">
+          <a
+            href={DONATE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="lift-hover text-navbar flex items-center gap-2 hover:opacity-80 transition-opacity"
+          >
+            <span
+              style={{
+                background: gradients.pink,
+                WebkitBackgroundClip: 'text',
+                backgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                color: 'transparent',
+              }}
+            >
+              Support GTS
+            </span>
+            {/* Heart.svg is a black stroke; used as a mask so it takes the pink gradient. */}
+            <span
+              aria-hidden="true"
+              className="inline-block w-4 h-4"
+              style={{
+                background: gradients.pink,
+                WebkitMask: 'url(/Heart.svg) center / contain no-repeat',
+                mask: 'url(/Heart.svg) center / contain no-repeat',
+              }}
+            />
+          </a>
           <a
             href="/terms"
             className="text-navbar hover:opacity-80 transition-opacity"

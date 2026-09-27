@@ -393,7 +393,8 @@ function CreateListingPageInner() {
       });
 
       setTimeout(() => {
-        window.location.href = '/';
+        // A new post lands on the feed with a one-time thank-you card.
+        window.location.href = isEditing ? '/' : '/?posted=1';
       }, 1000);
     } catch (error) {
       console.error('Error creating listing:', error);
