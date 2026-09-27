@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, after } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { Platform, Prisma } from '@prisma/client';
 import { prisma } from '@/lib/db/db';
 import { getSteamIdFromUrl } from '@/lib/steam/api';
 import { MAX_LISTINGS_PER_PAGE } from '@/lib/constants';
 import { getFeedGames } from '@/lib/db/feed';
-import { saveGames, type IncomingGame } from '@/lib/db/games';
+import { resolveHeaderImages, saveGames, type IncomingGame } from '@/lib/db/games';
 import { MANAGE_ENABLED } from '@/lib/featureFlags';
 import { extractBearerToken, validateManageToken } from '@/lib/utils/manageToken';
 
@@ -272,6 +272,24 @@ export async function POST(request: NextRequest) {
     // visitors keep the cached page.
     revalidatePath('/');
     revalidatePath(`/listings/${listing.id}`);
+
+    // Swap guessed header URLs for Steam's canonical ones without holding
+    // up the response, then re-render the pages that show them.
+    const listingId = listing.id;
+    after(async () => {
+      try {
+        const updated = await resolveHeaderImages(
+          allGames.map((g) => g.appId),
+          gamePlatform
+        );
+        if (updated > 0) {
+          revalidatePath('/');
+          revalidatePath(`/listings/${listingId}`);
+        }
+      } catch (error) {
+        console.error('Failed to resolve header images:', error);
+      }
+    });
 
     // The client only needs to know it worked; echoing back every game
     // (up to 1,000+) was wasted payload.

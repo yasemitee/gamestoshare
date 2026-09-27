@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse, after } from 'next/server';
 import { revalidatePath } from 'next/cache';
-import { getGameDetails } from '@/lib/steam/api';
+import { getGameDetails, getHeaderImages } from '@/lib/steam/api';
 import { prisma } from '@/lib/db/db';
 import { servesRealImage } from '@/lib/steam/images';
 
@@ -23,12 +23,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ headerImage: null }, { status: 400 });
   }
 
-  // Fresh lookup: this route only runs once the stored URL has already broken.
-  // Steam answers an unknown or delisted app with a 200 carrying
-  // `success: false`, which the Data Cache would otherwise keep for a day —
-  // replaying the miss no matter what the response headers above say.
-  const details = await getGameDetails(appId, { fresh: true });
-  const candidate = details?.header_image;
+  // Fresh lookup: this route only runs once the stored URL has already broken,
+  // and a cached miss would otherwise be replayed for a day. GetItems first:
+  // appdetails is throttled per game and, with many visitors repairing at
+  // once, was the call most likely to come back empty.
+  const candidate =
+    (await getHeaderImages([appId], { fresh: true })).get(appId) ??
+    (await getGameDetails(appId, { fresh: true }))?.header_image;
 
   // Steam answers a missing asset with a blank 200 rather than a 404, so the
   // URL has to be checked by what it serves before it's worth handing out.

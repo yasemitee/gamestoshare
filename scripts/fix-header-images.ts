@@ -15,12 +15,15 @@
 
 import 'dotenv/config';
 import { prisma } from '../app/lib/db/db';
-import { getGameDetails } from '../app/lib/steam/api';
+import { getGameDetails, getHeaderImages } from '../app/lib/steam/api';
 import { servesRealImage } from '../app/lib/steam/images';
 
 const APPLY = process.argv.includes('--apply');
 const HEAD_CONCURRENCY = 12;
-const STORE_DELAY_MS = 800;
+// Steam's store API allows roughly 200 calls per 5 minutes; past that it
+// answers with errors that getGameDetails reports as null. 800ms tripped it
+// part-way through and wrote off ~100 healthy games as unresolvable.
+const STORE_DELAY_MS = 1600;
 
 const constructed = (appId: number) =>
   `https://cdn.cloudflare.steamstatic.com/steam/apps/${appId}/header.jpg`;
@@ -67,12 +70,21 @@ async function main() {
   }
 
   // Phase 1: resolve real URLs over the network (no DB writes here).
+  // GetItems resolves the lot in a few batched calls; appdetails (one call
+  // per game, throttled) is only a fallback for whatever it doesn't cover.
+  const batched = await getHeaderImages(
+    broken.map((g) => g.steamAppId),
+    { fresh: true }
+  );
   const updates: { id: string; real: string }[] = [];
   let unresolved = 0;
   let done = 0;
   for (const g of broken) {
-    const details = await getGameDetails(g.steamAppId);
-    const real: string | undefined = details?.header_image;
+    let real = batched.get(g.steamAppId);
+    if (!real) {
+      real = (await getGameDetails(g.steamAppId, { fresh: true }))?.header_image;
+      await new Promise((r) => setTimeout(r, STORE_DELAY_MS));
+    }
     if (real && (await servesRealImage(real))) {
       console.log(`✓ ${g.steamAppId} ${g.name?.slice(0, 40)}`);
       updates.push({ id: g.id, real });
@@ -83,7 +95,6 @@ async function main() {
     if (++done % 25 === 0) {
       console.log(`  ...${done}/${broken.length} checked (${updates.length} resolved)`);
     }
-    await new Promise((r) => setTimeout(r, STORE_DELAY_MS));
   }
 
   // Phase 2: write all updates in a tight loop with retry/reconnect.

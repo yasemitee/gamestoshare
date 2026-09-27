@@ -17,7 +17,7 @@ export const GameCapsule: React.FC<GameCapsuleProps> = ({ game, onDead }) => {
   // Hidden until it actually paints, so a source that is failing over never
   // shows the browser's broken-image glyph and alt text.
   const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
-  const { src, handleError, dead } = useResilientGameImage({
+  const { src, handleError, imgRef, dead } = useResilientGameImage({
     headerImage: game.headerImage,
     iconUrl: game.iconUrl,
     appId: game.appId,
@@ -61,10 +61,7 @@ export const GameCapsule: React.FC<GameCapsuleProps> = ({ game, onDead }) => {
     >
       <img
         key={src}
-        ref={(el) => {
-          // Covers images that finished loading before hydration.
-          if (el?.complete && el.naturalWidth > 0) setLoadedSrc(src);
-        }}
+        ref={(el) => imgRef(el, () => setLoadedSrc(src))}
         src={src}
         alt={game.name}
         onLoad={() => setLoadedSrc(src)}

@@ -290,8 +290,14 @@ export async function getGameDetails(appId: number, { fresh = false } = {}) {
 
     const data = await response.json();
 
-    if (data[appId]?.success) {
-      return data[appId].data;
+    // Steam sometimes keys the reply by a different id than the one asked
+    // for (WARDOGS: ask 1867240, get back "4840670" with steam_appid still
+    // 1867240). Reading only data[appId] turned those into misses, so the
+    // header repair could never fix exactly the recent games that need it.
+    const entry = data?.[appId] ?? Object.values(data ?? {})[0];
+
+    if (entry?.success) {
+      return entry.data;
     }
 
     return null;
@@ -299,6 +305,61 @@ export async function getGameDetails(appId: number, { fresh = false } = {}) {
     console.error('Error fetching game details:', error);
     return null;
   }
+}
+
+const STORE_ASSETS_BASE = 'https://shared.akamai.steamstatic.com/store_item_assets/';
+// The endpoint takes the batch in the query string; 200 works, 100 leaves
+// plenty of headroom on URL length.
+const HEADER_BATCH_SIZE = 100;
+
+/**
+ * Canonical header URLs for many games at once, via IStoreBrowseService
+ * (no API key). Unlike appdetails — one call per game, throttled at roughly
+ * 200 calls per 5 minutes — this resolves a whole library in a handful of
+ * calls, and returns the content-hashed path recent releases need. Games
+ * Steam has no art for are simply absent from the map. `fresh` skips the
+ * Data Cache, for callers that only run once a stored URL has already broken.
+ */
+export async function getHeaderImages(
+  appIds: number[],
+  { fresh = false } = {}
+): Promise<Map<number, string>> {
+  const headers = new Map<number, string>();
+  const unique = [...new Set(appIds)];
+
+  for (let i = 0; i < unique.length; i += HEADER_BATCH_SIZE) {
+    const batch = unique.slice(i, i + HEADER_BATCH_SIZE);
+    const input = {
+      ids: batch.map((appid) => ({ appid })),
+      context: { language: 'english', country_code: 'US' },
+      data_request: { include_assets: true },
+    };
+    try {
+      const response = await fetch(
+        `${STEAM_API_BASE}/IStoreBrowseService/GetItems/v1/?input_json=${encodeURIComponent(JSON.stringify(input))}`,
+        fresh ? { cache: 'no-store' } : { next: { revalidate: 86400 } }
+      );
+      if (!response.ok) {
+        console.error(`Steam GetItems error: ${response.status}`);
+        continue;
+      }
+      const data = await response.json();
+      for (const item of data?.response?.store_items ?? []) {
+        const format: string | undefined = item?.assets?.asset_url_format;
+        const header: string | undefined = item?.assets?.header;
+        if (item?.appid && format && header) {
+          headers.set(
+            item.appid,
+            STORE_ASSETS_BASE + format.replace('${FILENAME}', header)
+          );
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching header images:', error);
+    }
+  }
+
+  return headers;
 }
 
 export async function getOwnedGamesWithPrices(steamId: string, limit: number = 1000) {

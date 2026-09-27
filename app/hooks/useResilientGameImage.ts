@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface UseResilientGameImageOptions {
   headerImage?: string | null;
@@ -68,7 +68,15 @@ export function useResilientGameImage({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sources.length, appId]);
 
+  const src = resolved ?? sources[idx] ?? (exhausted ? lastResort : null);
+
+  // Both onError and the hydration check in `imgRef` can report the same
+  // failure; advancing twice would skip a candidate.
+  const failed = useRef(new Set<string>());
+
   const handleError = () => {
+    if (!src || failed.current.has(src)) return;
+    failed.current.add(src);
     if (!resolved && idx < sources.length - 1) {
       setIdx((i) => i + 1);
       return;
@@ -76,7 +84,18 @@ export function useResilientGameImage({
     resolveViaApi();
   };
 
-  const src = resolved ?? sources[idx] ?? (exhausted ? lastResort : null);
+  // The feed is server-rendered, so the browser starts loading images before
+  // React hydrates — and React doesn't replay load/error events that fired
+  // before then. A header that 404'd early never reached onError: the <img>
+  // sat invisible and the fallback chain never started. Whether it loaded
+  // first or hydration won was down to timing, which is why the same game
+  // broke on one refresh and worked on the next. Inspect the element on
+  // mount instead of relying on the event alone.
+  const imgRef = (el: HTMLImageElement | null, onLoaded: () => void) => {
+    if (!el?.complete) return;
+    if (el.naturalWidth > 0) onLoaded();
+    else handleError();
+  };
 
-  return { src, handleError, dead: exhausted && !lastResort };
+  return { src, handleError, imgRef, dead: exhausted && !lastResort };
 }

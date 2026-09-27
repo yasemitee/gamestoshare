@@ -13,7 +13,7 @@ interface GameImageProps {
 
 export function GameImage({ headerImage, iconUrl, appId, name }: GameImageProps) {
   const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
-  const { src, handleError } = useResilientGameImage({
+  const { src, handleError, imgRef } = useResilientGameImage({
     headerImage,
     iconUrl,
     appId,
@@ -33,10 +33,7 @@ export function GameImage({ headerImage, iconUrl, appId, name }: GameImageProps)
   return (
     <img
       key={src}
-      ref={(el) => {
-        // Covers images that finished loading before hydration.
-        if (el?.complete && el.naturalWidth > 0) setLoadedSrc(src);
-      }}
+      ref={(el) => imgRef(el, () => setLoadedSrc(src))}
       src={src}
       alt={name}
       className="w-full h-full object-cover transition-opacity duration-200"

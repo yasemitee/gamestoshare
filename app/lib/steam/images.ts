@@ -13,8 +13,12 @@
  * detection has to happen server-side where Content-Length is visible.
  */
 
-/** Real headers are 30KB+; the blank placeholder is ~1.4KB. */
-const BLANK_PLACEHOLDER_MAX_BYTES = 5000;
+/**
+ * The blank placeholder is ~1.4KB. Most real headers are 30KB+, but
+ * minimalist art compresses far below that — Undertale's is 4,992 bytes —
+ * so the cut-off sits just above the placeholder, not near typical art.
+ */
+const BLANK_PLACEHOLDER_MAX_BYTES = 2500;
 
 /**
  * Checks whether a header URL actually serves art. Server-side only —
