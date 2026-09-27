@@ -21,8 +21,8 @@ interface SearchBarProps {
   selectedLocation?: string;
   clearOnSelect?: boolean;
   className?: string;
-  /** 'add' turns the bar into an add-to-list control: a plus icon and an
-   *  ADD / ADDED marker on each result. */
+  /** 'add' turns the bar into an add-to-list control: no search lens, and
+   *  an ADD / ADDED marker on each result. */
   mode?: 'search' | 'add';
   addedAppIds?: ReadonlySet<number>;
 }
@@ -118,23 +118,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           transition={{ duration: 0.2, ease: 'easeOut' }}
           className="relative flex-1 flex items-center glow-hover-subtle"
         >
-          {mode === 'add' ? (
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 20 20"
-              fill="none"
-              aria-hidden="true"
-              className="absolute left-4 pointer-events-none"
-            >
-              <path
-                d="M10 3.5V16.5M3.5 10H16.5"
-                stroke={colors.purple}
-                strokeWidth="2"
-                strokeLinecap="square"
-              />
-            </svg>
-          ) : (
+          {mode === 'search' && (
             <img
               src="/Lens.svg"
               alt=""
@@ -157,7 +141,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             }}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
-            className="text-field w-full pl-12 pr-4 py-4 focus:outline-none focus:ring-2 focus:ring-offset-0 transition-shadow duration-200"
+            className={`text-field w-full ${mode === 'search' ? 'pl-12' : 'pl-4'} pr-4 py-4 focus:outline-none focus:ring-2 focus:ring-offset-0 transition-shadow duration-200`}
             style={
               {
                 backgroundColor: colors.gray3,
