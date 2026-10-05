@@ -2,7 +2,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Container } from '@/components/layout/Container';
 import { MainContentContainer } from '@/components/layout/MainContentContainer';
 import { HomeContent } from '@/components/home/HomeContent';
-import { GameListingData } from '@/lib/db/types';
+import { GameListingData, TopLocationData } from '@/lib/db/types';
 import { prisma } from '@/lib/db/db';
 import { MAX_LISTINGS_PER_PAGE } from '@/lib/constants';
 import { getFeedGames, type FeedGameRow } from '@/lib/db/feed';
@@ -65,7 +65,7 @@ export const revalidate = false;
 export const fetchCache = 'default-cache';
 
 export default async function Home() {
-  const [listings, totalCount] = await Promise.all([
+  const [listings, totalCount, topLocationsRaw] = await Promise.all([
     prisma.listing.findMany({
       where: {
         isActive: true,
@@ -74,7 +74,19 @@ export default async function Home() {
       take: MAX_LISTINGS_PER_PAGE + 1,
     }),
     prisma.listing.count({ where: { isActive: true } }),
+    prisma.listing.groupBy({
+      by: ['location'],
+      where: { isActive: true },
+      _count: { location: true },
+      orderBy: { _count: { location: 'desc' } },
+      take: 5,
+    }),
   ]);
+
+  const topLocations: TopLocationData[] = topLocationsRaw.map((loc) => ({
+    code: loc.location,
+    count: loc._count.location,
+  }));
 
   const hasMore = listings.length > MAX_LISTINGS_PER_PAGE;
   const pageItems = hasMore
@@ -122,6 +134,7 @@ export default async function Home() {
           initialListings={tableData}
           initialNextCursor={nextCursor}
           initialTotalCount={totalCount}
+          initialTopLocations={topLocations}
         />
       </MainContentContainer>
     </Container>

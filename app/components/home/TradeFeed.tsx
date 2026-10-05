@@ -2,9 +2,10 @@ import React, { useRef } from 'react';
 import Link from 'next/link';
 import { AnimatePresence } from 'motion/react';
 import { TradeFeedRow } from './TradeFeedRow';
+import { RegionChips } from './RegionChips';
 import { colors } from '@/lib/colors';
 import { COUNTRIES } from '@/lib/countries';
-import { GameListingData } from '@/lib/db/types';
+import { GameListingData, TopLocationData } from '@/lib/db/types';
 
 interface TradeFeedProps {
   data: GameListingData[];
@@ -13,6 +14,8 @@ interface TradeFeedProps {
   isLoading?: boolean;
   onReachEnd?: () => void;
   scrollRef?: React.RefObject<HTMLDivElement | null>;
+  topLocations?: TopLocationData[];
+  onLocationChange?: (location: string) => void;
 }
 
 function countryName(code: string): string {
@@ -75,6 +78,8 @@ export const TradeFeed: React.FC<TradeFeedProps> = ({
   isLoading = false,
   onReachEnd,
   scrollRef: externalScrollRef,
+  topLocations = [],
+  onLocationChange,
 }) => {
   const internalScrollRef = useRef<HTMLDivElement>(null);
   const scrollRef = externalScrollRef ?? internalScrollRef;
@@ -93,7 +98,17 @@ export const TradeFeed: React.FC<TradeFeedProps> = ({
   };
 
   return (
-    <div style={{ marginTop: 56 }}>
+    <div style={{ marginTop: 40 }}>
+      {onLocationChange && (
+        <div className="mb-5 pl-2">
+          <RegionChips
+            value={selectedLocation}
+            onChange={onLocationChange}
+            topLocations={topLocations}
+          />
+        </div>
+      )}
+
       <div
         className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 pl-2 pr-5"
         style={{ marginBottom: 6 }}

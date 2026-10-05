@@ -56,4 +56,4 @@ export interface GameListingData {
   avatarUrl?: string | null;
   level?: number | null;
   years?: number | null;
-}
+}export interface TopLocationData { code: string; count: number; }

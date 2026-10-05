@@ -3,7 +3,6 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { HomeSearch } from '@/components/home/HomeSearch';
-import { RegionChips } from '@/components/home/RegionChips';
 import { GradientTitle } from '@/components/ui/GradientTitle';
 import { colors } from '@/lib/colors';
 import { MOTION } from '@/lib/constants';
@@ -17,15 +16,11 @@ interface Game {
 interface HeroSectionProps {
   onGameSelect?: (game: Game | null) => void;
   onSearchTermChange?: (term: string) => void;
-  onLocationChange: (location: string) => void;
-  selectedLocation: string;
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({
   onGameSelect,
   onSearchTermChange,
-  onLocationChange,
-  selectedLocation,
 }) => {
   const reduce = useReducedMotion();
   const container = {
@@ -43,7 +38,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
   return (
     <motion.div
-      className="text-center mt-20 md:mt-32 mb-16"
+      className="text-center mt-20 md:mt-32 mb-12"
       variants={container}
       initial="hidden"
       animate="show"
@@ -70,13 +65,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         <HomeSearch
           onGameSelect={onGameSelect}
           onSearchTermChange={onSearchTermChange}
-          selectedLocation={selectedLocation}
-          onLocationChange={onLocationChange}
         />
-      </motion.div>
-
-      <motion.div variants={item}>
-        <RegionChips value={selectedLocation} onChange={onLocationChange} />
       </motion.div>
     </motion.div>
   );

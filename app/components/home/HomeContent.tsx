@@ -53,6 +53,7 @@ interface HomeContentProps {
   initialListings: GameListingData[];
   initialNextCursor?: string | null;
   initialTotalCount?: number;
+  initialTopLocations?: { code: string; count: number }[];
 }
 
 const toFeedGame = (g: ListingsApiGame) => ({
@@ -90,6 +91,7 @@ export function HomeContent({
   initialListings,
   initialNextCursor = null,
   initialTotalCount,
+  initialTopLocations = [],
 }: HomeContentProps) {
   const [listings, setListings] = useState<GameListingData[]>(initialListings);
   const [nextCursor, setNextCursor] = useState<string | null>(
@@ -218,8 +220,6 @@ export function HomeContent({
       <HeroSection
         onGameSelect={handleGameSelect}
         onSearchTermChange={handleSearchTermChange}
-        onLocationChange={setSelectedLocation}
-        selectedLocation={selectedLocation}
       />
       <TradeFeed
         data={listings}
@@ -228,6 +228,8 @@ export function HomeContent({
         isLoading={isLoading}
         onReachEnd={handleReachTableEnd}
         scrollRef={feedScrollRef}
+        topLocations={initialTopLocations}
+        onLocationChange={setSelectedLocation}
       />
       {hasError && (
         <div
